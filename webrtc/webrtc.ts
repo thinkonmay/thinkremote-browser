@@ -25,7 +25,8 @@ export class WebRTC
             }, 
             {
                 urls: [
-                    "stun:workstation.thinkmay.net:3478"
+                    "stun:workstation.thinkmay.net:3478",
+                    "stun:stun.l.google.com:19302"
                 ]
             }]
         };

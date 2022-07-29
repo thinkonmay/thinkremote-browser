@@ -2,8 +2,24 @@ export class DataChannel
 {
     HID: RTCDataChannel | null;
 
-    constructor(chan: RTCDataChannel) {
+    constructor(chan: RTCDataChannel,
+                handler: ((data: string) => (void))) {
         this.HID = chan;
+        this.HID.onmessage = ((ev: MessageEvent) => {
+            if (ev.data === "ping") {
+                this.HID?.send("ping");
+                return;
+            }
+            handler(ev.data);
+        })
+
+        this.HID.onerror = (() => {
+
+        })
+
+        this.HID.onclose = (() => {
+
+        })
     }
 
     public sendMessage (message : string) {
@@ -12,24 +28,6 @@ export class DataChannel
         }
 
         this.HID.send(message);
-    }
-    
-    
-    /**
-     * Control data channel has been estalished, 
-     * start report stream stats to slave
-     * @param {Event} event 
-     */
-    
-    public onDataChannel(event : RTCDataChannelEvent) 
-    {
-        this.HID= event.channel;
-        var HID = this.HID;
-        this.HID.onmessage = (event =>{
-            if(event.data == "ping") {
-                HID.send("ping");
-            }
-        });
     }
 }
 

@@ -9,7 +9,7 @@ const Home = ({signaling_url} : {signaling_url: string}) => {
   useEffect(() => { 
     console.log("hello")
     if (remoteVideo.current) {
-      var app = new OneplayApp(remoteVideo.current,"client");
+      var app = new OneplayApp(remoteVideo,"client");
     }
   }, [])
 

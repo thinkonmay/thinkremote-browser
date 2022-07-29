@@ -6,14 +6,14 @@ import { SignallingClient } from "./websocket";
 const SIGNALLING_URL  = "ws://localhost:8088/ws"
 
 export class OneplayApp  {
-    video : HTMLVideoElement
+    video : any
 
     webrtc : WebRTC
     signaling : SignallingClient
     datachannels : Map<string,DataChannel>;
 
 
-    constructor(vid : HTMLVideoElement,
+    constructor(vid : any,
                 token : string) {
         this.video = vid;
         this.datachannels = new Map<string,DataChannel>();
@@ -27,9 +27,8 @@ export class OneplayApp  {
 
     private handleIncomingTrack(evt: RTCTrackEvent): any
     {
-        if (evt.streams[0] !== this.video.srcObject) {
-            // TODO
-            this.video.srcObject = evt.streams[0]
+        if ( this.video.current.srcObject !== evt.streams[0]) {
+            this.video.current.srcObject = evt.streams[0]
             console.log('Incoming stream');
         }
     }
@@ -39,7 +38,9 @@ export class OneplayApp  {
             return;
 
         setDebug(`incoming data channel label: ${a.channel.label}`)
-        this.datachannels.set(a.channel.label,new DataChannel(a.channel));
+        this.datachannels.set(a.channel.label,new DataChannel(a.channel,(data) => {
+            setDebug(data);
+        }));
     }
 
     private handleIncomingPacket(pkt : Map<string,string>)
