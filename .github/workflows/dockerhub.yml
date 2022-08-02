@@ -1,0 +1,29 @@
+name: Browser
+on:
+  workflow_dispatch:
+  push:
+    branch:
+    - "main"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+
+    - name: get timestamp 
+      id: time
+      run: echo "::set-output name=time::$(date -u)"
+    - name: get current date
+      id: date
+      run: echo "::set-output name=date::$(date +'%Y-%m-%d')"
+
+    - name: Checkout repository
+      uses: actions/checkout@v2
+    - name: build source image
+      run : |
+        docker login -u ${{ secrets.DOCKER_REPO_USER }} -p ${{ secrets.DOCKER_REPO_PASSWORD }} workstation.thinkmay.net
+        docker build -f docker/Dockerfile . -t workstation.thinkmay.net/browser-client:${{ steps.date.outputs.date }}
+        docker tag workstation.thinkmay.net/browser-client:${{ steps.date.outputs.date }} workstation.thinkmay.net/browser-client:latest
+
+        docker push workstation.thinkmay.net/browser-client:${{ steps.date.outputs.date }}
+        docker push workstation.thinkmay.net/browser-client:latest
