@@ -3,7 +3,7 @@ import { setDebug } from "./log";
 import { WebRTC } from "./webrtc";
 import { SignallingClient } from "./websocket";
 
-const SIGNALLING_URL  = "ws://localhost:8088/ws"
+const SIGNALLING_URL  = "wss://signaling.thinkmay.net/ws"
 
 export class OneplayApp  {
     video : any
