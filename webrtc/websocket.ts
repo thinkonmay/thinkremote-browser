@@ -77,14 +77,17 @@ export class SignallingClient
     state: string | null;
     WebSocketConnection: WebSocket;
     PacketHandler : ((Data : Map<string,string>) => (void));
+    ErrorHandler : ((n: void) => (void));
 
 
     constructor (url : string,
                  token : string,
-                 PacketHandler : ((Data : Map<string,string>) => (void)))
+                 PacketHandler : ((Data : Map<string,string>) => (void)),
+                 ErrorHandler : ((n: void) => (void)))
     {
         this.state = "Disconnected";
         this.PacketHandler = PacketHandler;
+        this.ErrorHandler = ErrorHandler;
         this.WebSocketConnection = new WebSocket(`${url}?token=${token}`);
 
         this.WebSocketConnection.onopen     = ((eve : Event) => { 
@@ -134,6 +137,8 @@ export class SignallingClient
     private onServerError() 
     {
         this.state = 'disconnected';
+        setDebug("websocket connection disconnected");
+        this.ErrorHandler();
     }
 
 

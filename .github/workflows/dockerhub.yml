@@ -27,3 +27,12 @@ jobs:
 
         docker push workstation.thinkmay.net/browser-client:${{ steps.date.outputs.date }}
         docker push workstation.thinkmay.net/browser-client:latest
+
+  CD:    
+    runs-on: ubuntu-latest
+    needs: [ "build" ]
+    steps:
+    - name: update via kubectl 
+      run : |
+        docker login -u ${{ secrets.DOCKER_REPO_USER }} -p ${{ secrets.DOCKER_REPO_PASSWORD }} workstation.thinkmay.net
+        docker run workstation.thinkmay.net/kubectl -n oneplay rollout restart deployment remote

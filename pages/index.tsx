@@ -7,9 +7,12 @@ import { OneplayApp } from '../webrtc/app'
 const Home = ({signaling_url} : {signaling_url: string}) => {
   const remoteVideo = useRef<HTMLVideoElement>(null);
   useEffect(() => { 
-    console.log("hello")
     if (remoteVideo.current) {
-      var app = new OneplayApp(remoteVideo,"client");
+
+      console.log("Started oneplay app")
+      var app = new OneplayApp(remoteVideo,"client",() => {
+        location.reload();
+      });
     }
   }, [])
 

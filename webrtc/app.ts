@@ -14,11 +14,13 @@ export class OneplayApp  {
 
 
     constructor(vid : any,
-                token : string) {
+                token : string,
+                ErrorHandler : ((n: void) => (void))) {
         this.video = vid;
         this.datachannels = new Map<string,DataChannel>();
         this.signaling = new SignallingClient(SIGNALLING_URL,token,
-                                 ((ev: Map<string,string>) => {this.handleIncomingPacket(ev)}).bind(this));
+                                 ((ev: Map<string,string>) => {this.handleIncomingPacket(ev)}).bind(this),
+                                 ErrorHandler);
 
         this.webrtc = new WebRTC(((ev : string, data : Map<string,string>) => { var signaling = this.signaling; signaling.SignallingSend(ev,data) }).bind(this),
                                  ((ev : RTCTrackEvent) => { this.handleIncomingTrack(ev) }).bind(this),
