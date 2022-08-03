@@ -11,7 +11,8 @@ const Home = ({signaling_url} : {signaling_url: string}) => {
 
       console.log("Started oneplay app")
       var app = new OneplayApp(remoteVideo,"client",() => {
-        location.reload();
+        console.log("websocket connection failed, please retry")
+        // location.reload();
       });
     }
   }, [])
