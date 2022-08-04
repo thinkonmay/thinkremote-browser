@@ -1,4 +1,5 @@
 import { DataChannel } from "./datachannel";
+import { HID } from "./hid";
 import { setDebug } from "./log";
 import { WebRTC } from "./webrtc";
 import { SignallingClient } from "./websocket";
@@ -9,6 +10,7 @@ export class OneplayApp  {
     video : any
 
     webrtc : WebRTC
+    hid : HID
     signaling : SignallingClient
     datachannels : Map<string,DataChannel>;
 
@@ -17,6 +19,7 @@ export class OneplayApp  {
                 token : string,
                 ErrorHandler : ((n: void) => (void))) {
         this.video = vid;
+        this.hid = new HID(this.video);
         this.datachannels = new Map<string,DataChannel>();
         this.signaling = new SignallingClient(SIGNALLING_URL,token,
                                  ((ev: Map<string,string>) => {this.handleIncomingPacket(ev)}).bind(this),
