@@ -19,8 +19,14 @@ export class OneplayApp  {
                 token : string,
                 ErrorHandler : ((n: void) => (void))) {
         this.video = vid;
-        this.hid = new HID(this.video);
         this.datachannels = new Map<string,DataChannel>();
+        this.hid = new HID(this.video,((data: string) => {
+            let channel = this.datachannels.get("hid")
+            if (channel == null) {
+                setDebug("channel not established");
+            }
+            channel.sendMessage(data);
+        }));
         this.signaling = new SignallingClient(SIGNALLING_URL,token,
                                  ((ev: Map<string,string>) => {this.handleIncomingPacket(ev)}).bind(this),
                                  ErrorHandler);
