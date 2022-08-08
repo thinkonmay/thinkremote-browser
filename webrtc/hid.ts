@@ -1,15 +1,30 @@
 import { setDebug } from "./log";
 
 enum EventCode{
-    Scroll,
-
+    MouseWheel,
     MouseMove,
     MouseUp,
     MouseDown,
 
     KeyUp,
     KeyDown,
+    KeyPress,
+    KeyReset,
 }
+
+class HIDMsg {
+    code: EventCode
+    data: Map<string,string>
+    constructor(code: EventCode, data: any)
+    {
+        this.code = code;
+        this.data = new Map<string,string>();
+        Object.keys(data).forEach(function(key) {
+            this.data.set(key,data[key]);
+        });
+    }
+}
+
 enum ShortcutCode{
     Fullscreen,
 }
@@ -146,27 +161,46 @@ export class HID {
         })
         let jsKey = event.code;
         let code = EventCode.KeyDown
+        this.SendFunc(JSON.stringify(new HIDMsg(code,{
+            key: jsKey,
+        })));
     }
     keyup(event: KeyboardEvent) {
         let jsKey = event.code;
-        let code = EventCode.KeyUp
+        let code = EventCode.KeyUp;
+        this.SendFunc(JSON.stringify(new HIDMsg(code,{
+            key: jsKey,
+        })));
     }
     mouseWheel(event: WheelEvent){
         let wheelY = event.deltaY;
         let wheelX = event.deltaX;
-        let code = EventCode.Scroll
+        let code = EventCode.MouseWheel
+        this.SendFunc(JSON.stringify(new HIDMsg(code,{
+            deltaY: wheelY,
+        })));
     }
     mouseButtonMovement(event: MouseEvent){
         this.elementConfig(this.video.current)
         let mousePosition_X = this.clientToServerX(event.clientX);
         let mousePosition_Y = this.clientToServerY(event.clientY);
         let code = EventCode.MouseMove
+        this.SendFunc(JSON.stringify(new HIDMsg(code,{
+            dX: mousePosition_X,
+            dY: mousePosition_Y,
+        })));
     }
     mouseButtonDown(event: MouseEvent){
         let code = EventCode.MouseDown
+        this.SendFunc(JSON.stringify(new HIDMsg(code,{
+            button: event.button
+        })));
     }
     mouseButtonUp(event: MouseEvent){
         let code = EventCode.MouseUp
+        this.SendFunc(JSON.stringify(new HIDMsg(code,{
+            button: event.button
+        })));
     }
 
 
