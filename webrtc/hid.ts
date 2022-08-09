@@ -172,14 +172,14 @@ export class HID {
         this.shortcuts.forEach((element: Shortcut) => {
             element.HandleShortcut(event);
         })
-        let jsKey = event.code;
+        let jsKey = event.key;
         let code = EventCode.KeyDown
         this.SendFunc((new HIDMsg(code,{
             key: jsKey,
         })).ToString());
     }
     keyup(event: KeyboardEvent) {
-        let jsKey = event.code;
+        let jsKey = event.key;
         let code = EventCode.KeyUp;
         this.SendFunc((new HIDMsg(code,{
             key: jsKey,
