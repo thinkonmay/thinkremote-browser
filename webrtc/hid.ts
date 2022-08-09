@@ -21,7 +21,20 @@ class HIDMsg {
         this.data = new Map<string,string>();
         Object.keys(data).forEach(function(key) {
             this.data.set(key,data[key]);
-        });
+        }.bind(this));
+    }
+
+    public ToString()
+    {
+        let data = {};
+        this.data.forEach((value: string, key: string) => {
+            data[key] = value;
+        })
+        return JSON.stringify({
+            code : this.code,
+            data: data,
+        })
+
     }
 }
 
@@ -161,46 +174,46 @@ export class HID {
         })
         let jsKey = event.code;
         let code = EventCode.KeyDown
-        this.SendFunc(JSON.stringify(new HIDMsg(code,{
+        this.SendFunc((new HIDMsg(code,{
             key: jsKey,
-        })));
+        })).ToString());
     }
     keyup(event: KeyboardEvent) {
         let jsKey = event.code;
         let code = EventCode.KeyUp;
-        this.SendFunc(JSON.stringify(new HIDMsg(code,{
+        this.SendFunc((new HIDMsg(code,{
             key: jsKey,
-        })));
+        })).ToString());
     }
     mouseWheel(event: WheelEvent){
         let wheelY = event.deltaY;
         let wheelX = event.deltaX;
         let code = EventCode.MouseWheel
-        this.SendFunc(JSON.stringify(new HIDMsg(code,{
+        this.SendFunc((new HIDMsg(code,{
             deltaY: wheelY,
-        })));
+        })).ToString());
     }
     mouseButtonMovement(event: MouseEvent){
         this.elementConfig(this.video.current)
         let mousePosition_X = this.clientToServerX(event.clientX);
         let mousePosition_Y = this.clientToServerY(event.clientY);
         let code = EventCode.MouseMove
-        this.SendFunc(JSON.stringify(new HIDMsg(code,{
+        this.SendFunc((new HIDMsg(code,{
             dX: mousePosition_X,
             dY: mousePosition_Y,
-        })));
+        })).ToString());
     }
     mouseButtonDown(event: MouseEvent){
         let code = EventCode.MouseDown
-        this.SendFunc(JSON.stringify(new HIDMsg(code,{
+        this.SendFunc((new HIDMsg(code,{
             button: event.button
-        })));
+        })).ToString());
     }
     mouseButtonUp(event: MouseEvent){
         let code = EventCode.MouseUp
-        this.SendFunc(JSON.stringify(new HIDMsg(code,{
+        this.SendFunc((new HIDMsg(code,{
             button: event.button
-        })));
+        })).ToString());
     }
 
 

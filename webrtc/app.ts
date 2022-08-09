@@ -24,6 +24,7 @@ export class OneplayApp  {
             let channel = this.datachannels.get("hid")
             if (channel == null) {
                 setDebug("channel not established");
+                return;
             }
             channel.sendMessage(data);
         }));
@@ -45,10 +46,10 @@ export class OneplayApp  {
     }
     private handleIncomingDataChannel(a: RTCDataChannelEvent)
     {
+        setDebug(`incoming data channel label: ${a.channel.label}`)
         if(!a.channel)
             return;
 
-        setDebug(`incoming data channel label: ${a.channel.label}`)
         this.datachannels.set(a.channel.label,new DataChannel(a.channel,(data) => {
             setDebug(data);
         }));
