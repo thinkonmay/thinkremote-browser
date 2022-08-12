@@ -8,6 +8,7 @@ const SIGNALLING_URL  = "wss://signaling.thinkmay.net/ws"
 
 export class OneplayApp  {
     video : any
+    audio : any
 
     webrtc : WebRTC
     hid : HID
@@ -16,9 +17,16 @@ export class OneplayApp  {
 
 
     constructor(vid : any,
+                audio: any,
                 token : string,
                 ErrorHandler : ((n: void) => (void))) {
         this.video = vid;
+        this.audio = audio;
+        
+
+
+
+        
         this.datachannels = new Map<string,DataChannel>();
         this.hid = new HID(this.video,((data: string) => {
             let channel = this.datachannels.get("hid")
@@ -39,9 +47,16 @@ export class OneplayApp  {
 
     private handleIncomingTrack(evt: RTCTrackEvent): any
     {
-        if ( this.video.current.srcObject !== evt.streams[0]) {
-            this.video.current.srcObject = evt.streams[0]
-            console.log('Incoming stream');
+        setDebug(`Incoming ${evt.track.kind} stream`);
+        if (evt.track.kind == "audio")
+        {
+            if ( this.audio.current.srcObject !== evt.streams[0]) {
+                this.audio.current.srcObject = evt.streams[0]
+            }
+        } else if (evt.track.kind == "video") {
+            if ( this.video.current.srcObject !== evt.streams[0]) {
+                this.video.current.srcObject = evt.streams[0]
+            }
         }
     }
     private handleIncomingDataChannel(a: RTCDataChannelEvent)

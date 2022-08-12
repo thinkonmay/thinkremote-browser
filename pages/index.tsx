@@ -6,11 +6,12 @@ import { OneplayApp } from '../webrtc/app'
 
 const Home = ({signaling_url} : {signaling_url: string}) => {
   const remoteVideo = useRef<HTMLVideoElement>(null);
+  const remoteAudio = useRef<HTMLAudioElement>(null);
   useEffect(() => { 
     if (remoteVideo.current) {
 
       console.log("Started oneplay app")
-      var app = new OneplayApp(remoteVideo,"client",() => {
+      var app = new OneplayApp(remoteVideo,remoteAudio,"client",() => {
         console.log("websocket connection failed, please retry")
         // location.reload();
       });
@@ -31,8 +32,12 @@ const Home = ({signaling_url} : {signaling_url: string}) => {
         muted
         playsInline
         loop
-      >
-      </video>
+      ></video>
+      <audio 
+        ref={remoteAudio} 
+        autoPlay 
+        controls
+      ></audio>
     </div>
   )
 }
