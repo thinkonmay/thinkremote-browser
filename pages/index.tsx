@@ -37,6 +37,7 @@ const Home = ({signaling_url} : {signaling_url: string}) => {
         ref={remoteAudio} 
         autoPlay 
         controls
+        hidden
       ></audio>
     </div>
   )
