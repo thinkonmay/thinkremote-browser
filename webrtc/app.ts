@@ -52,8 +52,6 @@ export class OneplayApp  {
         {
             if ( this.audio.current.srcObject !== evt.streams[0]) {
                 this.audio.current.srcObject = evt.streams[0]
-                this.audio.current.muted = true;
-                this.audio.current.play();
             }
         } else if (evt.track.kind == "video") {
             if ( this.video.current.srcObject !== evt.streams[0]) {
