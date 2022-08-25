@@ -2,16 +2,28 @@ import React, { useEffect, useRef, } from 'react'
 import Head from 'next/head'
 import styles from '../styles/Home.module.css'
 import { OneplayApp } from '../webrtc/app'
-
+import { useRouter } from 'next/router'
 
 const Home = ({signaling_url} : {signaling_url: string}) => {
   const remoteVideo = useRef<HTMLVideoElement>(null);
   const remoteAudio = useRef<HTMLAudioElement>(null);
+  let router = useRouter()
+  
   useEffect(() => { 
     if (remoteVideo.current) {
+      let token : string
+      try {
+        token = router.asPath;
+        token = token.split("?")[1].split("=")[1]
+        if (token == "") {
+          throw new Error("no valid token")
+        }
+      } catch (error) {
+        // ping token missing message
+      }
 
-      console.log("Started oneplay app")
-      var app = new OneplayApp(remoteVideo,remoteAudio,"client",() => {
+      console.log(`Started oneplay app with token ${token}`)
+      var app = new OneplayApp(remoteVideo,remoteAudio,token,() => {
         console.log("websocket connection failed, please retry")
         // location.reload();
       });
@@ -41,9 +53,5 @@ const Home = ({signaling_url} : {signaling_url: string}) => {
     </div>
   )
 }
-
-// export async function getStaticProps() {
-//   // console.log(`env: ${process.env.SIGNALING_SERVER}`)
-// }
 
 export default Home
