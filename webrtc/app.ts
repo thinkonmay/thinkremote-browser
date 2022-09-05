@@ -42,6 +42,7 @@ export class OneplayApp  {
 
         this.webrtc = new WebRTC(((ev : string, data : Map<string,string>) => { var signaling = this.signaling; signaling.SignallingSend(ev,data) }).bind(this),
                                  ((ev : RTCTrackEvent) => { this.handleIncomingTrack(ev) }).bind(this),
+                                 ErrorHandler,
                                  ((ev : RTCDataChannelEvent) => { this.handleIncomingDataChannel(ev) }).bind(this));
     }
 

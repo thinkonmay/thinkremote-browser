@@ -6,16 +6,19 @@ export class WebRTC
     Conn: RTCPeerConnection;
 
     private SignalingSendFunc : ((Target : string, Data : Map<string,string>) => (void))
+    private ClosedHandler     : (() => (any))
 
 
     State: string;
 
     constructor(sendFunc : ((Target : string, Data : Map<string,string>) => (void)),
                 TrackHandler : ((a : RTCTrackEvent) => (any)),
+                ClosedHandler : () => (any),
                 channelHandler : ((a : RTCDataChannelEvent) => (any)))
     {
         this.State = "Not connected"
         this.SignalingSendFunc = sendFunc;
+        this.ClosedHandler = ClosedHandler;
         var configuration = { 
         iceServers: 
             [{
@@ -35,7 +38,26 @@ export class WebRTC
         this.Conn.ondatachannel =  channelHandler;    
         this.Conn.ontrack =        TrackHandler;
         this.Conn.onicecandidate = ((ev: RTCPeerConnectionIceEvent) => { this.onICECandidates(ev) });
+        this.Conn.onconnectionstatechange = ((ev: Event) => { this.onConnectionStateChange(ev) })
     }
+
+    private onConnectionStateChange(eve: Event)
+    {
+        console.log(`state change to ${JSON.stringify(eve)}`)
+        switch (eve.type) {
+            case "connected":
+                break;
+            case "failed":
+                this.ClosedHandler();
+                break;
+            case "closed":
+                this.ClosedHandler();
+                break;
+            default:
+                break;
+        }
+    }
+
     /**
      * 
      * @param {*} ice 

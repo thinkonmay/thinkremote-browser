@@ -18,11 +18,9 @@ const Home = () => {
       headers: genHeaders(),
     }).then((res) => {
       res.text().then((token) => {
-        var remote = "remote.thinkmay.net"
-
         var width = window.innerWidth * 0.66;
         var height = width * window.innerHeight / window.innerWidth;
-        window.open(`https://${remote}/?token=${token}`, 'newwindow', 
+        window.open(`/?token=${token}`, 'newwindow', 
           `width=${width},height=${height},top=${((window.innerHeight - height) / 2)},left=${((window.innerWidth - width) / 2)}`);
       })
     }).catch((err) => {

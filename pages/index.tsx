@@ -24,8 +24,7 @@ const Home = ({signaling_url} : {signaling_url: string}) => {
 
       console.log(`Started oneplay app with token ${token}`)
       var app = new OneplayApp(remoteVideo,remoteAudio,token,() => {
-        console.log("websocket connection failed, please retry")
-        // location.reload();
+        window.close();
       });
     }
   }, [])
