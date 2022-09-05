@@ -1,9 +1,15 @@
 import React, { useEffect, useRef, } from 'react'
 import Head from 'next/head'
 import styles from '../../styles/Home.module.css'
-import { OneplayApp } from '../webrtc/app'
-import { useRouter } from 'next/router'
-import { genHeaders } from '../../api/api'
+
+/**
+ * @returns {Headers}
+ */
+const genHeaders = () => {
+	return Object.assign(
+		{ "Content-Type": "application/json" },
+	)
+}
 
 const Home = () => {
   useEffect(() => { 
