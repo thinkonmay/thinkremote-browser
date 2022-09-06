@@ -15,11 +15,14 @@ export class OneplayApp  {
     signaling : SignallingClient
     datachannels : Map<string,DataChannel>;
 
+    started : boolean
+
 
     constructor(vid : any,
                 audio: any,
                 token : string,
                 ErrorHandler : ((n: void) => (void))) {
+        this.started = false;
         this.video = vid;
         this.audio = audio;
         
@@ -38,7 +41,7 @@ export class OneplayApp  {
         }));
         this.signaling = new SignallingClient(SIGNALLING_URL,token,
                                  ((ev: Map<string,string>) => {this.handleIncomingPacket(ev)}).bind(this),
-                                 ErrorHandler);
+                                 (() => { if(!this.started) { ErrorHandler() }}).bind(this));
 
         this.webrtc = new WebRTC(((ev : string, data : Map<string,string>) => { var signaling = this.signaling; signaling.SignallingSend(ev,data) }).bind(this),
                                  ((ev : RTCTrackEvent) => { this.handleIncomingTrack(ev) }).bind(this),
@@ -48,6 +51,7 @@ export class OneplayApp  {
 
     private handleIncomingTrack(evt: RTCTrackEvent): any
     {
+        this.started = true;
         setDebug(`Incoming ${evt.track.kind} stream`);
         if (evt.track.kind == "audio")
         {
