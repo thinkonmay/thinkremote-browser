@@ -156,7 +156,9 @@ export class HID {
 
 
         this.shortcuts = new Array<Shortcut>();
-        this.shortcuts.push(new Shortcut(ShortcutCode.Fullscreen,[KeyCode.Ctrl,KeyCode.F],(()=> {})))
+        this.shortcuts.push(new Shortcut(ShortcutCode.Fullscreen,[KeyCode.Ctrl,KeyCode.F],(()=> {
+            this.video.current.parentElement.requestFullscreen();
+        })))
     }
 
     mouseEnterEvent(event: MouseEvent) {
@@ -164,6 +166,7 @@ export class HID {
     }
     mouseLeaveEvent(event: MouseEvent) {
         setDebug("mouse leave")
+        this.SendFunc((new HIDMsg(EventCode.KeyReset,{ }).ToString()))
     }
     pointerLock(event: Event) {
 
@@ -230,23 +233,11 @@ export class HID {
 
     elementConfig(VideoElement: HTMLVideoElement) 
     {
-        /**
-         * size of video element (included its border) on client screen
-         * (displayed video size)
-         */
         this.Screen.ClientWidth  =  VideoElement.offsetWidth;
         this.Screen.ClientHeight = VideoElement.offsetHeight;
         this.Screen.ClientTop    =  VideoElement.offsetTop;
         this.Screen.ClientLeft   = VideoElement.offsetLeft;
         this.Screen.StreamHeight =  VideoElement.videoHeight;
         this.Screen.StreamWidth  = VideoElement.videoWidth;
-
-        // setDebug(
-        // `stream Width: ${VideoElement.videoWidth} \n`+
-        // `stream Height: ${VideoElement.videoHeight} \n`+
-        // `offset Width: ${VideoElement.offsetWidth} \n`+
-        // `offset Height: ${VideoElement.offsetHeight} \n`+
-        // `offset Left: ${VideoElement.offsetLeft} \n`+
-        // `offset Top: ${VideoElement.offsetTop} \n`);
     }
 }
