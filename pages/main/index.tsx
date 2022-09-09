@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState, } from 'react'
 import Head from 'next/head'
 import styles from '../../styles/Home.module.css'
 import formstyles from '../../styles/form.module.css'
+import { server } from 'websocket'
 
 /**
  * @returns {Headers}
@@ -18,10 +19,10 @@ const Home = () => {
     server: "",
     secret: "",
   });
+  const [servers, setServers] = useState([]);
 
   useEffect(() => { 
     fetchServers();
-
   }, [])
 
 
@@ -32,6 +33,7 @@ const Home = () => {
     setState({ ...state, ["secret"]: e.target.value });
   }
   function handleServerSelect(e) {
+    console.log(`server is set to ${e.target.value}`)
     setState({ ...state, ["server"]: e.target.value });
   }
 
@@ -58,16 +60,16 @@ const Home = () => {
 
   async function fetchServers() {
     try {
-      var result = await (await 
-      fetch("https://auth.thinkmay.net/auth/allServer", {
+      var result = await (await fetch("https://auth.thinkmay.net/auth/allServer", {
         method: "GET",
         headers: genHeaders(),
       })).json()
 
-      var el = document.getElementById("bangbo");
+      var el = [];
       result.forEach((x) => {
-        el.innerHTML += `<option value="${x.name}">${x.name}</option>`
+        el.push(<option key={Date.now()} value={x.name}>{x.name}</option>);
       })
+      setServers(el);
     } catch (err) {
       console.log(err);
     }
@@ -96,9 +98,13 @@ const Home = () => {
           id="bangbo"
           onChange={handleServerSelect}
           >
+          {servers}
+        <option key="0" value="none">
+          none
+          </option>
         </select>
         <button type="submit" className={formstyles.label}>
-          Send
+          Connect
         </button>
       </form>
       </div>
