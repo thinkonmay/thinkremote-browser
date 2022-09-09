@@ -13,19 +13,30 @@ import {
   FullscreenExit,
 } from "@mui/icons-material";
 import Draggable from "react-draggable";
+import Swal from "sweetalert2";
 
-
-function TurnOnAlert(error: string) : void {
-  // @Mainak TODO: show Sweetalert notify user about the error,
-  // user will turn off this alert manually
+function TurnOnAlert(error: string): void {
+  Swal.fire({
+    title: "Opps...",
+    text: error,
+    icon: "error",
+    confirmButtonText: "OK",
+  });
 }
 
-function TurnOffLoading() : void {
-  // @Mainak TODO:
-  // this function would be called by an event from OneplayApp
+function TurnOnLoading(): void {
+  Swal.fire({
+    title: "Initializing...",
+    text: "Please wait while the client is getting ready...",
+    showConfirmButton: false,
+    willOpen: () => Swal.showLoading(),
+    willClose: () => Swal.hideLoading(),
+  });
 }
 
-
+function TurnOffLoading(): void {
+  Swal.close();
+}
 
 const Home = ({ signaling_url }: { signaling_url: string }) => {
   const remoteVideo = useRef<HTMLVideoElement>(null);
@@ -93,17 +104,18 @@ const Home = ({ signaling_url }: { signaling_url: string }) => {
       let token: string;
       try {
         token = router.asPath;
-        token = token.split("?")[1].split("=")[1];
+        token = token?.split("?")[1]?.split("=")[1] ?? "";
         if (token == "") {
           throw new Error("no valid token");
         }
       } catch (error) {
+        TurnOnAlert(error);
         // ping token missing message
       }
 
       console.log(`Started oneplay app with token ${token}`);
       var app = new OneplayApp(remoteVideo, remoteAudio, token, () => {
-        window.close();
+        // window.close();
       });
     }
   }, []);
