@@ -19,7 +19,7 @@ const Home = ({signaling_url} : {signaling_url: string}) => {
           throw new Error("no valid token")
         }
       } catch (error) {
-        // ping token missing message
+        window.location.replace("/main");
       }
 
       console.log(`Started oneplay app with token ${token}`)
