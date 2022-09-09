@@ -58,16 +58,19 @@
   font-size: 2.5rem;
 }
 
+/* @Mainak TODO: keep video aspect ratio,
+* Video should always fill the tab.
+*/
 .remoteVideo {
   position: fixed;
   top: 0px;
   left: 0px;
   right: 0px;
   bottom: 0px;
-  min-width: 100vw;
-  min-height: 100vh;
-  max-width: none;
-  max-height: none;
+  /* min-width: 100vw;
+  min-height: 100vh; */
+  /* max-width: none;
+  max-height: none; */
   visibility: visible;
 }
 

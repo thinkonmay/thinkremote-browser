@@ -14,6 +14,19 @@ import {
 } from "@mui/icons-material";
 import Draggable from "react-draggable";
 
+
+function TurnOnAlert(error: string) : void {
+  // @Mainak TODO: show Sweetalert notify user about the error,
+  // user will turn off this alert manually
+}
+
+function TurnOffLoading() : void {
+  // @Mainak TODO:
+  // this function would be called by an event from OneplayApp
+}
+
+
+
 const Home = ({ signaling_url }: { signaling_url: string }) => {
   const remoteVideo = useRef<HTMLVideoElement>(null);
   const remoteAudio = useRef<HTMLAudioElement>(null);
