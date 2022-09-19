@@ -1,10 +1,12 @@
+import getConfig from "next/config";
 import { DataChannel } from "./datachannel";
 import { HID } from "./hid";
 import { setDebug } from "./log";
 import { WebRTC } from "./webrtc";
 import { SignallingClient } from "./websocket";
 
-const SIGNALLING_URL  = process.env.NEXT_PUBLIC_SIGNALING_URL
+const { serverRuntimeConfig, publicRuntimeConfig } = getConfig()
+const SIGNALLING_URL  = publicRuntimeConfig.NEXT_PUBLIC_SIGNALING_URL;
 
 export class OneplayApp  {
     video : any

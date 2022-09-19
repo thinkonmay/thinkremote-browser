@@ -3,7 +3,9 @@ import Head from 'next/head'
 import styles from '../../styles/Home.module.css'
 import formstyles from '../../styles/form.module.css'
 import { server } from 'websocket'
+import getConfig from 'next/config'
 
+const { serverRuntimeConfig, publicRuntimeConfig } = getConfig()
 /**
  * @returns {Headers}
  */
@@ -39,7 +41,7 @@ const Home = () => {
 
   async function handleSubmit(e) {
     e.preventDefault();
-    fetch(`${process.env.NEXT_PUBLIC_AUTH_API}/auth/client/${state.user}/${state.server}/${state.secret}`, {
+    fetch(`${publicRuntimeConfig.NEXT_PUBLIC_AUTH_API}/auth/client/${state.user}/${state.server}/${state.secret}`, {
       method: "GET",
       headers: genHeaders(),
     }).then((res) => {
@@ -60,7 +62,7 @@ const Home = () => {
 
   async function fetchServers() {
     try {
-      var result = await (await fetch(`${process.env.NEXT_PUBLIC_AUTH_API}/auth/allServer`, {
+      var result = await (await fetch(`${publicRuntimeConfig.NEXT_PUBLIC_AUTH_API}/auth/allServer`, {
         method: "GET",
         headers: genHeaders(),
       })).json()
