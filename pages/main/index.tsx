@@ -39,7 +39,7 @@ const Home = () => {
 
   async function handleSubmit(e) {
     e.preventDefault();
-    fetch(`https://auth.thinkmay.net/auth/client/${state.user}/${state.server}/${state.secret}`, {
+    fetch(`${process.env.NEXT_PUBLIC_AUTH_API}/auth/client/${state.user}/${state.server}/${state.secret}`, {
       method: "GET",
       headers: genHeaders(),
     }).then((res) => {
@@ -60,7 +60,7 @@ const Home = () => {
 
   async function fetchServers() {
     try {
-      var result = await (await fetch("https://auth.thinkmay.net/auth/allServer", {
+      var result = await (await fetch(`${process.env.NEXT_PUBLIC_AUTH_API}/auth/allServer`, {
         method: "GET",
         headers: genHeaders(),
       })).json()

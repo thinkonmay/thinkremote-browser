@@ -4,7 +4,7 @@ import { setDebug } from "./log";
 import { WebRTC } from "./webrtc";
 import { SignallingClient } from "./websocket";
 
-const SIGNALLING_URL  = "wss://signaling.thinkmay.net/ws"
+const SIGNALLING_URL  = process.env.NEXT_PUBLIC_SIGNALING_URL
 
 export class OneplayApp  {
     video : any

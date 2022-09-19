@@ -23,8 +23,8 @@ export class WebRTC
         iceServers: 
             [{
                 urls: "turn:workstation.thinkmay.net:3478",
-                username: "thinkmay",
-                credential: "thinkmayvantue"
+                username: "oneplay",
+                credential: "oneplay"
             }, 
             {
                 urls: [
