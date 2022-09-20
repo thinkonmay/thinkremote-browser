@@ -10,6 +10,10 @@ enum EventCode{
     KeyDown,
     KeyPress,
     KeyReset,
+
+   
+    RelativeMouseOff,
+    RelativeMouseOn,
 }
 
 class HIDMsg {
@@ -51,6 +55,7 @@ enum KeyCode{
 }
 
 class Shortcut {
+    relative : boolean
     code : ShortcutCode
     keys : Array<KeyCode>
     Handler: ((a: void) => (void))
@@ -108,10 +113,10 @@ export class HID {
         ClientLeft: number,
     }
 
-    private hovering: boolean
     private video: any 
     private SendFunc: ((data: string) => (void))
     constructor(videoElement: any, Sendfunc: ((data:string)=>(void))){
+        this.relativeMouse = false;
         this.video = videoElement;
         this.SendFunc = Sendfunc;
         this.Screen = {
@@ -156,20 +161,33 @@ export class HID {
 
 
         this.shortcuts = new Array<Shortcut>();
-        this.shortcuts.push(new Shortcut(ShortcutCode.Fullscreen,[KeyCode.Ctrl,KeyCode.F],(()=> {
+        this.shortcuts.push(new Shortcut(ShortcutCode.Fullscreen,[KeyCode.Ctrl,KeyCode.Shift,KeyCode.F],(()=> {
             this.video.current.parentElement.requestFullscreen();
+        })))
+        this.shortcuts.push(new Shortcut(ShortcutCode.Fullscreen,[KeyCode.Ctrl,KeyCode.Shift,KeyCode.P],(()=> {
+            if(!document.pointerLockElement) {
+                this.video.current.requestPointerLock();
+            } else {
+                document.exitPointerLock();
+            }
         })))
     }
 
     mouseEnterEvent(event: MouseEvent) {
-        setDebug("mouse enter")
+        this.SendFunc((new HIDMsg(EventCode.KeyReset,{ }).ToString()))
     }
     mouseLeaveEvent(event: MouseEvent) {
-        setDebug("mouse leave")
         this.SendFunc((new HIDMsg(EventCode.KeyReset,{ }).ToString()))
     }
     pointerLock(event: Event) {
-
+        setDebug("pointer lock")
+        if (document.pointerLockElement) {
+            this.relativeMouse = true;
+            this.SendFunc((new HIDMsg(EventCode.RelativeMouseOn,{ }).ToString()))
+        } else  {
+            this.relativeMouse = false;
+            this.SendFunc((new HIDMsg(EventCode.RelativeMouseOff,{ }).ToString()))
+        }
     }
     keydown(event: KeyboardEvent) {
         this.shortcuts.forEach((element: Shortcut) => {
@@ -180,6 +198,7 @@ export class HID {
         this.SendFunc((new HIDMsg(code,{
             key: jsKey,
         })).ToString());
+        event.preventDefault();
     }
     keyup(event: KeyboardEvent) {
         let jsKey = event.key;
@@ -187,6 +206,7 @@ export class HID {
         this.SendFunc((new HIDMsg(code,{
             key: jsKey,
         })).ToString());
+        event.preventDefault();
     }
     mouseWheel(event: WheelEvent){
         let wheelY = event.deltaY;
@@ -198,13 +218,20 @@ export class HID {
     }
     mouseButtonMovement(event: MouseEvent){
         this.elementConfig(this.video.current)
-        let mousePosition_X = this.clientToServerX(event.clientX);
-        let mousePosition_Y = this.clientToServerY(event.clientY);
         let code = EventCode.MouseMove
-        this.SendFunc((new HIDMsg(code,{
-            dX: mousePosition_X,
-            dY: mousePosition_Y,
-        })).ToString());
+        if (this.relativeMouse) {
+            let mousePosition_X = this.clientToServerX(event.clientX);
+            let mousePosition_Y = this.clientToServerY(event.clientY);
+            this.SendFunc((new HIDMsg(code,{
+                dX: mousePosition_X,
+                dY: mousePosition_Y,
+            })).ToString());
+        } else {
+            this.SendFunc((new HIDMsg(code,{
+                dX: event.movementX,
+                dY: event.movementY,
+            })).ToString());
+        }
     }
     mouseButtonDown(event: MouseEvent){
         let code = EventCode.MouseDown
