@@ -219,7 +219,7 @@ export class HID {
     mouseButtonMovement(event: MouseEvent){
         this.elementConfig(this.video.current)
         let code = EventCode.MouseMove
-        if (this.relativeMouse) {
+        if (!this.relativeMouse) {
             let mousePosition_X = this.clientToServerX(event.clientX);
             let mousePosition_Y = this.clientToServerY(event.clientY);
             this.SendFunc((new HIDMsg(code,{
