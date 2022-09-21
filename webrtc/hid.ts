@@ -44,6 +44,7 @@ class HIDMsg {
 
 enum ShortcutCode{
     Fullscreen,
+    PointerLock
 }
 enum KeyCode{
     Shift = 0,
@@ -55,7 +56,6 @@ enum KeyCode{
 }
 
 class Shortcut {
-    relative : boolean
     code : ShortcutCode
     keys : Array<KeyCode>
     Handler: ((a: void) => (void))
@@ -164,10 +164,14 @@ export class HID {
         this.shortcuts.push(new Shortcut(ShortcutCode.Fullscreen,[KeyCode.Ctrl,KeyCode.Shift,KeyCode.F],(()=> {
             this.video.current.parentElement.requestFullscreen();
         })))
-        this.shortcuts.push(new Shortcut(ShortcutCode.Fullscreen,[KeyCode.Ctrl,KeyCode.Shift,KeyCode.P],(()=> {
+        this.shortcuts.push(new Shortcut(ShortcutCode.PointerLock,[KeyCode.Ctrl,KeyCode.Shift,KeyCode.P],(()=> {
             if(!document.pointerLockElement) {
+                this.relativeMouse = true;
+                this.SendFunc((new HIDMsg(EventCode.RelativeMouseOn,{ }).ToString()))
                 this.video.current.requestPointerLock();
             } else {
+                this.relativeMouse = false;
+                this.SendFunc((new HIDMsg(EventCode.RelativeMouseOff,{ }).ToString()))
                 document.exitPointerLock();
             }
         })))
@@ -180,14 +184,7 @@ export class HID {
         this.SendFunc((new HIDMsg(EventCode.KeyReset,{ }).ToString()))
     }
     pointerLock(event: Event) {
-        setDebug("pointer lock")
-        if (document.pointerLockElement) {
-            this.relativeMouse = true;
-            this.SendFunc((new HIDMsg(EventCode.RelativeMouseOn,{ }).ToString()))
-        } else  {
-            this.relativeMouse = false;
-            this.SendFunc((new HIDMsg(EventCode.RelativeMouseOff,{ }).ToString()))
-        }
+        setDebug("toggle pointer lock")
     }
     keydown(event: KeyboardEvent) {
         this.shortcuts.forEach((element: Shortcut) => {
