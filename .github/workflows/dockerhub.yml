@@ -35,4 +35,4 @@ jobs:
     - name: update via kubectl 
       run : |
         docker login -u ${{ secrets.DOCKER_REPO_USER }} -p ${{ secrets.DOCKER_REPO_PASSWORD }} workstation.thinkmay.net
-        docker run workstation.thinkmay.net/kubectl -n oneplay rollout restart deployment remote
+        docker run workstation.thinkmay.net/kubectl -n production rollout restart deployment remote
