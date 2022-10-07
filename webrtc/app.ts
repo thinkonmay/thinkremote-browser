@@ -6,7 +6,7 @@ import { WebRTC } from "./webrtc";
 import { SignallingClient } from "./websocket";
 
 const { serverRuntimeConfig, publicRuntimeConfig } = getConfig()
-const SIGNALLING_URL  = publicRuntimeConfig.NEXT_PUBLIC_SIGNALING_URL;
+const SIGNALLING_URL  = publicRuntimeConfig.NEXT_PUBLIC_SIGNALING_URL ? publicRuntimeConfig.NEXT_PUBLIC_SIGNALING_URL : "wss:/localhost:234"
 
 export class OneplayApp  {
     video : any

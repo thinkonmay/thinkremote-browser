@@ -33,9 +33,86 @@ function TurnOnLoading(): void {
     willClose: () => Swal.hideLoading(),
   });
 }
-
 function TurnOffLoading(): void {
   Swal.close();
+}
+
+
+
+async function AskSelectSoundcard(): string {
+    const { value: fruit } = await Swal.fire({
+    title: 'Select field validation',
+    input: 'select',
+    inputOptions: {
+      'Fruits': {
+        apples: 'Apples',
+        bananas: 'Bananas',
+        grapes: 'Grapes',
+        oranges: 'Oranges'
+      },
+      'Vegetables': {
+        potato: 'Potato',
+        broccoli: 'Broccoli',
+        carrot: 'Carrot'
+      },
+      'icecream': 'Ice cream'
+    },
+    inputPlaceholder: 'Select a fruit',
+    showCancelButton: true,
+    inputValidator: (value) => {
+      return new Promise((resolve) => {
+        if (value === 'oranges') {
+          resolve('')
+        } else {
+          resolve('You need to select oranges :)')
+        }
+      })
+    }
+  })
+
+  if (fruit) {
+    Swal.fire(`You selected: ${fruit}`)
+  }
+
+  return fruit
+}
+
+async function AskSelectDisplay(): string {
+    const { value: fruit } = await Swal.fire({
+    title: 'Select field validation',
+    input: 'select',
+    inputOptions: {
+      'Fruits': {
+        apples: 'Apples',
+        bananas: 'Bananas',
+        grapes: 'Grapes',
+        oranges: 'Oranges'
+      },
+      'Vegetables': {
+        potato: 'Potato',
+        broccoli: 'Broccoli',
+        carrot: 'Carrot'
+      },
+      'icecream': 'Ice cream'
+    },
+    inputPlaceholder: 'Select a fruit',
+    showCancelButton: true,
+    inputValidator: (value) => {
+      return new Promise((resolve) => {
+        if (value === 'oranges') {
+          resolve('')
+        } else {
+          resolve('You need to select oranges :)')
+        }
+      })
+    }
+  })
+
+  if (fruit) {
+    Swal.fire(`You selected: ${fruit}`)
+  }
+
+  return fruit
 }
 
 const Home = ({ signaling_url }: { signaling_url: string }) => {
@@ -112,12 +189,20 @@ const Home = ({ signaling_url }: { signaling_url: string }) => {
         window.location.replace("/main");
       }
 
+      var a = async () => {
+        var a = await AskSelectSoundcard()
+        var fruit = await AskSelectDisplay()
+      }
+
+      a()
+
       console.log(`Started oneplay app with token ${token}`);
       var app = new OneplayApp(remoteVideo, remoteAudio, token, () => {
         // window.close();
       });
     }
   }, []);
+
 
   return (
     <div>
@@ -127,16 +212,8 @@ const Home = ({ signaling_url }: { signaling_url: string }) => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <div className={styles.app}>
-        <video
-          ref={remoteVideo}
-          className={styles.remoteVideo}
-          autoPlay
-          muted
-          playsInline
-          loop
-        ></video>
         <Draggable>
-          <SpeedDial
+          <SpeedDial 
             ariaLabel="SpeedDial basic example"
             sx={{ position: "absolute", bottom: 16, right: 16 }}
             icon={<List />}
@@ -152,6 +229,7 @@ const Home = ({ signaling_url }: { signaling_url: string }) => {
           </SpeedDial>
         </Draggable>
       </div>
+      <video ref={remoteVideo} className={styles.remoteVideo} autoPlay muted playsInline loop ></video>
       <audio ref={remoteAudio} autoPlay controls style={{ zIndex: -1 }}></audio>
     </div>
   );
