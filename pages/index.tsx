@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import Head from "next/head";
 import styles from "../styles/Home.module.css";
+import { AskSelectDisplay, AskSelectSoundcard} from "../components/popup";
 import { OneplayApp } from "../webrtc/app";
 import { useRouter } from "next/router";
 import SpeedDial from "@mui/material/SpeedDial";
@@ -14,106 +15,9 @@ import {
 } from "@mui/icons-material";
 import Draggable from "react-draggable";
 import Swal from "sweetalert2";
+import { DeviceSelection, DeviceSelectionResult } from "../webrtc/models/devices.model";
+import { ConnectionEvent, Log, LogConnectionEvent, LogLevel } from "../webrtc/utils/log";
 
-function TurnOnAlert(error: string): void {
-  Swal.fire({
-    title: "Opps...",
-    text: error,
-    icon: "error",
-    confirmButtonText: "OK",
-  });
-}
-
-function TurnOnLoading(): void {
-  Swal.fire({
-    title: "Initializing...",
-    text: "Please wait while the client is getting ready...",
-    showConfirmButton: false,
-    willOpen: () => Swal.showLoading(),
-    willClose: () => Swal.hideLoading(),
-  });
-}
-function TurnOffLoading(): void {
-  Swal.close();
-}
-
-
-
-async function AskSelectSoundcard(): string {
-    const { value: fruit } = await Swal.fire({
-    title: 'Select field validation',
-    input: 'select',
-    inputOptions: {
-      'Fruits': {
-        apples: 'Apples',
-        bananas: 'Bananas',
-        grapes: 'Grapes',
-        oranges: 'Oranges'
-      },
-      'Vegetables': {
-        potato: 'Potato',
-        broccoli: 'Broccoli',
-        carrot: 'Carrot'
-      },
-      'icecream': 'Ice cream'
-    },
-    inputPlaceholder: 'Select a fruit',
-    showCancelButton: true,
-    inputValidator: (value) => {
-      return new Promise((resolve) => {
-        if (value === 'oranges') {
-          resolve('')
-        } else {
-          resolve('You need to select oranges :)')
-        }
-      })
-    }
-  })
-
-  if (fruit) {
-    Swal.fire(`You selected: ${fruit}`)
-  }
-
-  return fruit
-}
-
-async function AskSelectDisplay(): string {
-    const { value: fruit } = await Swal.fire({
-    title: 'Select field validation',
-    input: 'select',
-    inputOptions: {
-      'Fruits': {
-        apples: 'Apples',
-        bananas: 'Bananas',
-        grapes: 'Grapes',
-        oranges: 'Oranges'
-      },
-      'Vegetables': {
-        potato: 'Potato',
-        broccoli: 'Broccoli',
-        carrot: 'Carrot'
-      },
-      'icecream': 'Ice cream'
-    },
-    inputPlaceholder: 'Select a fruit',
-    showCancelButton: true,
-    inputValidator: (value) => {
-      return new Promise((resolve) => {
-        if (value === 'oranges') {
-          resolve('')
-        } else {
-          resolve('You need to select oranges :)')
-        }
-      })
-    }
-  })
-
-  if (fruit) {
-    Swal.fire(`You selected: ${fruit}`)
-  }
-
-  return fruit
-}
 
 const Home = ({ signaling_url }: { signaling_url: string }) => {
   const remoteVideo = useRef<HTMLVideoElement>(null);
@@ -189,17 +93,17 @@ const Home = ({ signaling_url }: { signaling_url: string }) => {
         window.location.replace("/main");
       }
 
-      var a = async () => {
-        var a = await AskSelectSoundcard()
-        var fruit = await AskSelectDisplay()
-      }
 
-      a()
 
-      console.log(`Started oneplay app with token ${token}`);
-      var app = new OneplayApp(remoteVideo, remoteAudio, token, () => {
-        // window.close();
-      });
+      Log(LogLevel.Infor,`Started oneplay app with token ${token}`);
+      LogConnectionEvent(ConnectionEvent.ApplicationStarted)
+      var app = new OneplayApp(remoteVideo, remoteAudio, token, (async (offer: DeviceSelection) => {
+          LogConnectionEvent(ConnectionEvent.WaitingAvailableDeviceSelection)
+          var soundcardID = await AskSelectSoundcard()
+          var displayID = await AskSelectDisplay(offer.monitors)
+          LogConnectionEvent(ConnectionEvent.ExchangingSignalingMessage)
+          return new DeviceSelectionResult(3000,30,soundcardID,displayID);
+      }));
     }
   }, []);
 

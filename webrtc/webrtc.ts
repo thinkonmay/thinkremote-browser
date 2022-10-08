@@ -1,24 +1,21 @@
-import { setDebug } from "./log";
-import { SignallingClient } from "./websocket.js";
+import { Log } from "./utils/log";
+import { SignallingClient } from "./signaling/websocket.js";
 
 export class WebRTC 
 {
     Conn: RTCPeerConnection;
 
     private SignalingSendFunc : ((Target : string, Data : Map<string,string>) => (void))
-    private ClosedHandler     : (() => (any))
 
 
     State: string;
 
     constructor(sendFunc : ((Target : string, Data : Map<string,string>) => (void)),
                 TrackHandler : ((a : RTCTrackEvent) => (any)),
-                ClosedHandler : () => (any),
                 channelHandler : ((a : RTCDataChannelEvent) => (any)))
     {
         this.State = "Not connected"
         this.SignalingSendFunc = sendFunc;
-        this.ClosedHandler = ClosedHandler;
         var configuration = { 
         iceServers: 
             [{
@@ -48,10 +45,10 @@ export class WebRTC
             case "connected":
                 break;
             case "failed":
-                this.ClosedHandler();
+                Log("webrtc connection establish failed");
                 break;
             case "closed":
-                this.ClosedHandler();
+                Log("webrtc connection establish failed");
                 break;
             default:
                 break;
@@ -67,7 +64,7 @@ export class WebRTC
         try{
             await this.Conn.addIceCandidate(candidate)
         } catch(error)  {
-            setDebug(error);
+            Log(error);
         };
     }
     
@@ -88,12 +85,12 @@ export class WebRTC
     
         try{
             var Conn = this.Conn;
-            setDebug(sdp.sdp);
+            Log(sdp.sdp);
             await Conn.setRemoteDescription(sdp)
             var ans = await Conn.createAnswer()
             await this.onLocalDescription(ans);
         } catch(error) {
-            setDebug(error);
+            Log(error);
         };
     }
     
@@ -115,7 +112,7 @@ export class WebRTC
         var dat = new Map<string,string>();
         dat.set("Type",init.type)
         dat.set("SDP",init.sdp)
-        setDebug(init.sdp);
+        Log(init.sdp);
         this.SignalingSendFunc("SDP",dat);
     }
     
