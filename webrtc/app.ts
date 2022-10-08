@@ -13,7 +13,6 @@ const SIGNALLING_URL  = publicRuntimeConfig.NEXT_PUBLIC_SIGNALING_URL ? publicRu
 
 
 
-
 export class OneplayApp  {
     video : any
     audio : any

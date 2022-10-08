@@ -19,6 +19,7 @@ import { DeviceSelection, DeviceSelectionResult } from "../webrtc/models/devices
 import { AddNotifier, ConnectionEvent, Log, LogConnectionEvent, LogLevel } from "../webrtc/utils/log";
 
 
+
 const Home = ({ signaling_url }: { signaling_url: string }) => {
   const remoteVideo = useRef<HTMLVideoElement>(null);
   const remoteAudio = useRef<HTMLAudioElement>(null);
@@ -113,9 +114,9 @@ const Home = ({ signaling_url }: { signaling_url: string }) => {
           LogConnectionEvent(ConnectionEvent.ExchangingSignalingMessage)
           return new DeviceSelectionResult(bitrate,framerate,soundcardID,DeviceHandle);
       }));
+
     }
   }, []);
-
 
   return (
     <div>
@@ -125,8 +126,16 @@ const Home = ({ signaling_url }: { signaling_url: string }) => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <div className={styles.app}>
+        <video
+          ref={remoteVideo}
+          className={styles.remoteVideo}
+          autoPlay
+          muted
+          playsInline
+          loop
+        ></video>
         <Draggable>
-          <SpeedDial 
+          <SpeedDial
             ariaLabel="SpeedDial basic example"
             sx={{ position: "absolute", bottom: 16, right: 16 }}
             icon={<List />}
@@ -142,7 +151,6 @@ const Home = ({ signaling_url }: { signaling_url: string }) => {
           </SpeedDial>
         </Draggable>
       </div>
-      <video ref={remoteVideo} className={styles.remoteVideo} autoPlay muted playsInline loop ></video>
       <audio ref={remoteAudio} autoPlay controls style={{ zIndex: -1 }}></audio>
     </div>
   );
