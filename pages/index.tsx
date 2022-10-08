@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import Head from "next/head";
 import styles from "../styles/Home.module.css";
+import { AskSelectBitrate, AskSelectDisplay, AskSelectFramerate, AskSelectSoundcard, TurnOnStatus} from "../components/popup";
 import { OneplayApp } from "../webrtc/app";
 import { useRouter } from "next/router";
 import SpeedDial from "@mui/material/SpeedDial";
@@ -14,29 +15,10 @@ import {
 } from "@mui/icons-material";
 import Draggable from "react-draggable";
 import Swal from "sweetalert2";
+import { DeviceSelection, DeviceSelectionResult } from "../webrtc/models/devices.model";
+import { AddNotifier, ConnectionEvent, Log, LogConnectionEvent, LogLevel } from "../webrtc/utils/log";
 
-function TurnOnAlert(error: string): void {
-  Swal.fire({
-    title: "Opps...",
-    text: error,
-    icon: "error",
-    confirmButtonText: "OK",
-  });
-}
 
-function TurnOnLoading(): void {
-  Swal.fire({
-    title: "Initializing...",
-    text: "Please wait while the client is getting ready...",
-    showConfirmButton: false,
-    willOpen: () => Swal.showLoading(),
-    willClose: () => Swal.hideLoading(),
-  });
-}
-
-function TurnOffLoading(): void {
-  Swal.close();
-}
 
 const Home = ({ signaling_url }: { signaling_url: string }) => {
   const remoteVideo = useRef<HTMLVideoElement>(null);
@@ -112,10 +94,27 @@ const Home = ({ signaling_url }: { signaling_url: string }) => {
         window.location.replace("/main");
       }
 
-      console.log(`Started oneplay app with token ${token}`);
-      var app = new OneplayApp(remoteVideo, remoteAudio, token, () => {
-        // window.close();
-      });
+      AddNotifier(message => {
+        TurnOnStatus(message);
+      })
+
+
+      Log(LogLevel.Infor,`Started oneplay app with token ${token}`);
+      LogConnectionEvent(ConnectionEvent.ApplicationStarted)
+      var app = new OneplayApp(remoteVideo, remoteAudio, token, (async (offer: DeviceSelection) => {
+          LogConnectionEvent(ConnectionEvent.WaitingAvailableDeviceSelection)
+          var soundcardID = await AskSelectSoundcard(offer.soundcards)
+          Log(LogLevel.Infor,`selected audio deviceid ${soundcardID}`)
+          var DeviceHandle = await AskSelectDisplay(offer.monitors)
+          Log(LogLevel.Infor,`selected monitor handle ${DeviceHandle}`)
+          var bitrate = await AskSelectBitrate()
+          Log(LogLevel.Infor,`selected bitrate ${bitrate}`)
+          var framerate = await AskSelectFramerate()
+          Log(LogLevel.Infor,`selected framerate ${framerate}`)
+          LogConnectionEvent(ConnectionEvent.ExchangingSignalingMessage)
+          return new DeviceSelectionResult(bitrate,framerate,soundcardID,DeviceHandle);
+      }));
+
     }
   }, []);
 
