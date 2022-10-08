@@ -94,9 +94,11 @@ export class HID {
     }
 
     mouseEnterEvent(event: MouseEvent) {
+        Log(LogLevel.Debug,"Mouse enter")
         this.SendFunc((new HIDMsg(EventCode.KeyReset,{ }).ToString()))
     }
     mouseLeaveEvent(event: MouseEvent) {
+        Log(LogLevel.Debug,"Mouse leave")
         this.SendFunc((new HIDMsg(EventCode.KeyReset,{ }).ToString()))
     }
     pointerLock(event: Event) {
