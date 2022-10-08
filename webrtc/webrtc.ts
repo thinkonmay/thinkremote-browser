@@ -1,4 +1,4 @@
-import { Log } from "./utils/log";
+import { ConnectionEvent, Log, LogConnectionEvent, LogLevel } from "./utils/log";
 import { SignallingClient } from "./signaling/websocket.js";
 
 export class WebRTC 
@@ -43,12 +43,13 @@ export class WebRTC
         console.log(`state change to ${JSON.stringify(eve)}`)
         switch (eve.type) {
             case "connected":
+                LogConnectionEvent(ConnectionEvent.WebRTCConnectionDoneChecking)
+                Log(LogLevel.Infor,"webrtc connection established");
                 break;
             case "failed":
-                Log("webrtc connection establish failed");
-                break;
             case "closed":
-                Log("webrtc connection establish failed");
+                LogConnectionEvent(ConnectionEvent.WebRTCConnectionClosed)
+                Log(LogLevel.Error,"webrtc connection establish failed");
                 break;
             default:
                 break;
@@ -64,7 +65,7 @@ export class WebRTC
         try{
             await this.Conn.addIceCandidate(candidate)
         } catch(error)  {
-            Log(error);
+            Log(LogLevel.Error,error);
         };
     }
     
@@ -85,12 +86,11 @@ export class WebRTC
     
         try{
             var Conn = this.Conn;
-            Log(sdp.sdp);
             await Conn.setRemoteDescription(sdp)
             var ans = await Conn.createAnswer()
             await this.onLocalDescription(ans);
         } catch(error) {
-            Log(error);
+            Log(LogLevel.Error,error);
         };
     }
     
@@ -112,7 +112,6 @@ export class WebRTC
         var dat = new Map<string,string>();
         dat.set("Type",init.type)
         dat.set("SDP",init.sdp)
-        Log(init.sdp);
         this.SignalingSendFunc("SDP",dat);
     }
     

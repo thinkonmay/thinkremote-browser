@@ -6,9 +6,10 @@ import { ConnectionEvent, Log, LogConnectionEvent, LogLevel } from "./utils/log"
 import { DeviceSelection, DeviceSelectionResult } from "./models/devices.model";
 import { WebRTC } from "./webrtc";
 import { SignallingClient } from "./signaling/websocket";
+import { TurnOnAlert } from "../components/popup";
 
 const { serverRuntimeConfig, publicRuntimeConfig } = getConfig()
-const SIGNALLING_URL  = publicRuntimeConfig.NEXT_PUBLIC_SIGNALING_URL ? publicRuntimeConfig.NEXT_PUBLIC_SIGNALING_URL : "wss:/localhost:234"
+const SIGNALLING_URL  = publicRuntimeConfig.NEXT_PUBLIC_SIGNALING_URL ? publicRuntimeConfig.NEXT_PUBLIC_SIGNALING_URL : "wss://remote.thinkmay.net/handshake"
 
 
 
@@ -37,10 +38,6 @@ export class OneplayApp  {
 
         this.DeviceSelection = DeviceSelection;
 
-
-
-
-        
         this.datachannels = new Map<string,DataChannel>();
         this.hid = new HID(this.video,((data: string) => {
             let channel = this.datachannels.get("hid")
@@ -128,15 +125,24 @@ export class OneplayApp  {
                 sdpMLineIndex: Number.parseInt(lineidx)
             })
         } else if (target == "PREFLIGHT") { //TODO
-            let i = new DeviceSelection(pkt["Devices"]);
-            let result = this.DeviceSelection(i);
+            let preverro = pkt.get("Error") 
+            if (preverro != null) {
+                Log(LogLevel.Error,preverro);
+                await TurnOnAlert(`There are some error with your device: ${preverro}`);                
+            }
+
+            let i = new DeviceSelection(pkt.get("Devices"));
+            let result = await this.DeviceSelection(i);
             var dat = new Map<string,string>();
-            dat.set("Type","answer");
-            signaling.SignallingSend("PREFLIGHT",dat)
+            dat.set("type","answer");
+            dat.set("monitor",result.MonitorHandle)
+            dat.set("soundcard",result.SoundcardDeviceID)
+            dat.set("bitrate",`${result.bitrate}`)
+            dat.set("framerate",`${result.framerate}`)
+            this.signaling.SignallingSend("PREFLIGHT",dat)
         } else if (target == "START") {
-            var signaling = this.signaling
             var dat = new Map<string,string>();
-            signaling.SignallingSend("START",dat)
+            this.signaling.SignallingSend("START",dat)
         }
     }
 }

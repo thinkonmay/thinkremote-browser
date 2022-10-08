@@ -1,144 +1,137 @@
 import Swal from "sweetalert2";
-import { Monitor } from "../webrtc/app";
+import { Monitor } from "../webrtc/models/devices.model";
+import { Soundcard } from "../webrtc/models/devices.model";
 
-function TurnOnAlert(error: string): void {
+export async function TurnOnAlert(error: string): Promise<void> {
   Swal.fire({
     title: "Opps...",
     text: error,
     icon: "error",
     confirmButtonText: "OK",
   });
+  await new Promise(r => setTimeout(r, 3000));
+  Swal.close();
 }
 
-function TurnOnLoading(): void {
+let have_swal = false
+export function TurnOnStatus(status: string): void {
+  if (have_swal) {
+    TurnOffStatus()
+  }
+
   Swal.fire({
-    title: "Initializing...",
+    title: `Application status: ${status}`,
     text: "Please wait while the client is getting ready...",
     showConfirmButton: false,
+    timer: 3000,
     willOpen: () => Swal.showLoading(),
     willClose: () => Swal.hideLoading(),
   });
+  have_swal = true;
 }
-function TurnOffLoading(): void {
+export function TurnOffStatus(): void {
   Swal.close();
 }
 
 
 
-export async function AskSelectSoundcard(): Promise<string> {
-    const { value: fruit } = await Swal.fire({
-    title: 'Select field validation',
-    input: 'select',
-    inputOptions: {
-      'Fruits': {
-        apples: 'Apples',
-        bananas: 'Bananas',
-        grapes: 'Grapes',
-        oranges: 'Oranges'
-      },
-      'Vegetables': {
-        potato: 'Potato',
-        broccoli: 'Broccoli',
-        carrot: 'Carrot'
-      },
-      'icecream': 'Ice cream'
-    },
-    inputPlaceholder: 'Select a fruit',
-    showCancelButton: true,
-    inputValidator: (value) => {
-      return new Promise((resolve) => {
-        if (value === 'oranges') {
-          resolve('')
-        } else {
-          resolve('You need to select oranges :)')
-        }
-      })
-    }
-  })
-
-
-
-  return fruit
-}
-
-export async function AskSelectDisplay(options: Array<Monitor>): Promise<string> {
+export async function AskSelectSoundcard(soundcards: Array<Soundcard>): Promise<string> {
     let swalInput = {};
 
-    options.forEach((x) => {
-        swalInput[x.Device][x.Name] = x.DeviceID;
+    soundcards.forEach((x) => {
+        if(swalInput[x.Api] == null){
+          swalInput[x.Api] = {}
+        }
+        swalInput[x.Api][x.DeviceID] = x.Name;
     })
 
-    const { value: fruit } = await Swal.fire({
+    const { value: DeviceID } = await Swal.fire({
+    title: 'Select a soundcard device',
+    input: 'select',
+    inputOptions: swalInput,
+    inputPlaceholder: 'Click here',
+    showCancelButton: true,
+    inputValidator: (value) => {
+        for( var x of soundcards) {
+          if (x.Name == value) {
+            return ''
+        }}
+
+    }})
+
+
+
+    return DeviceID
+}
+
+export async function AskSelectDisplay(monitors: Array<Monitor>): Promise<string> {
+    let swalInput = {};
+
+    monitors.forEach((x) => {
+        if(swalInput[x.Adapter] == null){
+          swalInput[x.Adapter] = {}
+        }
+
+        swalInput[x.Adapter][x.MonitorHandle] = x.MonitorName;
+    })
+
+    const { value: MonitorHandle } = await Swal.fire({
     title: 'Select monitor',
     input: 'select',
-    inputOptions: {
-      'Fruits': {
-        apples: 'Apples',
-        bananas: 'Bananas',
-        grapes: 'Grapes',
-        oranges: 'Oranges'
-      },
-      'Vegetables': {
-        potato: 'Potato',
-        broccoli: 'Broccoli',
-        carrot: 'Carrot'
-      },
-    },
-
+    inputOptions: swalInput,
     inputPlaceholder: 'Select monitor',
     showCancelButton: true,
     inputValidator: (value) => {
-      return new Promise((resolve) => {
-        if (value === 'oranges') {
-          resolve('')
-        } else {
-          resolve('You need to select oranges :)')
-        }
-      })
+        for( var x of monitors) {
+          if (x.MonitorName == value) {
+            return ''
+        }}
+
     }
   })
 
  
 
-  return fruit
+  return MonitorHandle
 }
 
-export async function AskSelectFramerate(): Promise<string> {
-    const { value: fruit } = await Swal.fire({
+export async function AskSelectFramerate(): Promise<number> {
+    const { value: framerate } = await Swal.fire({
+    title: 'Select framerate',
+    input: 'select',
+    inputOptions: {
+      '30': '30fps',
+      '60': '60fps'
+    },
+    inputPlaceholder: 'Select framerate',
+    showCancelButton: true,
+    inputValidator: (value) => {
+        return '';
+    }
+  })
+
+ 
+
+  return Number.parseInt(framerate)
+}
+
+export async function AskSelectBitrate(): Promise<number> {
+    const { value: bitrate } = await Swal.fire({
     title: 'Select bitrate',
     input: 'select',
     inputOptions: {
-      'Recommended': '30fps',
-      'High': '60fps'
+      '3000': '3 mbps',
+      '6000': '6 mbps',
+      '10000': '10 mbps'
     },
     inputPlaceholder: 'Select bitrate',
     showCancelButton: true,
     inputValidator: (value) => {
-        return value;
+      return '';
     }
   })
 
  
 
-  return fruit
-}
-
-export async function AskSelectBitrate(): Promise<string> {
-    const { value: fruit } = await Swal.fire({
-    title: 'Select framerate',
-    input: 'select',
-    inputOptions: {
-      'Recommended': '30fps',
-      'High': '60fps'
-    },
-    inputPlaceholder: 'Select framerate ',
-    showCancelButton: true,
-    inputValidator: (value) => {
-      return value;
-    }
-  })
-
- 
-
-  return fruit
+  return Number.parseInt(bitrate)
 }

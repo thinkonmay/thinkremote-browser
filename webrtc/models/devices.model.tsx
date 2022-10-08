@@ -12,6 +12,7 @@ export class Soundcard {
 	    this.Api = data.api
 	    this.IsDefault = data.isDefault
 	    this.IsLoopback = data.isLoopback
+        return this
     }
 }
 
@@ -34,6 +35,7 @@ export class Monitor {
 	    this.Height = data.height
 	    this.Framerate = data.framerate
 	    this.IsPrimary = data.isPrimary
+        return this;
     }
 
 }
@@ -43,12 +45,14 @@ export class DeviceSelection {
     soundcards: Array<Soundcard>;
 
     constructor (data: string) {
+        this.monitors = new Array<Monitor>();
+        this.soundcards = new Array<Soundcard>();
         let parseResult = JSON.parse(data)
 
-        for(var i in parseResult["monitors"]) {
+        for(var i of parseResult["monitors"]) {
             this.monitors.push(new Monitor(i));
         }
-        for(var i in parseResult["soundcards"]) {
+        for(var i of parseResult["soundcards"]) {
             this.soundcards.push(new Soundcard(i));
         }
     }
@@ -57,8 +61,8 @@ export class DeviceSelection {
 
 
 export class DeviceSelectionResult {
-    monitorID: number
-    soundcardID: string
+    MonitorHandle: string
+    SoundcardDeviceID: string
 
     bitrate: number
     framerate: number
@@ -66,17 +70,17 @@ export class DeviceSelectionResult {
     constructor(bitrate: number,
                 framerate: number,
                 soundcard: string,
-                monitor: number){
+                monitor: string){
         this.bitrate = bitrate
         this.framerate = framerate
-        this.soundcardID = soundcard 
-        this.monitorID = monitor
+        this.SoundcardDeviceID = soundcard 
+        this.MonitorHandle = monitor
     }
 
     ToString(): string {
         return JSON.stringify({
-            monitor: this.monitorID,
-            soundcard: this.soundcardID,
+            monitor: this.MonitorHandle,
+            soundcard: this.SoundcardDeviceID,
             bitrate: this.bitrate,
             framerate: this.framerate,
         })

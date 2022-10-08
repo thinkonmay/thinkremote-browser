@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import Head from "next/head";
 import styles from "../styles/Home.module.css";
-import { AskSelectDisplay, AskSelectSoundcard} from "../components/popup";
+import { AskSelectBitrate, AskSelectDisplay, AskSelectFramerate, AskSelectSoundcard, TurnOnStatus} from "../components/popup";
 import { OneplayApp } from "../webrtc/app";
 import { useRouter } from "next/router";
 import SpeedDial from "@mui/material/SpeedDial";
@@ -16,7 +16,7 @@ import {
 import Draggable from "react-draggable";
 import Swal from "sweetalert2";
 import { DeviceSelection, DeviceSelectionResult } from "../webrtc/models/devices.model";
-import { ConnectionEvent, Log, LogConnectionEvent, LogLevel } from "../webrtc/utils/log";
+import { AddNotifier, ConnectionEvent, Log, LogConnectionEvent, LogLevel } from "../webrtc/utils/log";
 
 
 const Home = ({ signaling_url }: { signaling_url: string }) => {
@@ -93,16 +93,25 @@ const Home = ({ signaling_url }: { signaling_url: string }) => {
         window.location.replace("/main");
       }
 
+      AddNotifier(message => {
+        TurnOnStatus(message);
+      })
 
 
       Log(LogLevel.Infor,`Started oneplay app with token ${token}`);
       LogConnectionEvent(ConnectionEvent.ApplicationStarted)
       var app = new OneplayApp(remoteVideo, remoteAudio, token, (async (offer: DeviceSelection) => {
           LogConnectionEvent(ConnectionEvent.WaitingAvailableDeviceSelection)
-          var soundcardID = await AskSelectSoundcard()
-          var displayID = await AskSelectDisplay(offer.monitors)
+          var soundcardID = await AskSelectSoundcard(offer.soundcards)
+          Log(LogLevel.Infor,`selected audio deviceid ${soundcardID}`)
+          var DeviceHandle = await AskSelectDisplay(offer.monitors)
+          Log(LogLevel.Infor,`selected monitor handle ${DeviceHandle}`)
+          var bitrate = await AskSelectBitrate()
+          Log(LogLevel.Infor,`selected bitrate ${bitrate}`)
+          var framerate = await AskSelectFramerate()
+          Log(LogLevel.Infor,`selected framerate ${framerate}`)
           LogConnectionEvent(ConnectionEvent.ExchangingSignalingMessage)
-          return new DeviceSelectionResult(3000,30,soundcardID,displayID);
+          return new DeviceSelectionResult(bitrate,framerate,soundcardID,DeviceHandle);
       }));
     }
   }, []);
