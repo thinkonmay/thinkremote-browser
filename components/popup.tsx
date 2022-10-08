@@ -2,18 +2,22 @@ import Swal from "sweetalert2";
 import { Monitor } from "../webrtc/models/devices.model";
 import { Soundcard } from "../webrtc/models/devices.model";
 
+let have_swal = false
 export async function TurnOnAlert(error: string): Promise<void> {
+  if (have_swal) {
+    TurnOffStatus()
+  }
+
   Swal.fire({
     title: "Opps...",
     text: error,
     icon: "error",
     confirmButtonText: "OK",
+    timer: 3000
   });
-  await new Promise(r => setTimeout(r, 3000));
-  Swal.close();
+  have_swal = true;
 }
 
-let have_swal = false
 export function TurnOnStatus(status: string): void {
   if (have_swal) {
     TurnOffStatus()
@@ -29,6 +33,7 @@ export function TurnOnStatus(status: string): void {
   });
   have_swal = true;
 }
+
 export function TurnOffStatus(): void {
   Swal.close();
 }
@@ -36,8 +41,9 @@ export function TurnOffStatus(): void {
 
 
 export async function AskSelectSoundcard(soundcards: Array<Soundcard>): Promise<string> {
-    let swalInput = {};
+    TurnOffStatus();
 
+    let swalInput = {};
     soundcards.forEach((x) => {
         if(swalInput[x.Api] == null){
           swalInput[x.Api] = {}
@@ -65,6 +71,7 @@ export async function AskSelectSoundcard(soundcards: Array<Soundcard>): Promise<
 }
 
 export async function AskSelectDisplay(monitors: Array<Monitor>): Promise<string> {
+    TurnOffStatus();
     let swalInput = {};
 
     monitors.forEach((x) => {
@@ -96,6 +103,7 @@ export async function AskSelectDisplay(monitors: Array<Monitor>): Promise<string
 }
 
 export async function AskSelectFramerate(): Promise<number> {
+    TurnOffStatus();
     const { value: framerate } = await Swal.fire({
     title: 'Select framerate',
     input: 'select',
@@ -116,6 +124,7 @@ export async function AskSelectFramerate(): Promise<number> {
 }
 
 export async function AskSelectBitrate(): Promise<number> {
+    TurnOffStatus();
     const { value: bitrate } = await Swal.fire({
     title: 'Select bitrate',
     input: 'select',

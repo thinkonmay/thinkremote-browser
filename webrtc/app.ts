@@ -2,11 +2,10 @@ import getConfig from "next/config";
 import { json } from "stream/consumers";
 import { DataChannel } from "./datachannel/datachannel";
 import { HID } from "./gui/hid";
-import { ConnectionEvent, Log, LogConnectionEvent, LogLevel } from "./utils/log";
+import { AddNotifier, ConnectionEvent, Log, LogConnectionEvent, LogLevel } from "./utils/log";
 import { DeviceSelection, DeviceSelectionResult } from "./models/devices.model";
 import { WebRTC } from "./webrtc";
 import { SignallingClient } from "./signaling/websocket";
-import { TurnOnAlert } from "../components/popup";
 
 const { serverRuntimeConfig, publicRuntimeConfig } = getConfig()
 const SIGNALLING_URL  = publicRuntimeConfig.NEXT_PUBLIC_SIGNALING_URL ? publicRuntimeConfig.NEXT_PUBLIC_SIGNALING_URL : "wss://remote.thinkmay.net/handshake"
@@ -23,6 +22,7 @@ export class OneplayApp  {
     datachannels : Map<string,DataChannel>;
     
     DeviceSelection: ((input: DeviceSelection) => Promise<DeviceSelectionResult>);
+    alert : ((input: string) => (void));
 
     started : boolean
 
@@ -30,6 +30,8 @@ export class OneplayApp  {
                 audio: any,
                 token : string,
                 DeviceSelection : ((n: DeviceSelection) => Promise<DeviceSelectionResult>)) {
+        Log(LogLevel.Infor,`Started oneplay app with token ${token}`);
+        LogConnectionEvent(ConnectionEvent.ApplicationStarted)
         this.started = false;
         this.video = vid;
         this.audio = audio;
@@ -127,7 +129,7 @@ export class OneplayApp  {
             let preverro = pkt.get("Error") 
             if (preverro != null) {
                 Log(LogLevel.Error,preverro);
-                await TurnOnAlert(`There are some error with your device: ${preverro}`);                
+                this.alert(preverro)
             }
 
             let i = new DeviceSelection(pkt.get("Devices"));
@@ -143,5 +145,14 @@ export class OneplayApp  {
             var dat = new Map<string,string>();
             this.signaling.SignallingSend("START",dat)
         }
+    }
+
+    Notifier(notifier: (message :string) => (void)): OneplayApp{
+        AddNotifier(notifier);
+        return this
+    }
+    Alert(notifier: (message :string) => (void)): OneplayApp{
+        this.alert = notifier;
+        return this
     }
 }

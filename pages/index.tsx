@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import Head from "next/head";
 import styles from "../styles/Home.module.css";
-import { AskSelectBitrate, AskSelectDisplay, AskSelectFramerate, AskSelectSoundcard, TurnOnStatus} from "../components/popup";
+import { AskSelectBitrate, AskSelectDisplay, AskSelectFramerate, AskSelectSoundcard, TurnOnAlert, TurnOnStatus} from "../components/popup";
 import { OneplayApp } from "../webrtc/app";
 import { useRouter } from "next/router";
 import SpeedDial from "@mui/material/SpeedDial";
@@ -14,9 +14,8 @@ import {
   FullscreenExit,
 } from "@mui/icons-material";
 import Draggable from "react-draggable";
-import Swal from "sweetalert2";
 import { DeviceSelection, DeviceSelectionResult } from "../webrtc/models/devices.model";
-import { AddNotifier, ConnectionEvent, Log, LogConnectionEvent, LogLevel } from "../webrtc/utils/log";
+import { ConnectionEvent, Log, LogConnectionEvent, LogLevel } from "../webrtc/utils/log";
 
 
 
@@ -94,13 +93,7 @@ const Home = ({ signaling_url }: { signaling_url: string }) => {
         window.location.replace("/main");
       }
 
-      AddNotifier(message => {
-        TurnOnStatus(message);
-      })
 
-
-      Log(LogLevel.Infor,`Started oneplay app with token ${token}`);
-      LogConnectionEvent(ConnectionEvent.ApplicationStarted)
       var app = new OneplayApp(remoteVideo, remoteAudio, token, (async (offer: DeviceSelection) => {
           LogConnectionEvent(ConnectionEvent.WaitingAvailableDeviceSelection)
           var soundcardID = await AskSelectSoundcard(offer.soundcards)
@@ -113,7 +106,12 @@ const Home = ({ signaling_url }: { signaling_url: string }) => {
           Log(LogLevel.Infor,`selected framerate ${framerate}`)
           LogConnectionEvent(ConnectionEvent.ExchangingSignalingMessage)
           return new DeviceSelectionResult(bitrate,framerate,soundcardID,DeviceHandle);
-      }));
+      })).Notifier(message => {
+        TurnOnStatus(message);
+      }).Alert(message => {
+        TurnOnAlert(message);
+      });
+
 
     }
   }, []);
@@ -126,14 +124,6 @@ const Home = ({ signaling_url }: { signaling_url: string }) => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <div className={styles.app}>
-        <video
-          ref={remoteVideo}
-          className={styles.remoteVideo}
-          autoPlay
-          muted
-          playsInline
-          loop
-        ></video>
         <Draggable>
           <SpeedDial
             ariaLabel="SpeedDial basic example"
@@ -151,6 +141,7 @@ const Home = ({ signaling_url }: { signaling_url: string }) => {
           </SpeedDial>
         </Draggable>
       </div>
+      <video ref={remoteVideo} className={styles.remoteVideo} autoPlay muted playsInline loop ></video>
       <audio ref={remoteAudio} autoPlay controls style={{ zIndex: -1 }}></audio>
     </div>
   );
