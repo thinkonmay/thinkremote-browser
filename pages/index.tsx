@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import Head from "next/head";
 import styles from "../styles/Home.module.css";
 import { AskSelectBitrate, AskSelectDisplay, AskSelectFramerate, AskSelectSoundcard, TurnOnAlert, TurnOnStatus} from "../components/popup";
-import { OneplayApp } from "../webrtc/app";
+import { WebRTCClient } from "../webrtc/app";
 import { useRouter } from "next/router";
 import SpeedDial from "@mui/material/SpeedDial";
 import SpeedDialAction from "@mui/material/SpeedDialAction";
@@ -94,7 +94,7 @@ const Home = ({ signaling_url }: { signaling_url: string }) => {
       }
 
 
-      var app = new OneplayApp(remoteVideo, remoteAudio, token, (async (offer: DeviceSelection) => {
+      var app = new WebRTCClient(remoteVideo, remoteAudio, token, (async (offer: DeviceSelection) => {
           LogConnectionEvent(ConnectionEvent.WaitingAvailableDeviceSelection)
           var soundcardID = await AskSelectSoundcard(offer.soundcards)
           Log(LogLevel.Infor,`selected audio deviceid ${soundcardID}`)

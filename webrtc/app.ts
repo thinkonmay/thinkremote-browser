@@ -12,7 +12,7 @@ const SIGNALLING_URL  = publicRuntimeConfig.NEXT_PUBLIC_SIGNALING_URL ? publicRu
 
 
 
-export class OneplayApp  {
+export class WebRTCClient  {
     video : any
     audio : any
 
@@ -147,11 +147,11 @@ export class OneplayApp  {
         }
     }
 
-    Notifier(notifier: (message :string) => (void)): OneplayApp{
+    Notifier(notifier: (message :string) => (void)): WebRTCClient{
         AddNotifier(notifier);
         return this
     }
-    Alert(notifier: (message :string) => (void)): OneplayApp{
+    Alert(notifier: (message :string) => (void)): WebRTCClient{
         this.alert = notifier;
         return this
     }
