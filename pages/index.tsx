@@ -16,10 +16,18 @@ import {
 import Draggable from "react-draggable";
 import { DeviceSelection, DeviceSelectionResult } from "../webrtc/models/devices.model";
 import { ConnectionEvent, Log, LogConnectionEvent, LogLevel } from "../webrtc/utils/log";
+import { GetServerSideProps, NextPage } from "next";
+
+
+type Props = { host: string | null };
+
+export const getServerSideProps: GetServerSideProps<Props> =
+  async context => ({ props: { host: context.req.headers.host || null } });
 
 
 
-const Home = ({ signaling_url }: { signaling_url: string }) => {
+
+const Home = ({ host }) => {
   const remoteVideo = useRef<HTMLVideoElement>(null);
   const remoteAudio = useRef<HTMLAudioElement>(null);
   let router = useRouter();
@@ -82,19 +90,14 @@ const Home = ({ signaling_url }: { signaling_url: string }) => {
   useEffect(() => {
     setActions([...actions1]);
     if (remoteVideo.current) {
-      let token: string;
-      try {
-        token = router.asPath;
-        token = token?.split("?")[1]?.split("=")[1] ?? "";
-        if (token == "") {
-          throw new Error("no valid token");
-        }
-      } catch (error) {
-        window.location.replace("/main");
+      let signalingURL = (host.split(":")[0] != "localhost" )? `wss://${host}/handshake` : "wss://remote.thinkmay.net/handshake";
+      let token = router.asPath?.split("?")[1]?.split("=")[1] ?? "";
+      if (token == "") {
+        window.location.replace("https://service.thinkmay.net/dashboard");
       }
 
 
-      var app = new WebRTCClient(remoteVideo, remoteAudio, token, (async (offer: DeviceSelection) => {
+      new WebRTCClient(signalingURL,remoteVideo, remoteAudio, token, (async (offer: DeviceSelection) => {
           LogConnectionEvent(ConnectionEvent.WaitingAvailableDeviceSelection)
           var soundcardID = await AskSelectSoundcard(offer.soundcards)
           Log(LogLevel.Infor,`selected audio deviceid ${soundcardID}`)

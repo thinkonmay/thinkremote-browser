@@ -7,9 +7,6 @@ import { DeviceSelection, DeviceSelectionResult } from "./models/devices.model";
 import { WebRTC } from "./webrtc";
 import { SignallingClient } from "./signaling/websocket";
 
-const { serverRuntimeConfig, publicRuntimeConfig } = getConfig()
-const SIGNALLING_URL  = publicRuntimeConfig.NEXT_PUBLIC_SIGNALING_URL ? publicRuntimeConfig.NEXT_PUBLIC_SIGNALING_URL : "wss://remote.thinkmay.net/handshake"
-
 
 
 export class WebRTCClient  {
@@ -26,11 +23,15 @@ export class WebRTCClient  {
 
     started : boolean
 
-    constructor(vid : any,
+    constructor(signalingURL : string,
+                vid : any,
                 audio: any,
                 token : string,
                 DeviceSelection : ((n: DeviceSelection) => Promise<DeviceSelectionResult>)) {
-        Log(LogLevel.Infor,`Started oneplay app with token ${token}`);
+
+        Log(LogLevel.Infor,`Started oneplay app connect to signaling server ${signalingURL}`);
+        Log(LogLevel.Infor,`Session token: ${token}`);
+
         LogConnectionEvent(ConnectionEvent.ApplicationStarted)
         this.started = false;
         this.video = vid;
@@ -48,7 +49,7 @@ export class WebRTCClient  {
             }
             channel.sendMessage(data);
         }));
-        this.signaling = new SignallingClient(SIGNALLING_URL,token,
+        this.signaling = new SignallingClient(signalingURL,token,
                                  ((ev: Map<string,string>) => {this.handleIncomingPacket(ev)}).bind(this));
 
         this.webrtc = new WebRTC(((ev : string, data : Map<string,string>) => { var signaling = this.signaling; signaling.SignallingSend(ev,data) }).bind(this),
