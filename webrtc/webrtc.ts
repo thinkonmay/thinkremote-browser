@@ -1,5 +1,6 @@
 import { ConnectionEvent, Log, LogConnectionEvent, LogLevel } from "./utils/log";
 import { SignallingClient } from "./signaling/websocket.js";
+import { Adaptive } from "./qos/qos";
 
 export class WebRTC 
 {
@@ -36,6 +37,8 @@ export class WebRTC
         this.Conn.ontrack =        TrackHandler;
         this.Conn.onicecandidate = ((ev: RTCPeerConnectionIceEvent) => { this.onICECandidates(ev) });
         this.Conn.onconnectionstatechange = ((ev: Event) => { this.onConnectionStateChange(ev) })
+
+        new Adaptive(this.Conn);
     }
 
     private onConnectionStateChange(eve: Event)
