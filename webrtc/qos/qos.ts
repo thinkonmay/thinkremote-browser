@@ -2,6 +2,11 @@
 
 
 export class VideoMetrics {
+    type : string
+    constructor() {
+        this.type = "video"
+    }
+
     frameWidth : number
     frameHeight : number
 
@@ -34,6 +39,11 @@ export class VideoMetrics {
 
 
 export class AudioMetrics {
+    type : string
+    constructor() {
+        this.type = "audio"
+    }
+
     audioLevel : number
     totalAudioEnergy : number
 
@@ -49,6 +59,11 @@ export class AudioMetrics {
 }
 
 export class NetworkMetrics {
+    type : string
+    constructor() {
+        this.type = "network"
+    }
+
     packetsReceived : number
     packetsSent : number
 
