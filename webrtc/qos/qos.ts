@@ -76,13 +76,16 @@ export class NetworkMetrics {
 
 
 export class Adaptive {
-    constructor(conn: RTCPeerConnection) {
+    constructor(conn: RTCPeerConnection,
+                metricCallback : (data : string) => void) {
         this.conn = conn;
         this.running = true;
+        this.metricCallback = metricCallback;
 
         this.startCollectingStat(this.conn);
     }
 
+    metricCallback : (data:string) => void;
     conn : RTCPeerConnection
     running : boolean
 
@@ -199,16 +202,17 @@ export class Adaptive {
 
         let network = this.filterNetwork(result);
         if (network != null) { 
-            console.log(network) 
+            this.metricCallback(JSON.stringify(network));
         }
+
         let audio   = this.filterAudio(result);
         if (audio != null) { 
-            console.log(audio) 
+            this.metricCallback(JSON.stringify(audio));
         }
 
         let video   = this.filterVideo(result);
         if (video != null) { 
-            console.log(video) 
+            this.metricCallback(JSON.stringify(video));
         }
     }
 

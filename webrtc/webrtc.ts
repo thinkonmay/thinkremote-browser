@@ -4,16 +4,15 @@ import { Adaptive } from "./qos/qos";
 
 export class WebRTC 
 {
-    Conn: RTCPeerConnection;
-
-    private SignalingSendFunc : ((Target : string, Data : Map<string,string>) => (void))
-
-
     State: string;
+    Conn: RTCPeerConnection;
+    Ads : Adaptive
+    private SignalingSendFunc : (Target : string, Data : Map<string,string>) => (void)
 
-    constructor(sendFunc : ((Target : string, Data : Map<string,string>) => (void)),
-                TrackHandler : ((a : RTCTrackEvent) => (any)),
-                channelHandler : ((a : RTCDataChannelEvent) => (any)))
+    constructor(sendFunc        : (Target : string, Data : Map<string,string>) => (void),
+                TrackHandler    : (a : RTCTrackEvent) => (any),
+                channelHandler  : (a : RTCDataChannelEvent) => (any),
+                metricHandler   : (a : string) => (void))
     {
         this.State = "Not connected"
         this.SignalingSendFunc = sendFunc;
@@ -33,12 +32,12 @@ export class WebRTC
         };
 
         this.Conn = new RTCPeerConnection(configuration);
-        this.Conn.ondatachannel =  channelHandler;    
-        this.Conn.ontrack =        TrackHandler;
-        this.Conn.onicecandidate = ((ev: RTCPeerConnectionIceEvent) => { this.onICECandidates(ev) });
-        this.Conn.onconnectionstatechange = ((ev: Event) => { this.onConnectionStateChange(ev) })
+        this.Ads = new Adaptive(this.Conn,metricHandler);
 
-        new Adaptive(this.Conn);
+        this.Conn.ondatachannel =               channelHandler;    
+        this.Conn.ontrack =                     TrackHandler;
+        this.Conn.onicecandidate =              this.onICECandidates.bind(this);
+        this.Conn.onconnectionstatechange =     this.onConnectionStateChange.bind(this);
     }
 
     private onConnectionStateChange(eve: Event)

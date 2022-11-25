@@ -18,8 +18,8 @@ export class WebRTCClient  {
     signaling : SignallingClient
     datachannels : Map<string,DataChannel>;
     
-    DeviceSelection: ((input: DeviceSelection) => Promise<DeviceSelectionResult>);
-    alert : ((input: string) => (void));
+    DeviceSelection: (input: DeviceSelection) => Promise<DeviceSelectionResult>;
+    alert : (input: string) => (void);
 
     started : boolean
 
@@ -27,7 +27,7 @@ export class WebRTCClient  {
                 vid : any,
                 audio: any,
                 token : string,
-                DeviceSelection : ((n: DeviceSelection) => Promise<DeviceSelectionResult>)) {
+                DeviceSelection : (n: DeviceSelection) => Promise<DeviceSelectionResult>) {
 
         Log(LogLevel.Infor,`Started oneplay app connect to signaling server ${signalingURL}`);
         Log(LogLevel.Infor,`Session token: ${token}`);
@@ -41,20 +41,22 @@ export class WebRTCClient  {
         this.DeviceSelection = DeviceSelection;
 
         this.datachannels = new Map<string,DataChannel>();
-        this.hid = new HID(this.video,((data: string) => {
+        this.hid = new HID(this.video,(data: string) => {
             let channel = this.datachannels.get("hid")
             if (channel == null) {
                 Log(LogLevel.Warning,"attempting to send message while data channel is not established");
                 return;
             }
             channel.sendMessage(data);
-        }));
-        this.signaling = new SignallingClient(signalingURL,token,
-                                 ((ev: Map<string,string>) => {this.handleIncomingPacket(ev)}).bind(this));
+        });
 
-        this.webrtc = new WebRTC(((ev : string, data : Map<string,string>) => { var signaling = this.signaling; signaling.SignallingSend(ev,data) }).bind(this),
-                                 ((ev : RTCTrackEvent) => { this.handleIncomingTrack(ev) }).bind(this),
-                                 ((ev : RTCDataChannelEvent) => { this.handleIncomingDataChannel(ev) }).bind(this));
+        this.signaling = new SignallingClient(signalingURL,token,
+                                 this.handleIncomingPacket.bind(this));
+
+        this.webrtc = new WebRTC(this.signaling.SignallingSend.bind(this.signaling),
+                                 this.handleIncomingTrack.bind(this),
+                                 this.handleIncomingDataChannel.bind(this),
+                                 this.handleWebRTCMetric.bind(this));
     }
 
     private handleIncomingTrack(evt: RTCTrackEvent): any
@@ -74,6 +76,21 @@ export class WebRTCClient  {
             }
         }
     }
+
+    private handleWebRTCMetric(a: string)
+    {
+        Log(LogLevel.Infor,`metric : ${a}`)
+
+        const dcName = "adaptive";
+        let channel = this.datachannels.get(dcName)
+        if (channel == null) {
+            Log(LogLevel.Warning,`attempting to send message while data channel ${dcName} is ready`);
+            return;
+        }
+
+        channel.sendMessage(a);
+    }
+
     private handleIncomingDataChannel(a: RTCDataChannelEvent)
     {
         LogConnectionEvent(ConnectionEvent.ReceivedDatachannel)
