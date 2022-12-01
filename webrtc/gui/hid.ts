@@ -105,15 +105,25 @@ export class HID {
         Log(LogLevel.Infor,"toggle pointer lock")
     }
     keydown(event: KeyboardEvent) {
+        event.preventDefault();
+
+        let disable_send = false;
         this.shortcuts.forEach((element: Shortcut) => {
-            element.HandleShortcut(event);
+            let triggered = element.HandleShortcut(event);
+
+            if (triggered) 
+                disable_send = true;
         })
+
+        if (disable_send) 
+            return;
+
+
         let jsKey = event.key;
         let code = EventCode.KeyDown
         this.SendFunc((new HIDMsg(code,{
             key: jsKey,
         })).ToString());
-        event.preventDefault();
     }
     keyup(event: KeyboardEvent) {
         let jsKey = event.key;
