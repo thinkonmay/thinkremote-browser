@@ -17,17 +17,13 @@ export class WebRTC
         this.State = "Not connected"
         this.SignalingSendFunc = sendFunc;
         var configuration = { 
-        iceServers: 
-            [{
+        iceServers: [{ urls: [
+                "stun:stun.l.google.com:19302",
+                "stun:workstation.thinkmay.net:3478"
+            ]},{
                 urls: "turn:workstation.thinkmay.net:3478",
                 username: "oneplay",
                 credential: "oneplay"
-            }, 
-            {
-                urls: [
-                    "stun:workstation.thinkmay.net:3478",
-                    "stun:stun.l.google.com:19302"
-                ]
             }]
         };
 
