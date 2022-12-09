@@ -46,7 +46,7 @@ export class Shortcut {
         this.Handler = Handler;
     }
 
-    public HandleShortcut(event : KeyboardEvent){
+    public HandleShortcut(event : KeyboardEvent) : Boolean {
         var shift = this.keys.includes(KeyCode.Shift) === event.shiftKey;
         var alt   = this.keys.includes(KeyCode.Alt)   === event.altKey;
         var ctrl  = this.keys.includes(KeyCode.Ctrl)  === event.ctrlKey;
@@ -62,7 +62,9 @@ export class Shortcut {
             event.preventDefault();
             Log(LogLevel.Infor,`shortcut fired with code ${this.code}`)
             this.Handler();
+            return true;
         }
+        return false;
     }
 }
 
