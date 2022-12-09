@@ -150,19 +150,6 @@ export class WebRTCClient  {
 
             let webrtcConf = pkt.get("WebRTCConfig") 
             if (webrtcConf != null) {
-                var example_configuration = { 
-                    "iceServers": [{
-                            "urls": [ "turn:workstation.thinkmay.net:3478" ],
-                            "username": "oneplay",
-                            "credential": "oneplay"
-                        }, {
-                        urls: [
-                            "stun:workstation.thinkmay.net:3478",
-                            "stun:stun.l.google.com:19302"
-                        ]
-                    }]
-                };
-
                 let config = JSON.parse(webrtcConf)
                 this.webrtc.SetupConnection(config)
             }
