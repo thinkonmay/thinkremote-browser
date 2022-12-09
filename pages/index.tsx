@@ -103,12 +103,7 @@ const Home = ({ host }) => {
           Log(LogLevel.Infor,`selected audio deviceid ${soundcardID}`)
           var DeviceHandle = await AskSelectDisplay(offer.monitors)
           Log(LogLevel.Infor,`selected monitor handle ${DeviceHandle}`)
-          var bitrate = await AskSelectBitrate()
-          Log(LogLevel.Infor,`selected bitrate ${bitrate}`)
-          var framerate = await AskSelectFramerate()
-          Log(LogLevel.Infor,`selected framerate ${framerate}`)
-          LogConnectionEvent(ConnectionEvent.ExchangingSignalingMessage)
-          return new DeviceSelectionResult(bitrate,framerate,soundcardID,DeviceHandle);
+          return new DeviceSelectionResult(soundcardID,DeviceHandle);
       })).Notifier(message => {
         TurnOnStatus(message);
       }).Alert(message => {

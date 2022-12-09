@@ -1,5 +1,3 @@
-import getConfig from "next/config";
-import { json } from "stream/consumers";
 import { DataChannel } from "./datachannel/datachannel";
 import { HID } from "./gui/hid";
 import { AddNotifier, ConnectionEvent, Log, LogConnectionEvent, LogLevel } from "./utils/log";
@@ -150,14 +148,32 @@ export class WebRTCClient  {
                 this.alert(preverro)
             }
 
+            let webrtcConf = pkt.get("WebRTCConfig") 
+            if (webrtcConf != null) {
+                var example_configuration = { 
+                    "iceServers": [{
+                            "urls": [ "turn:workstation.thinkmay.net:3478" ],
+                            "username": "oneplay",
+                            "credential": "oneplay"
+                        }, {
+                        urls: [
+                            "stun:workstation.thinkmay.net:3478",
+                            "stun:stun.l.google.com:19302"
+                        ]
+                    }]
+                };
+
+                let config = JSON.parse(webrtcConf)
+                this.webrtc.SetupConnection(config)
+            }
+            
+
             let i = new DeviceSelection(pkt.get("Devices"));
             let result = await this.DeviceSelection(i);
             var dat = new Map<string,string>();
             dat.set("type","answer");
             dat.set("monitor",result.MonitorHandle)
             dat.set("soundcard",result.SoundcardDeviceID)
-            dat.set("bitrate",`${result.bitrate}`)
-            dat.set("framerate",`${result.framerate}`)
             this.signaling.SignallingSend("PREFLIGHT",dat)
         } else if (target == "START") {
             var dat = new Map<string,string>();

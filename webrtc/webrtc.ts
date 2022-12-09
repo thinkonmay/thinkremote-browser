@@ -1,5 +1,4 @@
 import { ConnectionEvent, Log, LogConnectionEvent, LogLevel } from "./utils/log";
-import { SignallingClient } from "./signaling/websocket.js";
 import { Adaptive } from "./qos/qos";
 
 export class WebRTC 
@@ -7,37 +6,33 @@ export class WebRTC
     State: string;
     Conn: RTCPeerConnection;
     Ads : Adaptive
+
     private SignalingSendFunc : (Target : string, Data : Map<string,string>) => (void)
+    private MetricHandler     : (Target : string) => (void)
+    private TrackHandler      : (a : RTCTrackEvent) => (any)
+    private channelHandler    : (a : RTCDataChannelEvent) => (any)
 
     constructor(sendFunc        : (Target : string, Data : Map<string,string>) => (void),
                 TrackHandler    : (a : RTCTrackEvent) => (any),
                 channelHandler  : (a : RTCDataChannelEvent) => (any),
                 metricHandler   : (a : string) => (void))
     {
-        this.State = "Not connected"
+        this.State = "Not setted up"
         this.SignalingSendFunc = sendFunc;
-        var configuration = { 
-        iceServers: 
-            [{
-                urls: "turn:workstation.thinkmay.net:3478",
-                username: "oneplay",
-                credential: "oneplay"
-            }, 
-            {
-                urls: [
-                    "stun:workstation.thinkmay.net:3478",
-                    "stun:stun.l.google.com:19302"
-                ]
-            }]
-        };
+        this.MetricHandler     = metricHandler;
+        this.TrackHandler      = TrackHandler;
+        this.channelHandler    = channelHandler; 
+    }
 
-        this.Conn = new RTCPeerConnection(configuration);
-        this.Ads = new Adaptive(this.Conn,metricHandler);
 
-        this.Conn.ondatachannel =               channelHandler;    
-        this.Conn.ontrack =                     TrackHandler;
+    public SetupConnection(config : RTCConfiguration) {
+        this.Conn = new RTCPeerConnection(config);
+        this.Ads = new Adaptive(this.Conn,this.MetricHandler);
+        this.Conn.ondatachannel =               this.channelHandler.bind(this);    
+        this.Conn.ontrack =                     this.TrackHandler.bind(this);
         this.Conn.onicecandidate =              this.onICECandidates.bind(this);
         this.Conn.onconnectionstatechange =     this.onConnectionStateChange.bind(this);
+        this.State = "Not connected"
     }
 
     private onConnectionStateChange(eve: Event)
@@ -49,6 +44,9 @@ export class WebRTC
                 Log(LogLevel.Infor,"webrtc connection established");
                 break;
             case "failed":
+                LogConnectionEvent(ConnectionEvent.WebRTCConnectionClosed)
+                Log(LogLevel.Error,"webrtc connection establish failed");
+                break;
             case "closed":
                 LogConnectionEvent(ConnectionEvent.WebRTCConnectionClosed)
                 Log(LogLevel.Error,"webrtc connection establish failed");
