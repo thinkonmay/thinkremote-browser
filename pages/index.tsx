@@ -70,7 +70,7 @@ const Home = ({ host }) => {
 
       const actions = [ {
         icon: <Fullscreen/>,
-        name: "Bitrate",
+        name: "Framerate",
         action: async () => {
           let framerate = await AskSelectFramerate();
           if (client != null) {
@@ -79,7 +79,7 @@ const Home = ({ host }) => {
           } 
         }, }, {
         icon: <Fullscreen/>,
-        name: "Framerate",
+        name: "Bitrate",
         action: async () => {
           let bitrate = await AskSelectBitrate();
           if (client != null) {
