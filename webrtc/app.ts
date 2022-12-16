@@ -176,4 +176,31 @@ export class WebRTCClient  {
         this.alert = notifier;
         return this
     }
+    public ChangeFramerate (framerate : number) {
+        const dcName = "manual";
+        let channel = this.datachannels.get(dcName)
+        if (channel == null) {
+            Log(LogLevel.Warning,`attempting to send message while data channel ${dcName} is ready`);
+            return;
+        }
+
+        channel.sendMessage(JSON.stringify({
+            type: "framerate",
+            framerate: framerate
+        }))
+
+    }
+    public ChangeBitrate (bitrate: number) {
+        const dcName = "manual";
+        let channel = this.datachannels.get(dcName)
+        if (channel == null) {
+            Log(LogLevel.Warning,`attempting to send message while data channel ${dcName} is ready`);
+            return;
+        }
+
+        channel.sendMessage(JSON.stringify({
+            type: "bitrate",
+            bitrate: bitrate
+        }))
+    }
 }

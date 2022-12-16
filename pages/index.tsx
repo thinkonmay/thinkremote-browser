@@ -12,11 +12,14 @@ import {
   VolumeUp,
   Fullscreen,
   FullscreenExit,
+  ArrowBackIos,
 } from "@mui/icons-material";
 import Draggable from "react-draggable";
 import { DeviceSelection, DeviceSelectionResult } from "../webrtc/models/devices.model";
 import { ConnectionEvent, Log, LogConnectionEvent, LogLevel } from "../webrtc/utils/log";
 import { GetServerSideProps, NextPage } from "next";
+import { stepButtonClasses } from "@mui/material";
+import { frame } from "websocket";
 
 
 type Props = { host: string | null };
@@ -32,63 +35,18 @@ const Home = ({ host }) => {
   const remoteAudio = useRef<HTMLAudioElement>(null);
   let router = useRouter();
 
-  const [actions, setActions] = useState<
-    {
-      icon: JSX.Element;
-      name: string;
-      action: () => void;
-    }[]
-  >([]);
+  const [volumeButton, setVolumeButton] = useState<JSX.Element>();
+  const [actions, setActions] = useState<{
+    icon: JSX.Element;
+    name: string;
+    action: () => void;
+  }[] >([]);
 
-  const actions1 = [
-    {
-      icon: <VolumeUp />,
-      name: "Mute",
-      action: () => {
-        remoteAudio.current.muted = true;
-        toggleAction(0, 1);
-      },
-    },
-    {
-      icon: <Fullscreen />,
-      name: "Enter fullscreen",
-      action: () => {
-        document.documentElement.requestFullscreen();
-        toggleAction(1, 1);
-      },
-    },
-  ];
 
-  const actions2 = [
-    {
-      icon: <VolumeOff />,
-      name: "Unmute",
-      action: () => {
-        remoteAudio.current.muted = false;
-        toggleAction(0, 2);
-      },
-    },
-    {
-      icon: <FullscreenExit />,
-      name: "exit fullscreen",
-      action: () => {
-        document.exitFullscreen();
-        toggleAction(1, 2);
-      },
-    },
-  ];
 
-  const toggleAction = (index: number, action: 1 | 2) => {
-    setActions((s) => {
-      const newActions = [...s];
-      newActions[index] =
-        action === 1 ? { ...actions2[index] } : { ...actions1[index] };
-      return newActions;
-    });
-  };
+
 
   useEffect(() => {
-    setActions([...actions1]);
     if (remoteVideo.current) {
       let signalingURL = (host.split(":")[0] != "localhost" )? `wss://${host}/handshake` : "wss://remote.thinkmay.net/handshake";
       let token = router.asPath?.split("?")[1]?.split("=")[1] ?? "";
@@ -97,7 +55,7 @@ const Home = ({ host }) => {
       }
 
 
-      new WebRTCClient(signalingURL,remoteVideo, remoteAudio, token, (async (offer: DeviceSelection) => {
+      let client = new WebRTCClient(signalingURL,remoteVideo, remoteAudio, token, (async (offer: DeviceSelection) => {
           LogConnectionEvent(ConnectionEvent.WaitingAvailableDeviceSelection)
           var soundcardID = await AskSelectSoundcard(offer.soundcards)
           Log(LogLevel.Infor,`selected audio deviceid ${soundcardID}`)
@@ -108,8 +66,44 @@ const Home = ({ host }) => {
         TurnOnStatus(message);
       }).Alert(message => {
         TurnOnAlert(message);
-      });
+      });  
 
+      const actions = [ {
+        icon: <Fullscreen/>,
+        name: "Bitrate",
+        action: async () => {
+          let framerate = await AskSelectFramerate();
+          if (client != null) {
+            console.log(`framerate is change to ${framerate}`)
+            client.ChangeFramerate(framerate)
+          } 
+        }, }, {
+        icon: <Fullscreen/>,
+        name: "Framerate",
+        action: async () => {
+          let bitrate = await AskSelectBitrate();
+          if (client != null) {
+            console.log(`bitrate is change to ${bitrate}`)
+            client.ChangeBitrate(bitrate);
+          }
+        }, }, {
+        icon: <VolumeUp/>,
+        name: "Mute",
+        action: async () => {
+          if (remoteAudio.current.muted) {
+            remoteAudio.current.muted = false;
+          } else {
+            remoteAudio.current.muted = true;
+          }
+        }, }, {
+        icon: <Fullscreen />,
+        name: "Enter fullscreen",
+        action: async () => {
+          document.documentElement.requestFullscreen();
+        }, 
+      }, ];
+
+      setActions([...actions]);
 
     }
   }, []);
