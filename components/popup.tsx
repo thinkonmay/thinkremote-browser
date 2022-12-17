@@ -56,7 +56,7 @@ export async function AskSelectSoundcard(soundcards: Array<Soundcard>): Promise<
     input: 'select',
     inputOptions: swalInput,
     inputPlaceholder: 'Click here',
-    showCancelButton: true,
+    showCancelButton: false,
     inputValidator: (value) => {
         for( var x of soundcards) {
           if (x.Name == value) {
@@ -87,7 +87,7 @@ export async function AskSelectDisplay(monitors: Array<Monitor>): Promise<string
     input: 'select',
     inputOptions: swalInput,
     inputPlaceholder: 'Select monitor',
-    showCancelButton: true,
+    showCancelButton: false,
     inputValidator: (value) => {
         for( var x of monitors) {
           if (x.MonitorName == value) {
@@ -105,16 +105,18 @@ export async function AskSelectDisplay(monitors: Array<Monitor>): Promise<string
 export async function AskSelectFramerate(): Promise<number> {
     TurnOffStatus();
     const { value: framerate } = await Swal.fire({
-    title: 'Select framerate',
-    input: 'select',
-    inputOptions: {
-      '30': '30fps',
-      '40': '40fps',
-      '50': '50fps',
-      '60': '60fps'
+      title: 'Select framerate',
+      input: 'select',
+      inputOptions: {
+        '30': '30fps',
+        '40': '40fps',
+        '50': '50fps',
+        '55': '55fps',
+        '59': '59fps',
+        '60': '60fps'
     },
     inputPlaceholder: 'Select framerate',
-    showCancelButton: true,
+    showCancelButton: false,
     inputValidator: (value) => {
         return '';
     }
@@ -139,7 +141,7 @@ export async function AskSelectBitrate(): Promise<number> {
       '10000': '10 mbps'
     },
     inputPlaceholder: 'Select bitrate',
-    showCancelButton: true,
+    showCancelButton: false,
     inputValidator: (value) => {
       return '';
     }
