@@ -109,6 +109,8 @@ export async function AskSelectFramerate(): Promise<number> {
     input: 'select',
     inputOptions: {
       '30': '30fps',
+      '40': '40fps',
+      '50': '50fps',
       '60': '60fps'
     },
     inputPlaceholder: 'Select framerate',
@@ -129,6 +131,9 @@ export async function AskSelectBitrate(): Promise<number> {
     title: 'Select bitrate',
     input: 'select',
     inputOptions: {
+      '500': '500 kbps',
+      '1000': '1 mbps',
+      '2000': '2 mbps',
       '3000': '3 mbps',
       '6000': '6 mbps',
       '10000': '10 mbps'
