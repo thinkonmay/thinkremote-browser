@@ -109,7 +109,7 @@ const Home = ({ host }) => {
         name: "Framerate",
         action: async () => {
           let framerate = await AskSelectFramerate();
-          if (client != null && framerate > 30 && framerate < 60) {
+          if (client != null && framerate > 10 && framerate < 61) {
             console.log(`framerate is change to ${framerate}`)
             client.ChangeFramerate(framerate)
           } 
@@ -118,7 +118,7 @@ const Home = ({ host }) => {
         name: "Bitrate",
         action: async () => {
           let bitrate = await AskSelectBitrate();
-          if (client != null && bitrate > 100 && bitrate < 10000) {
+          if (client != null && bitrate > 100 && bitrate < 30000) {
             console.log(`bitrate is change to ${bitrate}`)
             client.ChangeBitrate(bitrate);
           }
