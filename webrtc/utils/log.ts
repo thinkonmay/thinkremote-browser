@@ -126,11 +126,9 @@ export function AddNotifier(notifier: (message :string) => (void)){
 export function Log(level : LogLevel, message: string) {
     let logger = getLoggerSingleton()
     logger.filterEvent(JSON.stringify(level));
-    console.log(`[${GetLogLevelString(level)}] : ${message}`);
 }
 
 export function LogConnectionEvent(a : ConnectionEvent) {
     let logger = getLoggerSingleton()
     logger.BroadcastEvent(a);
-    console.log(`[${GetLogLevelString(LogLevel.Infor)}] : ${GetEventMessage(a)}`);
 }

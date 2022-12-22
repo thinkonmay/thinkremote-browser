@@ -37,7 +37,7 @@ export class WebRTC
 
     private onConnectionStateChange(eve: Event)
     {
-        console.log(`state change to ${JSON.stringify(eve)}`)
+        Log(LogLevel.Infor,`state change to ${JSON.stringify(eve)}`)
         switch (eve.type) {
             case "connected":
                 LogConnectionEvent(ConnectionEvent.WebRTCConnectionDoneChecking)
@@ -121,7 +121,7 @@ export class WebRTC
     {
         if (event.candidate == null) 
         {
-            console.log("ICE Candidate was null, done");
+            Log(LogLevel.Infor,"ICE Candidate was null, done");
             return;
         }
 
