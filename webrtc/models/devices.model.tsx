@@ -64,16 +64,24 @@ export class DeviceSelectionResult {
     MonitorHandle: string
     SoundcardDeviceID: string
 
+    bitrate: number | null
+    framerate: number | null
+
+
     constructor(soundcard: string,
                 monitor: string){
         this.SoundcardDeviceID = soundcard 
         this.MonitorHandle = monitor
+        this.framerate = null
+        this.bitrate = null
     }
 
     ToString(): string {
         return JSON.stringify({
             monitor: this.MonitorHandle,
             soundcard: this.SoundcardDeviceID,
+            framerate: this.framerate,
+            bitrate: this.bitrate
         })
     }
 }

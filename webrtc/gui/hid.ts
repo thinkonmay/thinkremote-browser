@@ -135,7 +135,8 @@ export class HID {
     }
     mouseWheel(event: WheelEvent){
         let wheelY = event.deltaY;
-        let wheelX = event.deltaX;
+        // let wheelX = event.deltaX;
+
         let code = EventCode.MouseWheel
         this.SendFunc((new HIDMsg(code,{
             deltaY: wheelY,
@@ -143,8 +144,9 @@ export class HID {
     }
     mouseButtonMovement(event: MouseEvent){
         this.elementConfig(this.video.current)
-        let code = EventCode.MouseMove
+
         if (!this.relativeMouse) {
+            let code = EventCode.MouseMoveAbs
             let mousePosition_X = this.clientToServerX(event.clientX);
             let mousePosition_Y = this.clientToServerY(event.clientY);
             this.SendFunc((new HIDMsg(code,{
@@ -152,6 +154,7 @@ export class HID {
                 dY: mousePosition_Y,
             })).ToString());
         } else {
+            let code = EventCode.MouseMoveRel
             this.SendFunc((new HIDMsg(code,{
                 dX: event.movementX,
                 dY: event.movementY,

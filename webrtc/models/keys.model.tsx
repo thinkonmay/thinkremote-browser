@@ -2,15 +2,22 @@ import { Log, LogLevel } from "../utils/log";
 
 export enum EventCode{
     MouseWheel,
-    MouseMove,
     MouseUp,
     MouseDown,
+
+    MouseMoveRel,
+    MouseMoveAbs,
 
     KeyUp,
     KeyDown,
     KeyPress,
     KeyReset,
 
+    GamepadSlide,
+    GamepadAxis,
+    GamepadButtonUp,
+    GamepadButtonDown,
+    GamepadRumble,
    
     RelativeMouseOff,
     RelativeMouseOn,
@@ -72,7 +79,7 @@ export class Shortcut {
 
 export class HIDMsg {
     code: EventCode
-    data: Map<string,string>
+    data: Map<string,string | number>
     constructor(code: EventCode, data: any)
     {
         this.code = code;
@@ -82,17 +89,40 @@ export class HIDMsg {
         }.bind(this));
     }
 
-    public ToString()
+    public ToString() : string
     {
-        let data = {};
-        this.data.forEach((value: string, key: string) => {
-            data[key] = value;
-        })
-        return JSON.stringify({
-            code : this.code,
-            data: data,
-        })
+        switch (this.code) {
+            case EventCode.KeyUp:
+                return `ku|${this.data.get("key")}`
+            case EventCode.KeyDown:
+                return `kd|${this.data.get("key")}`
+            case EventCode.KeyReset:
+                return `kr`
 
+            case EventCode.MouseUp:
+                return `mu|${this.data.get("button")}`
+            case EventCode.MouseDown:
+                return `md|${this.data.get("button")}`
+
+            case EventCode.MouseMoveRel:
+                return `mmr|${this.data.get("dX")}|${this.data.get("dY")}`
+            case EventCode.MouseMoveAbs:
+                return `mma|${this.data.get("dX")}|${this.data.get("dY")}`
+            case EventCode.MouseWheel:
+                return `mw|${this.data.get("deltaY")}`
+
+            case EventCode.GamepadButtonUp:
+                return `gb|${this.data.get("index")}|1`
+            case EventCode.GamepadButtonDown:
+                return `gb|${this.data.get("index")}|0`
+            case EventCode.GamepadAxis:
+                return `ga|${this.data.get("index")}|${this.data.get("val")}`
+            case EventCode.GamepadSlide:
+                return `gs|${this.data.get("index")}|${this.data.get("val")}`
+
+            default:
+            return ""
+        }
     }
 }
 

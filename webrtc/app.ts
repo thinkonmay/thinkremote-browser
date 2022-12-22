@@ -42,7 +42,6 @@ export class WebRTCClient  {
         this.hid = new HID(this.video,(data: string) => {
             let channel = this.datachannels.get("hid")
             if (channel == null) {
-                Log(LogLevel.Warning,"attempting to send message while data channel is not established");
                 return;
             }
             channel.sendMessage(data);
@@ -158,9 +157,9 @@ export class WebRTCClient  {
             let i = new DeviceSelection(pkt.get("Devices"));
             let result = await this.DeviceSelection(i);
             var dat = new Map<string,string>();
+
             dat.set("type","answer");
-            dat.set("monitor",result.MonitorHandle)
-            dat.set("soundcard",result.SoundcardDeviceID)
+            dat.set("value",result.ToString())
             this.signaling.SignallingSend("PREFLIGHT",dat)
         } else if (target == "START") {
             var dat = new Map<string,string>();
