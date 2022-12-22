@@ -40,9 +40,9 @@ export class WebRTCClient  {
 
         this.datachannels = new Map<string,DataChannel>();
         this.hid = new HID(this.video,(data: string) => {
+            console.log(data);
             let channel = this.datachannels.get("hid")
             if (channel == null) {
-                Log(LogLevel.Warning,"attempting to send message while data channel is not established");
                 return;
             }
             channel.sendMessage(data);

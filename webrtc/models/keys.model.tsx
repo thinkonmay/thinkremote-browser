@@ -93,31 +93,32 @@ export class HIDMsg {
     {
         switch (this.code) {
             case EventCode.KeyUp:
-                return `ku|${this.data["button"]}`
+                return `ku|${this.data.get("key")}`
             case EventCode.KeyDown:
-                return `kd|${this.data["button"]}`
+                return `kd|${this.data.get("key")}`
             case EventCode.KeyReset:
                 return `kr`
 
             case EventCode.MouseUp:
-                return `mu|${this.data["key"]}`
+                return `mu|${this.data.get("button")}`
             case EventCode.MouseDown:
-                return `md|${this.data["key"]}`
-            case EventCode.MouseMoveRel:
-                return `mmr|${this.data["dX"]}|${this.data["dY"]}`
-            case EventCode.MouseMoveAbs:
-                return `mma|${this.data["dX"]}|${this.data["dY"]}`
-            case EventCode.MouseWheel:
-                return `mw|${this.data["deltaY"]}`
+                return `md|${this.data.get("button")}`
 
-            case EventCode.GamepadAxis:
-                return `ga|${this.data["index"]}|${this.data["val"]}`
+            case EventCode.MouseMoveRel:
+                return `mmr|${this.data.get("dX")}|${this.data.get("dY")}`
+            case EventCode.MouseMoveAbs:
+                return `mma|${this.data.get("dX")}|${this.data.get("dY")}`
+            case EventCode.MouseWheel:
+                return `mw|${this.data.get("deltaY")}`
+
             case EventCode.GamepadButtonUp:
-                return `gb|${this.data["index"]}|1`
+                return `gb|${this.data.get("index")}|1`
             case EventCode.GamepadButtonDown:
-                return `gb|${this.data["index"]}|${this.data["val"]}`
+                return `gb|${this.data.get("index")}|0`
+            case EventCode.GamepadAxis:
+                return `ga|${this.data.get("index")}|${this.data.get("val")}`
             case EventCode.GamepadSlide:
-                return `gs|${this.data["deltaY"]}|${this.data["val"]}`
+                return `gs|${this.data.get("index")}|${this.data.get("val")}`
 
             default:
             return ""

@@ -48,7 +48,7 @@ const Home = ({ host }) => {
 
   useEffect(() => {
     if (remoteVideo.current) {
-      let signalingURL = (host.split(":")[0] != "localhost" )? `wss://${host}/handshake` : "wss://remote.thinkmay.net/handshake";
+      let signalingURL = (host.split(":")[0] != "localhost" )? `wss://${host}/handshake` : "wss://remote.dev.thinkmay.net/handshake";
       let token = router.asPath?.split("?")[1]?.split("=")[1] ?? "";
       if (token == "") {
         window.location.replace("https://service.thinkmay.net/dashboard");
