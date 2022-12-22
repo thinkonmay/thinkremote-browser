@@ -157,14 +157,9 @@ export class WebRTCClient  {
             let i = new DeviceSelection(pkt.get("Devices"));
             let result = await this.DeviceSelection(i);
             var dat = new Map<string,string>();
+
             dat.set("type","answer");
-            dat.set("monitor",result.MonitorHandle)
-            dat.set("soundcard",result.SoundcardDeviceID)
-            if(result.framerate != null) 
-                dat.set("framerate",result.framerate.toString())
-            if(result.bitrate != null) 
-                dat.set("bitrate",result.bitrate.toString())
-                
+            dat.set("value",result.ToString())
             this.signaling.SignallingSend("PREFLIGHT",dat)
         } else if (target == "START") {
             var dat = new Map<string,string>();
