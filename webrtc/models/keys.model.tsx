@@ -79,7 +79,7 @@ export class Shortcut {
 
 export class HIDMsg {
     code: EventCode
-    data: Map<string,string>
+    data: Map<string,string | number>
     constructor(code: EventCode, data: any)
     {
         this.code = code;
