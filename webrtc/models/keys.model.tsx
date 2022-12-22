@@ -2,15 +2,22 @@ import { Log, LogLevel } from "../utils/log";
 
 export enum EventCode{
     MouseWheel,
-    MouseMove,
     MouseUp,
     MouseDown,
+
+    MouseMoveRel,
+    MouseMoveAbs,
 
     KeyUp,
     KeyDown,
     KeyPress,
     KeyReset,
 
+    GamepadSlide,
+    GamepadAxis,
+    GamepadButtonUp,
+    GamepadButtonDown,
+    GamepadRumble,
    
     RelativeMouseOff,
     RelativeMouseOn,
@@ -82,17 +89,39 @@ export class HIDMsg {
         }.bind(this));
     }
 
-    public ToString()
+    public ToString() : string
     {
-        let data = {};
-        this.data.forEach((value: string, key: string) => {
-            data[key] = value;
-        })
-        return JSON.stringify({
-            code : this.code,
-            data: data,
-        })
+        switch (this.code) {
+            case EventCode.KeyUp:
+                return `ku|${this.data["button"]}`
+            case EventCode.KeyDown:
+                return `kd|${this.data["button"]}`
+            case EventCode.KeyReset:
+                return `kr`
 
+            case EventCode.MouseUp:
+                return `mu|${this.data["key"]}`
+            case EventCode.MouseDown:
+                return `md|${this.data["key"]}`
+            case EventCode.MouseMoveRel:
+                return `mmr|${this.data["dX"]}|${this.data["dY"]}`
+            case EventCode.MouseMoveAbs:
+                return `mma|${this.data["dX"]}|${this.data["dY"]}`
+            case EventCode.MouseWheel:
+                return `mw|${this.data["deltaY"]}`
+
+            case EventCode.GamepadAxis:
+                return `ga|${this.data["index"]}|${this.data["val"]}`
+            case EventCode.GamepadButtonUp:
+                return `gb|${this.data["index"]}|1`
+            case EventCode.GamepadButtonDown:
+                return `gb|${this.data["index"]}|${this.data["val"]}`
+            case EventCode.GamepadSlide:
+                return `gs|${this.data["deltaY"]}|${this.data["val"]}`
+
+            default:
+            return ""
+        }
     }
 }
 
