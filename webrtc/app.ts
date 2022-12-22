@@ -160,6 +160,11 @@ export class WebRTCClient  {
             dat.set("type","answer");
             dat.set("monitor",result.MonitorHandle)
             dat.set("soundcard",result.SoundcardDeviceID)
+            if(result.framerate != null) 
+                dat.set("framerate",result.framerate.toString())
+            if(result.bitrate != null) 
+                dat.set("bitrate",result.bitrate.toString())
+                
             this.signaling.SignallingSend("PREFLIGHT",dat)
         } else if (target == "START") {
             var dat = new Map<string,string>();
