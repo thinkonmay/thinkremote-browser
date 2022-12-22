@@ -15,7 +15,7 @@ import {
   ArrowBackIos,
 } from "@mui/icons-material";
 import Draggable from "react-draggable";
-import { DeviceSelection, DeviceSelectionResult } from "../webrtc/models/devices.model";
+import { DeviceSelection, DeviceSelectionResult, Soundcard } from "../webrtc/models/devices.model";
 import { ConnectionEvent, Log, LogConnectionEvent, LogLevel } from "../webrtc/utils/log";
 import { GetServerSideProps, NextPage } from "next";
 import { stepButtonClasses } from "@mui/material";
@@ -54,14 +54,50 @@ const Home = ({ host }) => {
         window.location.replace("https://service.thinkmay.net/dashboard");
       }
 
+      var defaultSoundcard = "Default Audio Render Device";
+      var defaultBitrate   = null;
+      var defaultFramerate = null;
 
       let client = new WebRTCClient(signalingURL,remoteVideo, remoteAudio, token, (async (offer: DeviceSelection) => {
           LogConnectionEvent(ConnectionEvent.WaitingAvailableDeviceSelection)
-          var soundcardID = await AskSelectSoundcard(offer.soundcards)
-          Log(LogLevel.Infor,`selected audio deviceid ${soundcardID}`)
-          var DeviceHandle = await AskSelectDisplay(offer.monitors)
-          Log(LogLevel.Infor,`selected monitor handle ${DeviceHandle}`)
-          return new DeviceSelectionResult(soundcardID,DeviceHandle);
+
+          let ret = new DeviceSelectionResult(offer.soundcards[0].DeviceID,offer.monitors[0].MonitorHandle.toString());
+          if(offer.soundcards.length > 1) {
+
+            let exist = false;
+            if (defaultSoundcard != null) {
+              offer.soundcards.forEach(x => {
+                if (x.Name == defaultSoundcard) {
+                  exist = true;
+                  ret.SoundcardDeviceID = x.DeviceID;
+                  defaultSoundcard = null;
+                }
+              })
+            }
+
+            if (!exist) {
+              ret.SoundcardDeviceID = await AskSelectSoundcard(offer.soundcards)
+              Log(LogLevel.Infor,`selected audio deviceid ${ret.SoundcardDeviceID}`)
+            }
+          }           
+
+          if(offer.monitors.length > 1) {
+            ret.MonitorHandle = await AskSelectDisplay(offer.monitors)
+            Log(LogLevel.Infor,`selected monitor handle ${ret.MonitorHandle}`)
+          }
+
+          if (defaultBitrate == null) {
+            ret.bitrate= await AskSelectBitrate();
+          } else {
+            ret.bitrate = defaultBitrate;
+          }
+          if (defaultFramerate == null) {
+            ret.framerate = await AskSelectFramerate();
+          } else {
+            ret.framerate = defaultFramerate;
+          }
+
+          return ret;
       })).Notifier(message => {
         TurnOnStatus(message);
       }).Alert(message => {

@@ -40,7 +40,6 @@ export class WebRTCClient  {
 
         this.datachannels = new Map<string,DataChannel>();
         this.hid = new HID(this.video,(data: string) => {
-            console.log(data);
             let channel = this.datachannels.get("hid")
             if (channel == null) {
                 return;
