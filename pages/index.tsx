@@ -56,7 +56,7 @@ const Home = ({ host }) => {
 
       var defaultSoundcard = "Default Audio Render Device";
       var defaultBitrate   = null;
-      var defaultFramerate = null;
+      var defaultFramerate = 55;
 
       let client = new WebRTCClient(signalingURL,remoteVideo, remoteAudio, token, (async (offer: DeviceSelection) => {
           LogConnectionEvent(ConnectionEvent.WaitingAvailableDeviceSelection)
