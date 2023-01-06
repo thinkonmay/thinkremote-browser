@@ -72,12 +72,13 @@ export class WebRTCClient  {
             LogConnectionEvent(ConnectionEvent.ReceivedAudioStream);
             (this.audio.current as HTMLAudioElement).srcObject = evt.streams[0]
         } else if (evt.track.kind == "video") {
-            LogConnectionEvent(ConnectionEvent.ReceivedVideoStream)
-            let pipeline = new Pipeline('h264');
-            pipeline.updateSource(evt.streams[0])
-            pipeline.updateTransform(new WebGLTransform());
-            pipeline.updateSink(new VideoSink(this.video.current as HTMLVideoElement))
-            this.pipelines.set(evt.track.id,pipeline);
+            LogConnectionEvent(ConnectionEvent.ReceivedVideoStream);
+            (this.video.current as HTMLVideoElement).srcObject = evt.streams[0]
+            // let pipeline = new Pipeline('h264');
+            // pipeline.updateSource(evt.streams[0])
+            // pipeline.updateTransform(new WebGLTransform());
+            // pipeline.updateSink(new VideoSink(this.video.current as HTMLVideoElement))
+            // this.pipelines.set(evt.track.id,pipeline);
         }
     }
 
