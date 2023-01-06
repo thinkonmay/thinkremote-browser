@@ -5,24 +5,39 @@ import { HIDMsg, KeyCode, Shortcut, ShortcutCode } from "../models/keys.model";
 
 
 
+class Screen {
+    constructor() {
+        this.ClientHeight = 0;
+        this.ClientWidth = 0;
+        this.ClientLeft = 0;
+        this.ClientTop = 0;
+        this.Streamheight = 0;
+        this.StreamWidth = 0;
+        this.desiredRatio = 0;
+    }
+    /*
+    * client resolution display on client screen
+    */
+    public ClientWidth: number;
+    public ClientHeight: number;
+    /*
+    * client resolution display on client screen
+    */
+    public ClientTop: number;
+    public ClientLeft: number;
+
+    public StreamWidth: number;
+    public Streamheight: number;
+    
+    public desiredRatio: number;
+}
 
 export class HID {
     private gamepads : Map<number,Gamepad>;
     private shortcuts: Array<Shortcut>
 
-    private relativeMouse: boolean
-    private Screen: {
-        /*
-        * client resolution display on client screen
-        */
-        ClientWidth: number,
-        ClientHeight: number,
-        /*
-        * client resolution display on client screen
-        */
-        ClientTop: number,
-        ClientLeft: number,
-    }
+    private relativeMouse : boolean
+    private Screen : Screen;
 
 
     private video: HTMLVideoElement
@@ -33,27 +48,20 @@ export class HID {
         this.relativeMouse = false;
         this.video = videoElement;
         this.SendFunc = Sendfunc;
-        this.Screen = {
-            ClientHeight: 0,
-            ClientWidth: 0,
-            ClientLeft: 0,
-            ClientTop: 0,
-        }
+        this.Screen = new Screen();
 
-
-        let VideoElement = this.video;
         /**
          * video event
          */
-        VideoElement.addEventListener('contextmenu',   ((event: Event) => {event.preventDefault()})); ///disable content menu key on remote control
+        this.video.addEventListener('contextmenu',   ((event: Event) => {event.preventDefault()})); ///disable content menu key on remote control
 
         /**
          * mouse event
          */
-        VideoElement.addEventListener('wheel',          this.mouseWheel.bind(this));
-        VideoElement.addEventListener('mousemove',      this.mouseButtonMovement.bind(this));
-        VideoElement.addEventListener('mousedown',      this.mouseButtonDown.bind(this));
-        VideoElement.addEventListener('mouseup',        this.mouseButtonUp.bind(this));
+        this.video.addEventListener('wheel',          this.mouseWheel.bind(this));
+        this.video.addEventListener('mousemove',      this.mouseButtonMovement.bind(this));
+        this.video.addEventListener('mousedown',      this.mouseButtonDown.bind(this));
+        this.video.addEventListener('mouseup',        this.mouseButtonUp.bind(this));
         
         /**
          * keyboard event
@@ -67,8 +75,8 @@ export class HID {
         /**
          * mouse lock event
          */
-        VideoElement.addEventListener('mouseleave',     this.mouseLeaveEvent.bind(this));
-        VideoElement.addEventListener('mouseenter',     this.mouseEnterEvent.bind(this));
+        this.video.addEventListener('mouseleave',     this.mouseLeaveEvent.bind(this));
+        this.video.addEventListener('mouseenter',     this.mouseEnterEvent.bind(this));
 
         document.addEventListener('pointerlockchange',  this.pointerLock.bind(this));
 
@@ -76,7 +84,7 @@ export class HID {
 
         this.shortcuts = new Array<Shortcut>();
         this.shortcuts.push(new Shortcut(ShortcutCode.Fullscreen,[KeyCode.Ctrl,KeyCode.Shift,KeyCode.F],(()=> {
-            this.video.requestFullscreen();
+            this.video.parentElement.requestFullscreen();
         })))
         this.shortcuts.push(new Shortcut(ShortcutCode.PointerLock,[KeyCode.Ctrl,KeyCode.Shift,KeyCode.P],(()=> {
             if(!document.pointerLockElement) {
@@ -233,8 +241,22 @@ export class HID {
     elementConfig(VideoElement: HTMLVideoElement) 
     {
         this.Screen.ClientWidth  =  VideoElement.offsetWidth;
-        this.Screen.ClientHeight = VideoElement.offsetHeight;
+        this.Screen.ClientHeight =  VideoElement.offsetHeight;
         this.Screen.ClientTop    =  VideoElement.offsetTop;
-        this.Screen.ClientLeft   = VideoElement.offsetLeft;
+        this.Screen.ClientLeft   =  VideoElement.offsetLeft;
+
+        this.Screen.StreamWidth  =  VideoElement.videoWidth;
+        this.Screen.Streamheight =  VideoElement.videoHeight;
+
+        let desiredRatio = this.Screen.StreamWidth / this.Screen.Streamheight;
+        let HTMLVideoElementRatio = this.Screen.ClientWidth / this.Screen.ClientHeight;
+
+        if (HTMLVideoElementRatio > desiredRatio) {
+            let virtualWidth = this.Screen.ClientHeight * desiredRatio
+            let virtualLeft = ( this.Screen.ClientWidth - virtualWidth ) / 2;
+
+            this.Screen.ClientWidth = virtualWidth
+            this.Screen.ClientLeft = virtualLeft
+        }
     }
 }
