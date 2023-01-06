@@ -1,16 +1,36 @@
 import fullscreenTexturedQuadWGSL from './blur/fullscreenTexturedQuad.wgsl';
 import blurWGSL from './blur/blur.wgsl';
+import { MediaStreamSink } from '../sink';
 
-export class WebGPUTransform { // eslint-disable-line no-unused-vars
+export class WebGPUCanvas implements MediaStreamSink{ // eslint-disable-line no-unused-vars
 	device: GPUDevice
 	context: GPUCanvasContext
 	adapter: GPUAdapter
 	canvas: HTMLCanvasElement
 
+	mediastream: MediaStream
+	srcWidth: number
+	srcHeight: number
+
 	fullscreenQuadPipeline: GPURenderPipeline
 	showResultBindGroup: GPUBindGroup
+	blurPipeline: GPUComputePipeline
 
+	computeBindGroup1: GPUBindGroup
+	computeBindGroup2: GPUBindGroup
+	computeBindGroup3: GPUBindGroup
+	computeConstants:  GPUBindGroup
+	computeBindGroup0: GPUBindGroup
+	
+	blurParamsBuffer: GPUBuffer
 	vertexBuffer_: GPUBuffer
+
+	buffer0: GPUBuffer
+	buffer1: GPUBuffer
+
+	cubeTexture: GPUTexture	
+	textures: Array<GPUTexture>
+
 
 	constructor(inputCanvas: HTMLCanvasElement) {
 		this.canvas = inputCanvas;
@@ -22,7 +42,7 @@ export class WebGPUTransform { // eslint-disable-line no-unused-vars
 		this.context = this.canvas.getContext('webgpu');
 		if (!this.context) {
 			const errorMessage = 'Your browser does not support the WebGPU API.' +
-						' Please see the note at the bottom of the page.';
+								 'Please see the note at the bottom of the page.';
 			return new Error(errorMessage);
 		}
 
@@ -33,44 +53,49 @@ export class WebGPUTransform { // eslint-disable-line no-unused-vars
 			return;
 		}
 
-		const devicePixelRatio = window.devicePixelRatio || 1;
-		const presentationSize = [
-			this.canvas.clientWidth * devicePixelRatio,
-			this.canvas.clientHeight * devicePixelRatio,
-		];
 
 
-  		const presentationFormat = navigator.gpu.getPreferredCanvasFormat();
-		this.context.configure({
-			device: this.device,
-			size: presentationSize,
-			format: presentationFormat,
-			alphaMode: 'opaque',
-		})
 
-		this.fullscreenQuadPipeline = this.device.createRenderPipeline({
-			layout: 'auto',
-			vertex: {
-			module: this.device.createShaderModule({
-				code: fullscreenTexturedQuadWGSL,
-			}),
-			entryPoint: 'vert_main',
-			},
-			fragment: {
-			module: this.device.createShaderModule({
-				code: fullscreenTexturedQuadWGSL,
-			}),
-			entryPoint: 'frag_main',
-			targets: [
-				{
+		{
+			const devicePixelRatio = window.devicePixelRatio || 1;
+			const presentationSize = [
+				this.canvas.clientWidth * devicePixelRatio,
+				this.canvas.clientHeight * devicePixelRatio,
+			];
+
+
+			const presentationFormat = navigator.gpu.getPreferredCanvasFormat();
+			this.context.configure({
+				device: this.device,
+				size: presentationSize,
 				format: presentationFormat,
+				alphaMode: 'opaque',
+			})
+
+			this.fullscreenQuadPipeline = this.device.createRenderPipeline({
+				layout: 'auto',
+				vertex: {
+				module: this.device.createShaderModule({
+					code: fullscreenTexturedQuadWGSL,
+				}),
+				entryPoint: 'vert_main',
 				},
-			],
-			},
-			primitive: {
-			topology: 'triangle-list',
-			},
-		});
+				fragment: {
+				module: this.device.createShaderModule({
+					code: fullscreenTexturedQuadWGSL,
+				}),
+				entryPoint: 'frag_main',
+				targets: [
+					{
+					format: presentationFormat,
+					},
+				],
+				},
+				primitive: {
+				topology: 'triangle-list',
+				},
+			});
+		}
 
 		const sampler = this.device.createSampler({
 			magFilter: 'linear',
@@ -78,296 +103,293 @@ export class WebGPUTransform { // eslint-disable-line no-unused-vars
 		});
 		
 
-		const textures = [0, 1].map(() => {
-			return this.device.createTexture({
-			size: {
-				width: srcWidth,
-				height: srcHeight,
-			},
-			format: 'rgba8unorm',
-			usage:
-				GPUTextureUsage.COPY_DST |
-				GPUTextureUsage.STORAGE_BINDING |
-				GPUTextureUsage.TEXTURE_BINDING,
-			});
-		});
-		this.showResultBindGroup = this.device.createBindGroup({
-			layout: this.fullscreenQuadPipeline.getBindGroupLayout(0),
-			entries: [
-				{
-					binding: 0,
-					resource: sampler,
+		{
+			this.textures = [0, 1].map(() => {
+				return this.device.createTexture({
+				size: {
+					width: this.srcWidth,
+					height: this.srcHeight,
 				},
+				format: 'rgba8unorm',
+				usage:
+					GPUTextureUsage.COPY_DST |
+					GPUTextureUsage.STORAGE_BINDING |
+					GPUTextureUsage.TEXTURE_BINDING,
+				});
+			});
+			this.showResultBindGroup = this.device.createBindGroup({
+				layout: this.fullscreenQuadPipeline.getBindGroupLayout(0),
+				entries: [
+					{
+						binding: 0,
+						resource: sampler,
+					},
+					{
+						binding: 1,
+						resource: this.textures[1].createView(),
+					},
+				],
+			});
+		}
+
+		this.blurPipeline = this.device.createComputePipeline({
+			layout: 'auto',
+			compute: {
+				module: this.device.createShaderModule({
+					code: blurWGSL,
+				}),
+				entryPoint: 'main',
+			},
+		});
+
+
+
+
+
+
+
+
+
+		{
+			{
+				const buffer = this.device.createBuffer({
+					size: 4,
+					mappedAtCreation: true,
+					usage: GPUBufferUsage.UNIFORM,
+				});
+
+				new Uint32Array(buffer.getMappedRange())[0] = 0;
+				buffer.unmap();
+				this.buffer0 = buffer;
+			};
+
+			{
+				const buffer = this.device.createBuffer({
+					size: 4,
+					mappedAtCreation: true,
+					usage: GPUBufferUsage.UNIFORM,
+				});
+
+				new Uint32Array(buffer.getMappedRange())[0] = 1;
+				buffer.unmap();
+				this.buffer1 = buffer;
+			}
+
+			this.computeBindGroup1 = this.device.createBindGroup({
+				layout: this.blurPipeline.getBindGroupLayout(1),
+				entries: [
 				{
 					binding: 1,
-					resource: textures[1].createView(),
-				},
-			],
-		});
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-		
-
-
-		const swapChainFormat = 'bgra8unorm';
-		const rectVerts = new Float32Array([
-			1.0, 1.0, 0.0, 1.0, 0.0,
-			1.0, -1.0, 0.0, 1.0, 1.0,
-			-1.0, -1.0, 0.0, 0.0, 1.0,
-			1.0, 1.0, 0.0, 1.0, 0.0,
-			-1.0, -1.0, 0.0, 0.0, 1.0,
-			-1.0, 1.0, 0.0, 0.0, 0.0,
-		]);
-		// Creates a GPU buffer.
-		const vertexBuffer = this.device.createBuffer({
-		size: rectVerts.byteLength,
-		usage: GPUBufferUsage.VERTEX,
-		mappedAtCreation: true,
-		});
-		// Copies rectVerts to vertexBuffer
-		new Float32Array(vertexBuffer.getMappedRange()).set(rectVerts);
-		vertexBuffer.unmap();
-		this.vertexBuffer_ = vertexBuffer;
-
-		context.configure({
-		device,
-		format: swapChainFormat
-		});
-
-		this.renderPipeline_ = device.createRenderPipeline({
-		vertex: {
-			module: device.createShaderModule({
-			code: wgslShaders.vertex,
-			}),
-			entryPoint: 'main',
-			buffers: [
-			{
-				arrayStride: 20,
-				attributes: [
-				{
-					// position
-					shaderLocation: 0,
-					offset: 0,
-					format: 'float32x3',
+					resource: this.textures[0].createView(),
 				},
 				{
-					// uv
-					shaderLocation: 1,
-					offset: 12,
-					format: 'float32x2',
+					binding: 2,
+					resource: this.textures[1].createView(),
+				},
+				{
+					binding: 3,
+					resource: {
+					buffer: this.buffer1,
+					},
 				},
 				],
+			});
+
+			this.computeBindGroup2 = this.device.createBindGroup({
+				layout: this.blurPipeline.getBindGroupLayout(1),
+				entries: [
+				{
+					binding: 1,
+					resource: this.textures[1].createView(),
+				},
+				{
+					binding: 2,
+					resource: this.textures[0].createView(),
+				},
+				{
+					binding: 3,
+					resource: {
+					buffer: this.buffer0,
+					},
+				},
+				],
+			});
+		}
+
+
+
+
+
+		this.blurParamsBuffer = this.device.createBuffer({
+			size: 8,
+			usage: GPUBufferUsage.COPY_DST | GPUBufferUsage.UNIFORM,
+		});
+
+		this.computeConstants = this.device.createBindGroup({
+			layout: this.blurPipeline.getBindGroupLayout(0),
+			entries: [
+			{
+				binding: 0,
+				resource: sampler,
+			},
+			{
+				binding: 1,
+				resource: {
+				buffer: this.blurParamsBuffer,
+				},
 			},
 			],
-		},
-		fragment: {
-			module: device.createShaderModule({
-			code: wgslShaders.fragment,
-			}),
-			entryPoint: 'main',
-			targets: [
+		});	
+
+
+		this.cubeTexture = this.device.createTexture({
+			size: [this.srcWidth, this.srcHeight, 1],
+			format: 'rgba8unorm',
+			usage:
+			GPUTextureUsage.TEXTURE_BINDING |
+			GPUTextureUsage.COPY_DST |
+			GPUTextureUsage.RENDER_ATTACHMENT,
+		});
+
+		this.computeBindGroup0 = this.device.createBindGroup({
+			layout: this.blurPipeline.getBindGroupLayout(1),
+			entries: [
 			{
-				format: swapChainFormat,
+				binding: 1,
+				resource: this.cubeTexture.createView(),
+			},
+			{
+				binding: 2,
+				resource: this.textures[0].createView(),
+			},
+			{
+				binding: 3,
+				resource: {
+				buffer: this.buffer0,
+				},
 			},
 			],
-		},
-		primitive: {
-			topology: 'triangle-list',
-		},
 		});
 
-		this.videoTexture_ = device.createTexture({
-		size: [480 * 2, 270 * 2],
-		format: 'rgba8unorm',
-		usage: GPUTextureUsage.COPY_DST | GPUTextureUsage.TEXTURE_BINDING |
-					GPUTextureUsage.RENDER_ATTACHMENT,
-		});
 
-		this.sampler_ = device.createSampler({
-		addressModeU: 'repeat',
-		addressModeV: 'repeat',
-		addressModeW: 'repeat',
-		magFilter: 'linear',
-		minFilter: 'linear',
-		});
+
+
+
+
+
+
+
+
+
 	}
 
-	async copyOnTexture(device, videoTexture, frame, xcorr, ycorr) {
-		if (!frame) {
-		return;
-		}
-		// Using GPUExternalTexture(when it's implemented for Breakout Box frames) will
-		// avoid making extra copies through ImageBitmap.
-		const videoBitmap = await createImageBitmap(frame, {resizeWidth: 480, resizeHeight: 270});
-		device.queue.copyExternalImageToTexture(
-			{source: videoBitmap, origin: {x: 0, y: 0}},
-			{texture: videoTexture, origin: {x: xcorr, y: ycorr}},
-			{
-			// the width of the image being copied
-			width: videoBitmap.width,
-			height: videoBitmap.height,
-			}
-		);
-		videoBitmap.close();
-		frame.close();
-	}
+    setMediaStream(stream: MediaStream) {
+		this.mediastream = stream;
 
-	async renderOnScreen(videoSource, gumSource) {
-		const device = this.device_;
-		const videoTexture = this.videoTexture_;
-		if (!device) {
-		console.log('[WebGPUTransform] device is undefined or null.');
-		return false;
-		}
+		let cap = this.mediastream.getVideoTracks()[0].getSettings()
+		this.srcWidth = cap.width;
+		this.srcHeight = cap.height;
 
-		const videoPromise = videoSource.read().then(({value}) => {
-		this.copyOnTexture(device, videoTexture, value, 0, 270);
-		});
-		const gumPromise = gumSource.read().then(({value}) => {
-		this.copyOnTexture(device, videoTexture, value, 480, 0);
-		});
-		await Promise.all([videoPromise, gumPromise]);
-
-		if (!this.device_) {
-		console.log('Check if destroy has been called asynchronously.');
-		return false;
-		}
-
-		const uniformBindGroup = device.createBindGroup({
-		layout: this.renderPipeline_.getBindGroupLayout(0),
-		entries: [
-			{
-			binding: 0,
-			resource: this.sampler_,
-			},
-			{
-			binding: 1,
-			resource: videoTexture.createView(),
-			},
-		],
-		});
-
-		const commandEncoder = device.createCommandEncoder();
-		const textureView = this.context_.getCurrentTexture().createView();
-
-		const renderPassDescriptor = {
-		colorAttachments: [
-			{
-			view: textureView,
-			loadValue: {r: 0.0, g: 0.0, b: 0.0, a: 1.0},
-			storeOp: 'store',
-			},
-		],
-		};
-		const passEncoder = commandEncoder.beginRenderPass(renderPassDescriptor);
-		passEncoder.setPipeline(this.renderPipeline_);
-		passEncoder.setVertexBuffer(0, this.vertexBuffer_);
-		passEncoder.setBindGroup(0, uniformBindGroup);
-		passEncoder.draw(6, 1, 0, 0);
-		passEncoder.endPass();
-		device.queue.submit([commandEncoder.finish()]);
-		return true;
 	}
 
 
-	async transform(videoStream, gumStream) {
-		const videoSource = videoStream.getReader();
-		const gumSource = gumStream.getReader();
+
+	private setFrameSize(bitmap: ImageBitmap) {
+		this.srcHeight = bitmap.height;
+		this.srcWidth = bitmap.width;
+	}
+
+
+
+
+
+	async process() {
+		const processor = new MediaStreamTrackProcessor({track: this.mediastream.getVideoTracks()[0]});
+		const videoSource = processor.readable.getReader()
+
 		while (true) {
-		const rendered = await this.renderOnScreen(videoSource, gumSource);
-		if (!rendered) {
-			break;
-		}
+			let frame = await videoSource.read()
+			while (!frame.done) { await new Promise(resolve => setTimeout(resolve, 1)) }
+
+			let bitmap = await createImageBitmap(frame.value);
+
+			this.device.queue.copyExternalImageToTexture(
+				{ source : bitmap},
+				{ texture: this.cubeTexture},
+    			[ this.srcWidth, this.srcHeight ]
+			)
+
+			await this.render()
 		}
 		videoSource.cancel();
-		gumSource.cancel();
 	}
 
-	private frame_callback() {
+	private async render() {
 		// Sample is no longer the active page.
 		// if (!pageState.active) return;
 
 		const commandEncoder = this.device.createCommandEncoder();
 
 		const computePass = commandEncoder.beginComputePass();
-		computePass.setPipeline(blurPipeline);
-		computePass.setBindGroup(0, computeConstants);
+		computePass.setPipeline(this.blurPipeline);
+		computePass.setBindGroup(0, this.computeConstants);
 
-		computePass.setBindGroup(1, computeBindGroup0);
+		computePass.setBindGroup(1, this.computeBindGroup0);
 		computePass.dispatchWorkgroups(
-		Math.ceil(srcWidth / blockDim),
-		Math.ceil(srcHeight / batch[1])
+			Math.ceil(this.srcWidth / blockDim),
+			Math.ceil(this.srcHeight / batch[1])
 		);
 
-		computePass.setBindGroup(1, computeBindGroup1);
+		computePass.setBindGroup(1, this.computeBindGroup1);
 		computePass.dispatchWorkgroups(
-		Math.ceil(srcHeight / blockDim),
-		Math.ceil(srcWidth / batch[1])
+			Math.ceil(this.srcHeight / blockDim),
+			Math.ceil(this.srcWidth / batch[1])
 		);
 
 		for (let i = 0; i < settings.iterations - 1; ++i) {
-		computePass.setBindGroup(1, computeBindGroup2);
-		computePass.dispatchWorkgroups(
-			Math.ceil(srcWidth / blockDim),
-			Math.ceil(srcHeight / batch[1])
-		);
+			computePass.setBindGroup(1, this.computeBindGroup2);
+			computePass.dispatchWorkgroups(
+				Math.ceil(this.srcWidth / blockDim),
+				Math.ceil(this.srcHeight / batch[1])
+			);
 
-		computePass.setBindGroup(1, computeBindGroup1);
-		computePass.dispatchWorkgroups(
-			Math.ceil(srcHeight / blockDim),
-			Math.ceil(srcWidth / batch[1])
-		);
+			computePass.setBindGroup(1, this.computeBindGroup1);
+			computePass.dispatchWorkgroups(
+				Math.ceil(this.srcHeight / blockDim),
+				Math.ceil(this.srcWidth / batch[1])
+			);
 		}
 
 		computePass.end();
 
 		let descriptor = {
-		colorAttachments: [{
-			label: "",
-			view: this.context.getCurrentTexture().createView(),
-			clearValue: { r: 0.0, g: 0.0, b: 0.0, a: 1.0 },
-			loadOp: 'clear',
-			storeOp: 'store',
+			colorAttachments: [{
+				label: "",
+				view: this.context.getCurrentTexture().createView(),
+				clearValue: { r: 0.0, g: 0.0, b: 0.0, a: 1.0 },
+				loadOp: 'clear',
+				storeOp: 'store',
 			}],
 		} as GPURenderPassDescriptor;
 
 		const passEncoder = commandEncoder.beginRenderPass(descriptor);
-
 		passEncoder.setPipeline(this.fullscreenQuadPipeline);
 		passEncoder.setBindGroup(0, this.showResultBindGroup);
 		passEncoder.draw(6, 1, 0, 0);
 		passEncoder.end();
-		device.queue.submit([commandEncoder.finish()]);
-
-		requestAnimationFrame(this.frame_callback);
+		this.device.queue.submit([commandEncoder.finish()]);
 	}
 
 
 
 
 	destroy() {
-		if (this.device_) {
-		// Currently being implemented.
-		// await this.device_.destroy();
-		this.device_ = null;
-		this.vertexBuffer_.destroy();
-		this.videoTexture_.destroy();
-		if (this.canvas_.parentNode) {
-			this.canvas_.parentNode.removeChild(this.canvas_);
-		}
-		console.log('[WebGPUTransform] Context destroyed.',);
+		if (this.device) {
+			// Currently being implemented.
+			// await this.device_.destroy();
+			this.device = null;
+			this.blurParamsBuffer.destroy();
+			console.log('[WebGPUTransform] Context destroyed.',);
 		}
 	}
 }
