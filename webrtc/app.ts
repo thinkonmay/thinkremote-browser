@@ -162,8 +162,12 @@ export class WebRTCClient  {
             }
             
 
-            let i = new DeviceSelection(pkt.get("Devices"));
-            let result = await this.DeviceSelection(i);
+            let devices = pkt.get("Devices")
+            if (devices == null) {
+                return;
+            }
+
+            let result = await this.DeviceSelection(new DeviceSelection(devices));
             var dat = new Map<string,string>();
 
             dat.set("type","answer");
