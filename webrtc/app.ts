@@ -4,6 +4,10 @@ import { AddNotifier, ConnectionEvent, Log, LogConnectionEvent, LogLevel } from 
 import { DeviceSelection, DeviceSelectionResult } from "./models/devices.model";
 import { WebRTC } from "./webrtc";
 import { SignallingClient } from "./signaling/websocket";
+import { Pipeline } from "./pipeline/pipeline";
+import { VideoSink } from "./pipeline/sink/video/video";
+import { WebCodecTransform } from "./pipeline/transform/webcodec/webcodec";
+import { WebGLTransform } from "./pipeline/transform/webgl/webgl";
 
 
 
@@ -15,6 +19,7 @@ export class WebRTCClient  {
     hid : HID
     signaling : SignallingClient
     datachannels : Map<string,DataChannel>;
+    pipelines: Map<string,Pipeline>
     
     DeviceSelection: (input: DeviceSelection) => Promise<DeviceSelectionResult>;
     alert : (input: string) => (void);
@@ -34,12 +39,14 @@ export class WebRTCClient  {
         this.started = false;
         this.video = vid;
         this.audio = audio;
+        this.pipelines = new Map<string,Pipeline>();
         
 
         this.DeviceSelection = DeviceSelection;
 
         this.datachannels = new Map<string,DataChannel>();
-        this.hid = new HID(this.video,(data: string) => {
+        this.hid = new HID((this.video.current as HTMLVideoElement),(data: string) => {
+            Log(LogLevel.Debug,data)
             let channel = this.datachannels.get("hid")
             if (channel == null) {
                 return;
@@ -62,15 +69,16 @@ export class WebRTCClient  {
         Log(LogLevel.Infor,`Incoming ${evt.track.kind} stream`);
         if (evt.track.kind == "audio")
         {
-            if ( this.audio.current.srcObject !== evt.streams[0]) {
-                LogConnectionEvent(ConnectionEvent.ReceivedAudioStream)
-                this.audio.current.srcObject = evt.streams[0]
-            }
+            LogConnectionEvent(ConnectionEvent.ReceivedAudioStream);
+            (this.audio.current as HTMLAudioElement).srcObject = evt.streams[0]
         } else if (evt.track.kind == "video") {
-            if ( this.video.current.srcObject !== evt.streams[0]) {
-                LogConnectionEvent(ConnectionEvent.ReceivedVideoStream)
-                this.video.current.srcObject = evt.streams[0]
-            }
+            LogConnectionEvent(ConnectionEvent.ReceivedVideoStream);
+            (this.video.current as HTMLVideoElement).srcObject = evt.streams[0]
+            // let pipeline = new Pipeline('h264');
+            // pipeline.updateSource(evt.streams[0])
+            // pipeline.updateTransform(new WebGLTransform());
+            // pipeline.updateSink(new VideoSink(this.video.current as HTMLVideoElement))
+            // this.pipelines.set(evt.track.id,pipeline);
         }
     }
 
@@ -154,8 +162,12 @@ export class WebRTCClient  {
             }
             
 
-            let i = new DeviceSelection(pkt.get("Devices"));
-            let result = await this.DeviceSelection(i);
+            let devices = pkt.get("Devices")
+            if (devices == null) {
+                return;
+            }
+
+            let result = await this.DeviceSelection(new DeviceSelection(devices));
             var dat = new Map<string,string>();
 
             dat.set("type","answer");

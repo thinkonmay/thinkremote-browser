@@ -112,13 +112,13 @@ export class HIDMsg {
                 return `mw|${this.data.get("deltaY")}`
 
             case EventCode.GamepadButtonUp:
-                return `gb|${this.data.get("index")}|1`
+                return `gb|${this.data.get("gamepad_id")}|${this.data.get("index")}|1`
             case EventCode.GamepadButtonDown:
-                return `gb|${this.data.get("index")}|0`
+                return `gb|${this.data.get("gamepad_id")}|${this.data.get("index")}|0`
             case EventCode.GamepadAxis:
-                return `ga|${this.data.get("index")}|${this.data.get("val")}`
+                return `ga|${this.data.get("gamepad_id")}|${this.data.get("index")}|${this.data.get("val")}`
             case EventCode.GamepadSlide:
-                return `gs|${this.data.get("index")}|${this.data.get("val")}`
+                return `gs|${this.data.get("gamepad_id")}|${this.data.get("index")}|${this.data.get("val")}`
 
             default:
             return ""
