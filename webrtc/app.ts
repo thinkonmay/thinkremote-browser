@@ -45,7 +45,8 @@ export class WebRTCClient  {
         this.DeviceSelection = DeviceSelection;
 
         this.datachannels = new Map<string,DataChannel>();
-        this.hid = new HID(this.video,(data: string) => {
+        this.hid = new HID((this.video.current as HTMLVideoElement),(data: string) => {
+            Log(LogLevel.Debug,data)
             let channel = this.datachannels.get("hid")
             if (channel == null) {
                 return;

@@ -7,16 +7,11 @@ import { HIDMsg, KeyCode, Shortcut, ShortcutCode } from "../models/keys.model";
 
 
 export class HID {
+    private gamepads : Map<number,Gamepad>;
     private shortcuts: Array<Shortcut>
+
     private relativeMouse: boolean
     private Screen: {
-        /*
-        * frame resolution used to transport to client
-        */
-        StreamWidth: number,
-        StreamHeight: number,
-
-
         /*
         * client resolution display on client screen
         */
@@ -29,15 +24,16 @@ export class HID {
         ClientLeft: number,
     }
 
-    private video: any 
+
+    private video: HTMLVideoElement
     private SendFunc: ((data: string) => (void))
-    constructor(videoElement: any, Sendfunc: ((data:string)=>(void))){
+
+    constructor(videoElement: HTMLVideoElement, Sendfunc: ((data:string)=>(void))){
+        this.gamepads = new Map<number,Gamepad>();
         this.relativeMouse = false;
         this.video = videoElement;
         this.SendFunc = Sendfunc;
         this.Screen = {
-            StreamHeight: 0,
-            StreamWidth: 0,
             ClientHeight: 0,
             ClientWidth: 0,
             ClientLeft: 0,
@@ -45,8 +41,7 @@ export class HID {
         }
 
 
-        var VideoElement : HTMLVideoElement;
-        VideoElement = this.video.current;
+        let VideoElement = this.video;
         /**
          * video event
          */
@@ -66,6 +61,9 @@ export class HID {
         window.addEventListener('keydown',        this.keydown.bind(this));
         window.addEventListener('keyup',          this.keyup.bind(this));
 
+        window.addEventListener("gamepadconnected",     this.connectGamepad.bind(this));
+        window.addEventListener("gamepaddisconnected",  this.disconnectGamepad.bind(this));
+
         /**
          * mouse lock event
          */
@@ -78,20 +76,66 @@ export class HID {
 
         this.shortcuts = new Array<Shortcut>();
         this.shortcuts.push(new Shortcut(ShortcutCode.Fullscreen,[KeyCode.Ctrl,KeyCode.Shift,KeyCode.F],(()=> {
-            this.video.current.parentElement.requestFullscreen();
+            this.video.requestFullscreen();
         })))
         this.shortcuts.push(new Shortcut(ShortcutCode.PointerLock,[KeyCode.Ctrl,KeyCode.Shift,KeyCode.P],(()=> {
             if(!document.pointerLockElement) {
                 this.relativeMouse = true;
                 this.SendFunc((new HIDMsg(EventCode.RelativeMouseOn,{ }).ToString()))
-                this.video.current.requestPointerLock();
+                this.video.requestPointerLock();
             } else {
                 this.relativeMouse = false;
                 this.SendFunc((new HIDMsg(EventCode.RelativeMouseOff,{ }).ToString()))
                 document.exitPointerLock();
             }
         })))
+
+        setInterval(() => this.runGamepad(), 1);
     }
+
+    connectGamepad (event: GamepadEvent) : void {
+        if (event.gamepad.mapping === "standard") {
+            this.gamepads.set(event.gamepad.index,event.gamepad)
+        }
+    };
+
+    disconnectGamepad (event: GamepadEvent) : void {
+        if (event.gamepad.mapping === "standard") {
+            this.gamepads.delete(event.gamepad.index)
+        }
+    };
+
+    async runGamepad () : Promise<void> {
+        this.gamepads.forEach((gamepad: Gamepad,gamepad_id: number) =>{
+            let buttons = gamepad.buttons;
+            let axes = gamepad.axes;
+
+            buttons.forEach((button: GamepadButton,index: number) => {
+                if (index == 6 || index == 7) { // slider
+                    this.SendFunc((new HIDMsg(EventCode.GamepadSlide, {
+                        gamepad_id: gamepad_id,
+                        index: index,
+                        val: button.value
+                    }).ToString()))
+                } else {
+                    this.SendFunc((new HIDMsg((button.value > 0.5) ?  EventCode.GamepadButtonUp : EventCode.GamepadButtonDown,{ 
+                        gamepad_id: gamepad_id,
+                        index: index
+                    }).ToString()))
+                }
+            })
+
+            axes.forEach((value: number, index: number) => {
+                this.SendFunc((new HIDMsg(EventCode.GamepadAxis,{ 
+                    gamepad_id: gamepad_id,
+                    index: index,
+                    val: value
+                }).ToString()))
+            })
+        })
+    };
+
+
 
     mouseEnterEvent(event: MouseEvent) {
         Log(LogLevel.Debug,"Mouse enter")
@@ -143,7 +187,7 @@ export class HID {
         })).ToString());
     }
     mouseButtonMovement(event: MouseEvent){
-        this.elementConfig(this.video.current)
+        this.elementConfig(this.video)
 
         if (!this.relativeMouse) {
             let code = EventCode.MouseMoveAbs
@@ -192,7 +236,5 @@ export class HID {
         this.Screen.ClientHeight = VideoElement.offsetHeight;
         this.Screen.ClientTop    =  VideoElement.offsetTop;
         this.Screen.ClientLeft   = VideoElement.offsetLeft;
-        this.Screen.StreamHeight =  VideoElement.videoHeight;
-        this.Screen.StreamWidth  = VideoElement.videoWidth;
     }
 }
