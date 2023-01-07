@@ -41,16 +41,8 @@ export class WebRTCClient  {
 
         this.DeviceSelection = DeviceSelection;
 
+        this.hid = null;
         this.datachannels = new Map<string,DataChannel>();
-        this.hid = new HID((this.video.current as HTMLVideoElement),(data: string) => {
-            Log(LogLevel.Debug,data)
-            let channel = this.datachannels.get("hid")
-            if (channel == null) {
-                return;
-            }
-            channel.sendMessage(data);
-        });
-
         this.signaling = new SignallingClient(signalingURL,token,
                                  this.handleIncomingPacket.bind(this));
 
@@ -103,6 +95,17 @@ export class WebRTCClient  {
         this.datachannels.set(a.channel.label,new DataChannel(a.channel,(data) => {
             Log(LogLevel.Debug,`message from data channel ${a.channel.label}: ${data}`);
         }));
+
+        if(a.channel.label == "hid") {
+            this.hid = new HID((this.video.current as HTMLVideoElement),(data: string) => {
+                Log(LogLevel.Debug,data)
+                let channel = this.datachannels.get("hid")
+                if (channel == null) {
+                    return;
+                }
+                channel.sendMessage(data);
+            });
+        }
     }
 
     private async handleIncomingPacket(pkt : Map<string,string>)

@@ -42,6 +42,9 @@ export enum ConnectionEvent {
     ReceivedVideoStream,
     ReceivedAudioStream,
     ReceivedDatachannel,
+
+    GamepadConnected,
+    GamepadDisconnected,
 }
 
 function GetEventMessage(event: ConnectionEvent): string {
@@ -72,6 +75,10 @@ function GetEventMessage(event: ConnectionEvent): string {
         return "ReceivedDatachannel"
     case ConnectionEvent.WebRTCConnectionClosed:
         return "WebRTCConnectionClosed"
+    case ConnectionEvent.GamepadConnected:
+        return "Gamepad connected"
+    case ConnectionEvent.GamepadDisconnected:
+        return "Gamepad disconnected"
     }
 }
 

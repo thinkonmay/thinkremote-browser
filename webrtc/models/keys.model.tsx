@@ -13,6 +13,8 @@ export enum EventCode{
     KeyPress,
     KeyReset,
 
+    GamepadConnect,
+    GamepadDisconnect,
     GamepadSlide,
     GamepadAxis,
     GamepadButtonUp,
@@ -110,6 +112,11 @@ export class HIDMsg {
                 return `mma|${this.data.get("dX")}|${this.data.get("dY")}`
             case EventCode.MouseWheel:
                 return `mw|${this.data.get("deltaY")}`
+
+            case EventCode.GamepadConnect:
+                return `gcon|${this.data.get("gamepad_id")}`
+            case EventCode.GamepadDisconnect:
+                return `gdis|${this.data.get("gamepad_id")}`
 
             case EventCode.GamepadButtonUp:
                 return `gb|${this.data.get("gamepad_id")}|${this.data.get("index")}|1`

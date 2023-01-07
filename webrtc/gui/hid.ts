@@ -1,4 +1,4 @@
-import { Log, LogLevel } from "../utils/log";
+import { ConnectionEvent, Log, LogConnectionEvent, LogLevel } from "../utils/log";
 import { EventCode } from "../models/keys.model";
 import { HIDMsg, KeyCode, Shortcut, ShortcutCode } from "../models/keys.model";
 
@@ -33,7 +33,10 @@ class Screen {
 }
 
 export class HID {
-    private gamepads : Map<number,Gamepad>;
+    private prev_buttons : Map<number,boolean>;
+    private prev_sliders : Map<number,number>;
+    private prev_axis    : Map<number,number>;
+
     private shortcuts: Array<Shortcut>
 
     private relativeMouse : boolean
@@ -44,8 +47,11 @@ export class HID {
     private SendFunc: ((data: string) => (void))
 
     constructor(videoElement: HTMLVideoElement, Sendfunc: ((data:string)=>(void))){
-        this.gamepads = new Map<number,Gamepad>();
-        this.relativeMouse = false;
+        this.prev_buttons = new Map<number,boolean>();
+        this.prev_sliders = new Map<number,number>();
+        this.prev_axis    = new Map<number,number>();
+
+
         this.video = videoElement;
         this.SendFunc = Sendfunc;
         this.Screen = new Screen();
@@ -98,47 +104,93 @@ export class HID {
             }
         })))
 
-        setInterval(() => this.runGamepad(), 1);
+        setInterval(() => this.runButton(), 1);
+        setInterval(() => this.runAxis(), 1);
+        setInterval(() => this.runSlider(), 1);
     }
 
     connectGamepad (event: GamepadEvent) : void {
         if (event.gamepad.mapping === "standard") {
-            this.gamepads.set(event.gamepad.index,event.gamepad)
-        }
+            LogConnectionEvent(ConnectionEvent.GamepadConnected)
+            this.SendFunc((new HIDMsg(EventCode.GamepadConnect,{
+                gamepad_id: event.gamepad.index,
+            }).ToString()))
+        } 
     };
 
     disconnectGamepad (event: GamepadEvent) : void {
         if (event.gamepad.mapping === "standard") {
-            this.gamepads.delete(event.gamepad.index)
+            LogConnectionEvent(ConnectionEvent.GamepadDisconnected)
+            this.SendFunc((new HIDMsg(EventCode.GamepadDisconnect,{
+                gamepad_id: event.gamepad.index,
+            }).ToString()))
         }
     };
 
-    async runGamepad () : Promise<void> {
-        this.gamepads.forEach((gamepad: Gamepad,gamepad_id: number) =>{
-            let buttons = gamepad.buttons;
-            let axes = gamepad.axes;
-
-            buttons.forEach((button: GamepadButton,index: number) => {
+    runButton() : void {
+        navigator.getGamepads().forEach((gamepad: Gamepad,gamepad_id: number) =>{
+            if (gamepad == null) 
+                return;
+                
+            
+            gamepad.buttons.forEach((button: GamepadButton,index: number) => {
                 if (index == 6 || index == 7) { // slider
-                    this.SendFunc((new HIDMsg(EventCode.GamepadSlide, {
-                        gamepad_id: gamepad_id,
-                        index: index,
-                        val: button.value
-                    }).ToString()))
                 } else {
-                    this.SendFunc((new HIDMsg((button.value > 0.5) ?  EventCode.GamepadButtonUp : EventCode.GamepadButtonDown,{ 
+                    var pressed = button.pressed
+
+                    if(this.prev_buttons.get(index) == pressed)
+                        return;
+
+                    this.SendFunc((new HIDMsg(pressed ?  EventCode.GamepadButtonUp : EventCode.GamepadButtonDown,{ 
                         gamepad_id: gamepad_id,
                         index: index
                     }).ToString()))
+
+                    this.prev_buttons.set(index,pressed);
                 }
             })
+        })
+    };
+    runSlider() : void {
+        navigator.getGamepads().forEach((gamepad: Gamepad,gamepad_id: number) =>{
+            if (gamepad == null) 
+                return;
 
-            axes.forEach((value: number, index: number) => {
+            gamepad.buttons.forEach((button: GamepadButton,index: number) => {
+                if (index == 6 || index == 7) { // slider
+                    var value = button.value
+
+                    if(Math.abs(this.prev_sliders.get(index) - value) < 0.000001) 
+                        return;
+                    
+
+                    this.SendFunc((new HIDMsg(EventCode.GamepadSlide, {
+                        gamepad_id: gamepad_id,
+                        index: index,
+                        val: value
+                    }).ToString()))
+
+                    this.prev_sliders.set(index,value)
+                } 
+            })
+        })
+    };
+    runAxis() : void {
+        navigator.getGamepads().forEach((gamepad: Gamepad,gamepad_id: number) =>{
+            if (gamepad == null) 
+                return;
+
+            gamepad.axes.forEach((value: number, index: number) => {
+                if(Math.abs(this.prev_axis.get(index) - value) < 0.000001) 
+                    return;
+                
                 this.SendFunc((new HIDMsg(EventCode.GamepadAxis,{ 
                     gamepad_id: gamepad_id,
                     index: index,
                     val: value
                 }).ToString()))
+
+                this.prev_axis.set(index,value)
             })
         })
     };
@@ -186,12 +238,9 @@ export class HID {
         event.preventDefault();
     }
     mouseWheel(event: WheelEvent){
-        let wheelY = event.deltaY;
-        // let wheelX = event.deltaX;
-
         let code = EventCode.MouseWheel
         this.SendFunc((new HIDMsg(code,{
-            deltaY: wheelY,
+            deltaY: Math.round(event.deltaY),
         })).ToString());
     }
     mouseButtonMovement(event: MouseEvent){
