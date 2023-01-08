@@ -214,4 +214,17 @@ export class WebRTCClient  {
             bitrate: bitrate
         }))
     }
+    public ResetVideo () {
+        const dcName = "manual";
+        let channel = this.datachannels.get(dcName)
+        if (channel == null) {
+            Log(LogLevel.Warning,`attempting to send message while data channel ${dcName} is ready`);
+            return;
+        }
+
+        channel.sendMessage(JSON.stringify({
+            type: "reset",
+            reset: 0,
+        }))
+    }
 }

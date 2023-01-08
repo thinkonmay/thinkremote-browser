@@ -124,6 +124,11 @@ const Home = ({ host }) => {
           }
         }, }, {
         icon: <VolumeUp/>,
+        name: "Reset video",
+        action: async () => {
+            client.ResetVideo();
+        }, }, {
+        icon: <VolumeUp/>,
         name: "Mute",
         action: async () => {
           if (remoteAudio.current.muted) {
