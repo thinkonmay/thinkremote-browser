@@ -120,7 +120,6 @@ export class HID {
 
     connectGamepad (event: GamepadEvent) : void {
         if (event.gamepad.mapping === "standard") {
-            LogConnectionEvent(ConnectionEvent.GamepadConnected)
             this.SendFunc((new HIDMsg(EventCode.GamepadConnect,{
                 gamepad_id: event.gamepad.index,
             }).ToString()))
@@ -129,7 +128,6 @@ export class HID {
 
     disconnectGamepad (event: GamepadEvent) : void {
         if (event.gamepad.mapping === "standard") {
-            LogConnectionEvent(ConnectionEvent.GamepadDisconnected)
             this.SendFunc((new HIDMsg(EventCode.GamepadDisconnect,{
                 gamepad_id: event.gamepad.index,
             }).ToString()))
