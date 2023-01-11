@@ -209,6 +209,7 @@ export class HID {
     mouseEnterEvent(event: MouseEvent) {
         Log(LogLevel.Debug,"Mouse enter")
         this.SendFunc((new HIDMsg(EventCode.KeyReset,{ }).ToString()))
+        this.ResetVideo();
     }
     mouseLeaveEvent(event: MouseEvent) {
         Log(LogLevel.Debug,"Mouse leave")

@@ -27,7 +27,7 @@ export function TurnOnStatus(status: string): void {
     title: `Application status: ${status}`,
     text: "Please wait while the client is getting ready...",
     showConfirmButton: false,
-    timer: 3000,
+    timer: 7000,
     willOpen: () => Swal.showLoading(null),
     willClose: () => Swal.hideLoading(),
   });

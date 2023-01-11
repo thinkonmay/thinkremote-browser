@@ -63,7 +63,7 @@ export class SignallingClient
     private onServerError() 
     {
         Log(LogLevel.Warning,"websocket connection disconnected");
-        LogConnectionEvent(ConnectionEvent.WebSocketDisconnected)
+        // LogConnectionEvent(ConnectionEvent.WebSocketDisconnected)
     }
 
 

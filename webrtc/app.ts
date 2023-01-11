@@ -61,6 +61,7 @@ export class WebRTCClient  {
             LogConnectionEvent(ConnectionEvent.ReceivedAudioStream);
             (this.audio.current as HTMLAudioElement).srcObject = evt.streams[0]
         } else if (evt.track.kind == "video") {
+            this.ResetVideo();
             LogConnectionEvent(ConnectionEvent.ReceivedVideoStream);
             (this.video.current as HTMLVideoElement).srcObject = evt.streams[0]
             // let pipeline = new Pipeline('h264');
@@ -112,6 +113,7 @@ export class WebRTCClient  {
     {
         var target = pkt.get("Target");
         if(target == "SDP") {
+            LogConnectionEvent(ConnectionEvent.ExchangingSignalingMessage)
             var sdp = pkt.get("SDP")
             if(sdp === undefined) {
                 Log(LogLevel.Error,"missing sdp");
@@ -128,6 +130,7 @@ export class WebRTCClient  {
                 type: (type == "offer") ? "offer" : "answer"
             })
         } else if (target == "ICE") {
+            LogConnectionEvent(ConnectionEvent.ExchangingSignalingMessage)
             var sdpmid = pkt.get("SDPMid")
             if(sdpmid == undefined) {
                 Log(LogLevel.Error,"Missing sdp mid field");
@@ -149,6 +152,7 @@ export class WebRTCClient  {
                 sdpMLineIndex: Number.parseInt(lineidx)
             })
         } else if (target == "PREFLIGHT") { //TODO
+            LogConnectionEvent(ConnectionEvent.WaitingAvailableDeviceSelection)
             let preverro = pkt.get("Error") 
             if (preverro != null) {
                 Log(LogLevel.Error,preverro);
@@ -173,9 +177,11 @@ export class WebRTCClient  {
             dat.set("type","answer");
             dat.set("value",result.ToString())
             this.signaling.SignallingSend("PREFLIGHT",dat)
+            LogConnectionEvent(ConnectionEvent.ExchangingSignalingMessage)
         } else if (target == "START") {
             var dat = new Map<string,string>();
             this.signaling.SignallingSend("START",dat)
+            LogConnectionEvent(ConnectionEvent.WaitingAvailableDevice)
         }
     }
 

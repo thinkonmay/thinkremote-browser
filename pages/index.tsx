@@ -99,6 +99,7 @@ const Home = ({ host }) => {
 
           return ret;
       })).Notifier(message => {
+        console.log(message);
         TurnOnStatus(message);
       }).Alert(message => {
         TurnOnAlert(message);
