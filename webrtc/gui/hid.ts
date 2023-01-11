@@ -45,8 +45,11 @@ export class HID {
 
     private video: HTMLVideoElement
     private SendFunc: ((data: string) => (void))
+    private ResetVideo: (() => (void))
 
-    constructor(videoElement: HTMLVideoElement, Sendfunc: ((data:string)=>(void))){
+    constructor(videoElement: HTMLVideoElement, 
+                Sendfunc: ((data:string)=>(void)),
+                ResetVideo: (() => (void))){
         this.prev_buttons = new Map<number,boolean>();
         this.prev_sliders = new Map<number,number>();
         this.prev_axis    = new Map<number,number>();
@@ -54,6 +57,7 @@ export class HID {
 
         this.video = videoElement;
         this.SendFunc = Sendfunc;
+        this.ResetVideo = ResetVideo;
         this.Screen = new Screen();
 
         /**
@@ -205,6 +209,7 @@ export class HID {
     mouseLeaveEvent(event: MouseEvent) {
         Log(LogLevel.Debug,"Mouse leave")
         this.SendFunc((new HIDMsg(EventCode.KeyReset,{ }).ToString()))
+        this.ResetVideo();
     }
     pointerLock(event: Event) {
         Log(LogLevel.Infor,"toggle pointer lock")

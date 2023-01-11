@@ -104,7 +104,7 @@ export class WebRTCClient  {
                     return;
                 }
                 channel.sendMessage(data);
-            });
+            }, this.ResetVideo.bind(this) );
         }
     }
 
