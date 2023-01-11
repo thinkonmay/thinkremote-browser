@@ -88,7 +88,7 @@ export class HID {
         this.video.addEventListener('mouseleave',     this.mouseLeaveEvent.bind(this));
         this.video.addEventListener('mouseenter',     this.mouseEnterEvent.bind(this));
 
-        document.addEventListener('pointerlockchange',  this.pointerLock.bind(this));
+        document.addEventListener('pointerlockchange',  this.lockPointer.bind(this));
 
 
 
@@ -97,21 +97,23 @@ export class HID {
             this.video.parentElement.requestFullscreen();
             this.video.play();
         })))
-        this.shortcuts.push(new Shortcut(ShortcutCode.PointerLock,[KeyCode.Ctrl,KeyCode.Shift,KeyCode.P],(()=> {
-            if(!document.pointerLockElement) {
-                this.relativeMouse = true;
-                this.SendFunc((new HIDMsg(EventCode.RelativeMouseOn,{ }).ToString()))
-                this.video.requestPointerLock();
-            } else {
-                this.relativeMouse = false;
-                this.SendFunc((new HIDMsg(EventCode.RelativeMouseOff,{ }).ToString()))
-                document.exitPointerLock();
-            }
-        })))
+        this.shortcuts.push(new Shortcut(ShortcutCode.PointerLock,[KeyCode.Ctrl,KeyCode.Shift,KeyCode.P],this.lockPointer.bind(this)))
 
         setInterval(() => this.runButton(), 1);
         setInterval(() => this.runAxis(), 1);
         setInterval(() => this.runSlider(), 1);
+    }
+
+    public lockPointer() : void {
+        if(!document.pointerLockElement) {
+            this.relativeMouse = true;
+            this.SendFunc((new HIDMsg(EventCode.RelativeMouseOn,{ }).ToString()))
+            this.video.requestPointerLock();
+        } else {
+            this.relativeMouse = false;
+            this.SendFunc((new HIDMsg(EventCode.RelativeMouseOff,{ }).ToString()))
+            document.exitPointerLock();
+        }
     }
 
     connectGamepad (event: GamepadEvent) : void {
@@ -210,9 +212,6 @@ export class HID {
         Log(LogLevel.Debug,"Mouse leave")
         this.SendFunc((new HIDMsg(EventCode.KeyReset,{ }).ToString()))
         this.ResetVideo();
-    }
-    pointerLock(event: Event) {
-        Log(LogLevel.Infor,"toggle pointer lock")
     }
     keydown(event: KeyboardEvent) {
         event.preventDefault();

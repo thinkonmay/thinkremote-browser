@@ -132,6 +132,11 @@ const Home = ({ host }) => {
             remoteAudio.current.muted = true;
           }
         }, }, {
+        icon: <Fullscreen/>,
+        name: "Lock Pointer",
+        action: async () => {
+          client.VideoPointerLock();
+        }, }, {
         icon: <Fullscreen />,
         name: "Enter fullscreen",
         action: async () => {
