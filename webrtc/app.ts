@@ -180,7 +180,7 @@ export class WebRTCClient  {
     }
 
     public VideoPointerLock() : void {
-        this.hid.lockPointer();
+        this.hid?.lockPointer();
     }
     Notifier(notifier: (message :string) => (void)): WebRTCClient{
         AddNotifier(notifier);

@@ -98,6 +98,9 @@ export class HID {
         setInterval(() => this.runButton(), 1);
         setInterval(() => this.runAxis(), 1);
         setInterval(() => this.runSlider(), 1);
+        setInterval(() => {
+            this.relativeMouse = !(document.pointerLockElement == null);
+        }, 100);
     }
 
     private isFullscreen(): boolean { 
@@ -107,11 +110,9 @@ export class HID {
 
     public lockPointer() : void {
         if(!document.pointerLockElement) {
-            this.relativeMouse = true;
             this.SendFunc((new HIDMsg(EventCode.RelativeMouseOn,{ }).ToString()))
             this.video.requestPointerLock();
         } else {
-            this.relativeMouse = false;
             this.SendFunc((new HIDMsg(EventCode.RelativeMouseOff,{ }).ToString()))
             document.exitPointerLock();
         }
