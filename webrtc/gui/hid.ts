@@ -88,7 +88,6 @@ export class HID {
         this.video.addEventListener('mouseleave',     this.mouseLeaveEvent.bind(this));
         this.video.addEventListener('mouseenter',     this.mouseEnterEvent.bind(this));
 
-        document.addEventListener('pointerlockchange',  this.lockPointer.bind(this));
 
 
 
