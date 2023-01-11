@@ -93,16 +93,18 @@ export class HID {
 
 
         this.shortcuts = new Array<Shortcut>();
-        this.shortcuts.push(new Shortcut(ShortcutCode.Fullscreen,[KeyCode.Ctrl,KeyCode.Shift,KeyCode.F],(()=> {
-            this.video.parentElement.requestFullscreen();
-            this.video.play();
-        })))
+        this.shortcuts.push(new Shortcut(ShortcutCode.Fullscreen,[KeyCode.Ctrl,KeyCode.Shift,KeyCode.F],(()=> { this.video.parentElement.requestFullscreen(); })))
         this.shortcuts.push(new Shortcut(ShortcutCode.PointerLock,[KeyCode.Ctrl,KeyCode.Shift,KeyCode.P],this.lockPointer.bind(this)))
 
         setInterval(() => this.runButton(), 1);
         setInterval(() => this.runAxis(), 1);
         setInterval(() => this.runSlider(), 1);
     }
+
+    private isFullscreen(): boolean { 
+        return document.fullscreenElement != null;
+    };
+
 
     public lockPointer() : void {
         if(!document.pointerLockElement) {
@@ -223,6 +225,15 @@ export class HID {
             if (triggered) 
                 disable_send = true;
         })
+
+        if((event.key == "Esc" || event.key == "Escape") && this.isFullscreen()) {
+            this.shortcuts.forEach((element: Shortcut) => {
+                if (element.code == ShortcutCode.PointerLock) {
+                    element.ManualTrigger();
+                }
+            })
+        }
+
 
         if (disable_send) 
             return;

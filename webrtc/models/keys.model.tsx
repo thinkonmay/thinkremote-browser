@@ -55,6 +55,10 @@ export class Shortcut {
         this.Handler = Handler;
     }
 
+    public ManualTrigger(): void {
+        this.Handler();
+    }
+
     public HandleShortcut(event : KeyboardEvent) : Boolean {
         var shift = this.keys.includes(KeyCode.Shift) === event.shiftKey;
         var alt   = this.keys.includes(KeyCode.Alt)   === event.altKey;
