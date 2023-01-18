@@ -18,8 +18,6 @@ import Draggable from "react-draggable";
 import { DeviceSelection, DeviceSelectionResult, Soundcard } from "webrtc-streaming-core/dist/models/devices.model";
 import { ConnectionEvent, Log, LogConnectionEvent, LogLevel } from "webrtc-streaming-core/dist/utils/log";
 import { GetServerSideProps, NextPage } from "next";
-import { stepButtonClasses } from "@mui/material";
-import { frame } from "websocket";
 
 
 type Props = { host: string | null };
