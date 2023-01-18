@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import Head from "next/head";
 import styles from "../styles/Home.module.css";
 import { AskSelectBitrate, AskSelectDisplay, AskSelectFramerate, AskSelectSoundcard, TurnOnAlert, TurnOnStatus} from "../components/popup";
-import { WebRTCClient } from "../webrtc/app";
+import { WebRTCClient } from "webrtc-streaming-core/dist/app";
 import { useRouter } from "next/router";
 import SpeedDial from "@mui/material/SpeedDial";
 import SpeedDialAction from "@mui/material/SpeedDialAction";
@@ -15,8 +15,8 @@ import {
   ArrowBackIos,
 } from "@mui/icons-material";
 import Draggable from "react-draggable";
-import { DeviceSelection, DeviceSelectionResult, Soundcard } from "../webrtc/models/devices.model";
-import { ConnectionEvent, Log, LogConnectionEvent, LogLevel } from "../webrtc/utils/log";
+import { DeviceSelection, DeviceSelectionResult, Soundcard } from "webrtc-streaming-core/dist/models/devices.model";
+import { ConnectionEvent, Log, LogConnectionEvent, LogLevel } from "webrtc-streaming-core/dist/utils/log";
 import { GetServerSideProps, NextPage } from "next";
 import { stepButtonClasses } from "@mui/material";
 import { frame } from "websocket";
