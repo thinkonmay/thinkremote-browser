@@ -49,16 +49,31 @@ const Home = ({ host }) => {
   useEffect(() => {
     if (remoteVideo.current) {
       let signalingURL = (host.split(":")[0] != "localhost" )? `wss://${host}/handshake` : "wss://remote.thinkmay.net/handshake";
-      let token = router.asPath?.split("?")[1]?.split("=")[1] ?? "";
-      if (token == "") {
+
+      let paramKeyVal = new Map<string,string>();
+      try
+      {
+        const params = router.asPath?.split("?")[1]?.split("&");
+        params.forEach((val: string, index: number)=> {
+          let keyval = val.split("=")
+          if (keyval.length == 2) {
+            paramKeyVal.set(keyval[0],keyval[1])
+          } else {
+            console.log(`invalid param ${val}`)
+          }
+        })
+      }catch{}
+
+
+      if (paramKeyVal.get("token") == "") {
         window.location.replace("https://service.thinkmay.net/dashboard");
       }
 
       var defaultSoundcard = "Default Audio Render Device";
-      var defaultBitrate   = null;
-      var defaultFramerate = 55;
+      var defaultBitrate   = paramKeyVal.get("bitrate") ? Number.parseInt(paramKeyVal.get("bitrate")) : null;
+      var defaultFramerate = paramKeyVal.get("fps")     ? Number.parseInt(paramKeyVal.get("fps")) : 55;
 
-      let client = new WebRTCClient(signalingURL,remoteVideo, remoteAudio, token, (async (offer: DeviceSelection) => {
+      let client = new WebRTCClient(signalingURL,remoteVideo, remoteAudio, paramKeyVal.get("token"), (async (offer: DeviceSelection) => {
           LogConnectionEvent(ConnectionEvent.WaitingAvailableDeviceSelection)
 
           let ret = new DeviceSelectionResult(offer.soundcards[0].DeviceID,offer.monitors[0].MonitorHandle.toString());
