@@ -46,7 +46,8 @@ const Home = ({ host }) => {
 
   useEffect(() => {
     if (remoteVideo.current) {
-      let signalingURL = (host.split(":")[0] != "localhost" )? `wss://${host}/handshake` : "wss://remote.thinkmay.net/handshake";
+      // let signalingURL = (host.split(":")[0] != "localhost" )? `wss://${host}/handshake` : "wss://remote.thinkmay.net/handshake";
+      let signalingURL = "wss://remote.thinkmay.net/handshake";
 
       let paramKeyVal = new Map<string,string>();
       try
