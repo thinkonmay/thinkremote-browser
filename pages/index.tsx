@@ -171,7 +171,6 @@ const onStop = () => {
 
     }
   }, []);
-
   return (
     <div>
       <Head>
@@ -180,7 +179,7 @@ const onStop = () => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <div className={styles.app}>
-      <Joystick baseColor="darkgreen" stickColor="black" move={onMove} stop={onStop} ></Joystick>
+      {/* TODO: <Joystick baseColor="darkgreen" stickColor="black" move={onMove} stop={onStop} ></Joystick> */}
         <Draggable>
           <SpeedDial
             ariaLabel="SpeedDial basic example"
