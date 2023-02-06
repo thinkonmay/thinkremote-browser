@@ -18,7 +18,8 @@ import Draggable from "react-draggable";
 import { DeviceSelection, DeviceSelectionResult, Soundcard } from "webrtc-streaming-core/dist/models/devices.model";
 import { ConnectionEvent, Log, LogConnectionEvent, LogLevel } from "webrtc-streaming-core/dist/utils/log";
 import { GetServerSideProps, NextPage } from "next";
-
+import { Joystick } from 'react-joystick-component';
+import { IJoystickUpdateEvent } from "react-joystick-component/build/lib/Joystick";
 
 type Props = { host: string | null };
 
@@ -41,7 +42,14 @@ const Home = ({ host }) => {
   }[] >([]);
 
 
+  const onMove = (stick:IJoystickUpdateEvent) => {
+    //@ts-ignore
+    console.log(`X: ${stick.x}`);
+    console.log(`Y: ${stick.y}`);
+};
 
+const onStop = () => {
+};
 
 
   useEffect(() => {
@@ -163,7 +171,6 @@ const Home = ({ host }) => {
 
     }
   }, []);
-
   return (
     <div>
       <Head>
@@ -172,6 +179,7 @@ const Home = ({ host }) => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <div className={styles.app}>
+      {/* TODO: <Joystick baseColor="darkgreen" stickColor="black" move={onMove} stop={onStop} ></Joystick> */}
         <Draggable>
           <SpeedDial
             ariaLabel="SpeedDial basic example"
