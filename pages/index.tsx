@@ -156,9 +156,9 @@ const onStop = () => {
           }
         }, }, {
         icon: <Fullscreen/>,
-        name: "Lock Pointer",
+        name: "Reset Video ",
         action: async () => {
-          client.VideoPointerLock();
+          client.ResetVideo()
         }, }, {
         icon: <Fullscreen />,
         name: "Enter fullscreen",
