@@ -32,7 +32,6 @@ export const getServerSideProps: GetServerSideProps<Props> =
 const Home = ({ host }) => {
   const remoteVideo = useRef<HTMLVideoElement>(null);
   const remoteAudio = useRef<HTMLAudioElement>(null);
-  const [client, setClient] = useState<WebRTCClient>(null);
 
   const router = useRouter();
   const {signaling, token, fps,bitrate} = router.query
@@ -59,8 +58,9 @@ const Home = ({ host }) => {
 
   
 
+  let client : WebRTCClient
   useEffect(() => {
-  setClient(client != null ?client : new WebRTCClient(signalingURL,remoteVideo, remoteAudio, signalingToken, (async (offer: DeviceSelection) => {
+  client = (client != null) ? client : new WebRTCClient(signalingURL,remoteVideo, remoteAudio, signalingToken, (async (offer: DeviceSelection) => {
       LogConnectionEvent(ConnectionEvent.WaitingAvailableDeviceSelection)
 
       let ret = new DeviceSelectionResult(offer.soundcards[0].DeviceID,offer.monitors[0].MonitorHandle.toString());
@@ -105,7 +105,7 @@ const Home = ({ host }) => {
     TurnOnStatus(message);
   }).Alert(message => {
     TurnOnAlert(message);
-  }));  
+  });  
 
 
 
@@ -114,33 +114,15 @@ const Home = ({ host }) => {
     name: "Framerate",
     action: async () => {
       let framerate = await AskSelectFramerate();
-      if (client != null && framerate > 10 && framerate < 61) {
-        console.log(`framerate is change to ${framerate}`)
-        client.ChangeFramerate(framerate)
-      } 
+      console.log(`framerate is change to ${framerate}`)
+      client.ChangeFramerate(framerate)
     }, }, {
     icon: <Fullscreen/>,
     name: "Bitrate",
     action: async () => {
       let bitrate = await AskSelectBitrate();
-      if (client != null && bitrate > 100 && bitrate < 30000) {
-        console.log(`bitrate is change to ${bitrate}`)
-        client.ChangeBitrate(bitrate);
-      }
-    }, }, {
-    icon: <VolumeUp/>,
-    name: "Mute",
-    action: async () => {
-      if (remoteAudio.current.muted) {
-        remoteAudio.current.muted = false;
-      } else {
-        remoteAudio.current.muted = true;
-      }
-    }, }, {
-    icon: <Fullscreen/>,
-    name: "Reset Video ",
-    action: async () => {
-      client.ResetVideo()
+      console.log(`bitrate is change to ${bitrate}`)
+      client.ChangeBitrate(bitrate);
     }, }, {
     icon: <Fullscreen />,
     name: "Enter fullscreen",
