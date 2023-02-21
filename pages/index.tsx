@@ -112,16 +112,13 @@ const Home = ({ host }) => {
 
   const _actions = [ {
     icon: <Fullscreen/>,
-    name: "Framerate",
-    action: async () => {
-      let framerate = await AskSelectFramerate();
-      console.log(`framerate is change to ${framerate}`)
-      client.ChangeFramerate(framerate)
-    }, }, {
-    icon: <Fullscreen/>,
     name: "Bitrate",
     action: async () => {
       let bitrate = await AskSelectBitrate();
+      if (bitrate < 500) {
+        return
+      }
+      
       console.log(`bitrate is change to ${bitrate}`)
       client.ChangeBitrate(bitrate);
     }, }, {
