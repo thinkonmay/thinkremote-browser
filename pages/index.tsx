@@ -13,11 +13,19 @@ import {
   Fullscreen,
   FullscreenExit,
   ArrowBackIos,
+  Forward,
 } from "@mui/icons-material";
 import Draggable from "react-draggable";
 import { DeviceSelection, DeviceSelectionResult, Soundcard } from "webrtc-streaming-core/dist/models/devices.model";
 import { ConnectionEvent, Log, LogConnectionEvent, LogLevel } from "webrtc-streaming-core/dist/utils/log";
 import { GetServerSideProps, NextPage } from "next";
+import { Joystick } from 'react-joystick-component';
+import { IJoystickUpdateEvent } from "react-joystick-component/build/lib/Joystick";
+import { GoogleAnalytics } from "nextjs-google-analytics";
+import { SpeedDialIcon } from "@mui/material";
+import Button from '@mui/material/Button';
+import ButtonGroup from '@mui/material/ButtonGroup';
+import Stack from '@mui/material/Stack';
 
 
 type Props = { host: string | null };
@@ -25,7 +33,11 @@ type Props = { host: string | null };
 export const getServerSideProps: GetServerSideProps<Props> =
   async context => ({ props: { host: context.req.headers.host || null } });
 
-
+const buttons = [
+  <Button key="one">One</Button>,
+  <Button key="two">Two</Button>,
+  <Button key="three">Three</Button>,
+];
 
 
 const Home = ({ host }) => {
@@ -172,6 +184,7 @@ const Home = ({ host }) => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <div className={styles.app}>
+        {/* TODO: <Joystick baseColor="darkgreen" stickColor="black" move={onMove} stop={onStop} ></Joystick> */}
         <Draggable>
           <SpeedDial
             ariaLabel="SpeedDial basic example"
@@ -187,6 +200,32 @@ const Home = ({ host }) => {
               />
             ))}
           </SpeedDial>
+        </Draggable>
+        <Draggable>
+          <Stack style={{position: "absolute" }} direction="column">
+            <Button
+              onClick={() =>
+                console.log('y')
+              }
+            >Y</Button>
+            <Stack direction="row">
+              <Button
+                onClick={() =>
+                  console.log('x')
+                }
+              >X</Button>
+              <Button
+                onClick={() =>
+                  console.log('b')
+                }
+              >B</Button>
+            </Stack>
+            <Button
+              onClick={() =>
+                console.log('a')
+              }
+            >A</Button>
+          </Stack>
         </Draggable>
       </div>
       <video ref={remoteVideo} className={styles.remoteVideo} autoPlay muted playsInline loop ></video>
