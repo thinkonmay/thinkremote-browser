@@ -27,7 +27,6 @@ import Button from '@mui/material/Button';
 import ButtonGroup from '@mui/material/ButtonGroup';
 import Stack from '@mui/material/Stack';
 
-
 type Props = { host: string | null };
 
 export const getServerSideProps: GetServerSideProps<Props> =
@@ -43,9 +42,15 @@ const buttons = [
 const Home = ({ host }) => {
   const remoteVideo = useRef<HTMLVideoElement>(null);
   const remoteAudio = useRef<HTMLAudioElement>(null);
-  let router = useRouter();
 
-  const [volumeButton, setVolumeButton] = useState<JSX.Element>();
+  const router = useRouter();
+  const {signaling, token, fps,bitrate} = router.query
+  const signalingURL   = Buffer.from((signaling?signaling:"d3NzOi8vc2VydmljZS50aGlua21heS5uZXQvaGFuZHNoYWtl" ) as string, "base64").toString()
+  const signalingToken = (token? token : "none") as string
+  var defaultBitrate   = parseInt((bitrate? bitrate : "6000" ) as string,10)
+  var defaultFramerate = parseInt((fps? fps : "55") as string,10)
+  var defaultSoundcard = "Default Audio Render Device";
+
   const [actions, setActions] = useState<{
     icon: JSX.Element;
     name: string;
@@ -53,138 +58,101 @@ const Home = ({ host }) => {
   }[] >([]);
 
 
+  const onMove = (stick:IJoystickUpdateEvent) => {
+    console.log(`X: ${stick.x}`);
+    console.log(`Y: ${stick.y}`);
+  };
 
+  const onStop = () => {
+  };
 
+  
 
+  let client : WebRTCClient
   useEffect(() => {
-    if (remoteVideo.current) {
-      let signalingURL = (host.split(":")[0] != "localhost" )? `wss://${host}/handshake` : "wss://remote.thinkmay.net/handshake";
-      // let signalingURL = "wss://remote.thinkmay.net/handshake";
+  client = (client != null) ? client : new WebRTCClient(signalingURL,remoteVideo, remoteAudio, signalingToken, (async (offer: DeviceSelection) => {
+      LogConnectionEvent(ConnectionEvent.WaitingAvailableDeviceSelection)
 
-      let paramKeyVal = new Map<string,string>();
-      try
-      {
-        const params = router.asPath?.split("?")[1]?.split("&");
-        params.forEach((val: string, index: number)=> {
-          let keyval = val.split("=")
-          if (keyval.length == 2) {
-            paramKeyVal.set(keyval[0],keyval[1])
-          } else {
-            console.log(`invalid param ${val}`)
-          }
-        })
-      }catch{}
+      let ret = new DeviceSelectionResult(offer.soundcards[0].DeviceID,offer.monitors[0].MonitorHandle.toString());
+      if(offer.soundcards.length > 1) {
 
+        let exist = false;
+        if (defaultSoundcard != null) {
+          offer.soundcards.forEach(x => {
+            if (x.Name == defaultSoundcard) {
+              exist = true;
+              ret.SoundcardDeviceID = x.DeviceID;
+              defaultSoundcard = null;
+            }
+          })
+        }
 
-      if (paramKeyVal.get("token") == "") {
-        window.location.replace("https://service.thinkmay.net/dashboard");
+        if (!exist) {
+          ret.SoundcardDeviceID = await AskSelectSoundcard(offer.soundcards)
+          Log(LogLevel.Infor,`selected audio deviceid ${ret.SoundcardDeviceID}`)
+        }
+      }           
+
+      if(offer.monitors.length > 1) {
+        ret.MonitorHandle = await AskSelectDisplay(offer.monitors)
+        Log(LogLevel.Infor,`selected monitor handle ${ret.MonitorHandle}`)
       }
 
-      var defaultSoundcard = "Default Audio Render Device";
-      var defaultBitrate   = paramKeyVal.get("bitrate") ? Number.parseInt(paramKeyVal.get("bitrate")) : null;
-      var defaultFramerate = paramKeyVal.get("fps")     ? Number.parseInt(paramKeyVal.get("fps")) : 55;
+      if (defaultBitrate == null) {
+        ret.bitrate= await AskSelectBitrate();
+      } else {
+        ret.bitrate = defaultBitrate;
+      }
+      if (defaultFramerate == null) {
+        ret.framerate = await AskSelectFramerate();
+      } else {
+        ret.framerate = defaultFramerate;
+      }
 
-      let client = new WebRTCClient(signalingURL,remoteVideo, remoteAudio, paramKeyVal.get("token"), (async (offer: DeviceSelection) => {
-          LogConnectionEvent(ConnectionEvent.WaitingAvailableDeviceSelection)
+      return ret;
+  })).Notifier(message => {
+    console.log(message);
+    TurnOnStatus(message);
+  }).Alert(message => {
+    TurnOnAlert(message);
+  });  
 
-          let ret = new DeviceSelectionResult(offer.soundcards[0].DeviceID,offer.monitors[0].MonitorHandle.toString());
-          if(offer.soundcards.length > 1) {
 
-            let exist = false;
-            if (defaultSoundcard != null) {
-              offer.soundcards.forEach(x => {
-                if (x.Name == defaultSoundcard) {
-                  exist = true;
-                  ret.SoundcardDeviceID = x.DeviceID;
-                  defaultSoundcard = null;
-                }
-              })
-            }
 
-            if (!exist) {
-              ret.SoundcardDeviceID = await AskSelectSoundcard(offer.soundcards)
-              Log(LogLevel.Infor,`selected audio deviceid ${ret.SoundcardDeviceID}`)
-            }
-          }           
+  const _actions = [ {
+    icon: <Fullscreen/>,
+    name: "Bitrate",
+    action: async () => {
+      let bitrate = await AskSelectBitrate();
+      if (bitrate < 500) {
+        return
+      }
+      
+      console.log(`bitrate is change to ${bitrate}`)
+      client.ChangeBitrate(bitrate);
+    }, }, {
+    icon: <Fullscreen />,
+    name: "Enter fullscreen",
+    action: async () => {
+      document.documentElement.requestFullscreen();
+    }, 
+  },]
 
-          if(offer.monitors.length > 1) {
-            ret.MonitorHandle = await AskSelectDisplay(offer.monitors)
-            Log(LogLevel.Infor,`selected monitor handle ${ret.MonitorHandle}`)
-          }
+  setActions([..._actions]);
 
-          if (defaultBitrate == null) {
-            ret.bitrate= await AskSelectBitrate();
-          } else {
-            ret.bitrate = defaultBitrate;
-          }
-          if (defaultFramerate == null) {
-            ret.framerate = await AskSelectFramerate();
-          } else {
-            ret.framerate = defaultFramerate;
-          }
+  },[])
 
-          return ret;
-      })).Notifier(message => {
-        console.log(message);
-        TurnOnStatus(message);
-      }).Alert(message => {
-        TurnOnAlert(message);
-      });  
-
-      const actions = [ {
-        icon: <Fullscreen/>,
-        name: "Framerate",
-        action: async () => {
-          let framerate = await AskSelectFramerate();
-          if (client != null && framerate > 10 && framerate < 61) {
-            console.log(`framerate is change to ${framerate}`)
-            client.ChangeFramerate(framerate)
-          } 
-        }, }, {
-        icon: <Fullscreen/>,
-        name: "Bitrate",
-        action: async () => {
-          let bitrate = await AskSelectBitrate();
-          if (client != null && bitrate > 100 && bitrate < 30000) {
-            console.log(`bitrate is change to ${bitrate}`)
-            client.ChangeBitrate(bitrate);
-          }
-        }, }, {
-        icon: <VolumeUp/>,
-        name: "Mute",
-        action: async () => {
-          if (remoteAudio.current.muted) {
-            remoteAudio.current.muted = false;
-          } else {
-            remoteAudio.current.muted = true;
-          }
-        }, }, {
-        icon: <Fullscreen/>,
-        name: "Lock Pointer",
-        action: async () => {
-          client.VideoPointerLock();
-        }, }, {
-        icon: <Fullscreen />,
-        name: "Enter fullscreen",
-        action: async () => {
-          document.documentElement.requestFullscreen();
-        }, 
-      }, ];
-
-      setActions([...actions]);
-
-    }
-  }, []);
 
   return (
     <div>
+      <GoogleAnalytics trackPageViews />
       <Head>
         <title>WebRTC remote viewer</title>
         <meta name="description" content="Generated by create next app" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <div className={styles.app}>
-        {/* TODO: <Joystick baseColor="darkgreen" stickColor="black" move={onMove} stop={onStop} ></Joystick> */}
+      {/* TODO: <Joystick baseColor="darkgreen" stickColor="black" move={onMove} stop={onStop} ></Joystick> */}
         <Draggable>
           <SpeedDial
             ariaLabel="SpeedDial basic example"
