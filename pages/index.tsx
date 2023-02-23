@@ -8,23 +8,16 @@ import SpeedDial from "@mui/material/SpeedDial";
 import SpeedDialAction from "@mui/material/SpeedDialAction";
 import {
   List,
-  VolumeOff,
-  VolumeUp,
   Fullscreen,
-  FullscreenExit,
-  ArrowBackIos,
-  Forward,
 } from "@mui/icons-material";
 import Draggable from "react-draggable";
-import { DeviceSelection, DeviceSelectionResult, Soundcard } from "webrtc-streaming-core/dist/models/devices.model";
+import { DeviceSelection, DeviceSelectionResult } from "webrtc-streaming-core/dist/models/devices.model";
 import { ConnectionEvent, Log, LogConnectionEvent, LogLevel } from "webrtc-streaming-core/dist/utils/log";
-import { GetServerSideProps, NextPage } from "next";
+import { GetServerSideProps } from "next";
 import { Joystick } from 'react-joystick-component';
 import { IJoystickUpdateEvent } from "react-joystick-component/build/lib/Joystick";
 import { GoogleAnalytics } from "nextjs-google-analytics";
-import { SpeedDialIcon } from "@mui/material";
 import Button from '@mui/material/Button';
-import ButtonGroup from '@mui/material/ButtonGroup';
 import Stack from '@mui/material/Stack';
 
 type Props = { host: string | null };
@@ -57,6 +50,11 @@ const Home = ({ host }) => {
     action: () => void;
   }[] >([]);
 
+  const [JoyStick, setJoyStick] = useState<{
+    element: JSX.Element;
+  }[] >([]);
+
+
 
   const onMove = (stick:IJoystickUpdateEvent) => {
     console.log(`X: ${stick.x}`);
@@ -68,9 +66,9 @@ const Home = ({ host }) => {
 
   
 
-  let client : WebRTCClient
+  let client : WebRTCClient  
   useEffect(() => {
-  client = (client != null) ? client : new WebRTCClient(signalingURL,remoteVideo, remoteAudio, signalingToken, (async (offer: DeviceSelection) => {
+  client = (client == null) ? client : new WebRTCClient(signalingURL,remoteVideo, remoteAudio, signalingToken, (async (offer: DeviceSelection) => {
       LogConnectionEvent(ConnectionEvent.WaitingAvailableDeviceSelection)
 
       let ret = new DeviceSelectionResult(offer.soundcards[0].DeviceID,offer.monitors[0].MonitorHandle.toString());
@@ -121,7 +119,7 @@ const Home = ({ host }) => {
 
   const _actions = [ {
     icon: <Fullscreen/>,
-    name: "Bitrate",
+    name: "Bitrate",  
     action: async () => {
       let bitrate = await AskSelectBitrate();
       if (bitrate < 500) {
@@ -139,8 +137,83 @@ const Home = ({ host }) => {
   },]
 
   setActions([..._actions]);
+  remoteVideo.current?.addEventListener('touchstart',  (ev) => {
+    const touches = ev.changedTouches[0];
 
+    setJoyStick(prev => [...prev,{
+      element: 
+      <div style={{transform: `translate(${touches.screenX}px,${touches.screenY}px)`}}>
+      <Joystick>
+      </Joystick> 
+      </div>
+    }])
+  });
+  remoteVideo.current?.addEventListener('touchend',    () => {
+    setJoyStick(prev => {
+      return prev.slice(0,prev.length -1)
+    })
+  });
+  remoteVideo.current?.addEventListener('touchcancel', () => {
+
+  });
+  remoteVideo.current?.addEventListener('touchmove',   () => {
+
+  });
   },[])
+
+
+
+  const onmove = (event: IJoystickUpdateEvent) => {
+    // console.log(event.x)
+    // console.log(event.y)
+  }
+
+
+  const abxyGroup = 
+        <Draggable>
+          <Stack style={{ position: "absolute", bottom: 16, left: 16, zIndex: 2 }} direction="column">
+            <Button
+              onClick={() =>
+                console.log('y')
+              }
+            >Y</Button>
+            <Stack direction="row">
+              <Button
+                onClick={() =>
+                  console.log('x')
+                }
+              >X</Button>
+              <Button
+                onClick={() =>
+                  console.log('b')
+                }
+              >B</Button>
+            </Stack>
+            <Button
+              onClick={() =>
+                console.log('a')
+              }
+            >A</Button>
+          </Stack>
+
+        </Draggable>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
   return (
@@ -169,32 +242,17 @@ const Home = ({ host }) => {
             ))}
           </SpeedDial>
         </Draggable>
-        <Draggable>
+
+        {abxyGroup}
+
+
+        {JoyStick.map((val,index,arr) => { 
+          return val.element
+        })}
+        {/* <Draggable>
           <Stack style={{ position: "absolute", bottom: 16, left: 16, zIndex: 2 }} direction="column">
-            <Button
-              onClick={() =>
-                console.log('y')
-              }
-            >Y</Button>
-            <Stack direction="row">
-              <Button
-                onClick={() =>
-                  console.log('x')
-                }
-              >X</Button>
-              <Button
-                onClick={() =>
-                  console.log('b')
-                }
-              >B</Button>
-            </Stack>
-            <Button
-              onClick={() =>
-                console.log('a')
-              }
-            >A</Button>
           </Stack>
-        </Draggable>
+        </Draggable> */}
       </div>
       <video ref={remoteVideo} className={styles.remoteVideo} autoPlay muted playsInline loop ></video>
       <audio ref={remoteAudio} autoPlay controls style={{ zIndex: -1 }}></audio>
