@@ -170,7 +170,7 @@ const Home = ({ host }) => {
           </SpeedDial>
         </Draggable>
         <Draggable>
-          <Stack style={{position: "absolute" }} direction="column">
+          <Stack style={{ position: "absolute", bottom: 16, left: 16, zIndex: 2 }} direction="column">
             <Button
               onClick={() =>
                 console.log('y')
