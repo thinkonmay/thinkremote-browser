@@ -108,6 +108,7 @@ export const ButtonGroup = (input: { draggable: ButtonMode }): JSX.Element => {
               onEndTouchA= {(e: React.TouchEvent) => console.log(e)}
             ></YBXA>
         </Draggable>
+    )
 };
 
 export const VirtualGamepad = (param: { 
