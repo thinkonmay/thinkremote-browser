@@ -1,219 +1,145 @@
-import React, { useEffect, useRef, useState } from 'react';
-import Head from 'next/head';
-import styles from '../styles/Home.module.css';
+import React, { useEffect, useRef, useState } from "react";
+import Head from "next/head";
+import styles from "../styles/Home.module.css";
+import { AskSelectBitrate, AskSelectDisplay, AskSelectFramerate, AskSelectSoundcard, TurnOnAlert, TurnOnStatus} from "../components/popup/popup";
+import { WebRTCClient } from "webrtc-streaming-core/dist/app";
+import { useRouter } from "next/router";
+import SpeedDial from "@mui/material/SpeedDial";
+import SpeedDialAction from "@mui/material/SpeedDialAction";
 import {
-  AskSelectBitrate,
-  AskSelectDisplay,
-  AskSelectFramerate,
-  AskSelectSoundcard,
-  TurnOnAlert,
-  TurnOnStatus
-} from '../components/popup';
-import { WebRTCClient } from 'webrtc-streaming-core/dist/app';
-import { useRouter } from 'next/router';
-import SpeedDial from '@mui/material/SpeedDial';
-import SpeedDialAction from '@mui/material/SpeedDialAction';
-import { List, VolumeOff, VolumeUp, Fullscreen, FullscreenExit, ArrowBackIos } from '@mui/icons-material';
-import Draggable from 'react-draggable';
-import { DeviceSelection, DeviceSelectionResult, Soundcard } from 'webrtc-streaming-core/dist/models/devices.model';
-import { ConnectionEvent, Log, LogConnectionEvent, LogLevel } from 'webrtc-streaming-core/dist/utils/log';
-import { GetServerSideProps, NextPage } from 'next';
+  List,
+  Fullscreen,
+} from "@mui/icons-material";
+import Draggable from "react-draggable";
+import { DeviceSelection, DeviceSelectionResult } from "webrtc-streaming-core/dist/models/devices.model";
+import { ConnectionEvent, Log, LogConnectionEvent, LogLevel } from "webrtc-streaming-core/dist/utils/log";
+import { GetServerSideProps } from "next";
 import { Joystick } from 'react-joystick-component';
-import { IJoystickUpdateEvent } from 'react-joystick-component/build/lib/Joystick';
-import DPad from '../components/gamepad/d_pad';
+import { IJoystickUpdateEvent } from "react-joystick-component/build/lib/Joystick";
+import { GoogleAnalytics } from "nextjs-google-analytics";
+import Button from '@mui/material/Button';
+import Stack from '@mui/material/Stack';
+import { VirtualGamepad } from "../components/virtGamepad/virtGamepad";
+import { WebRTCControl } from "../components/control/control";
 
 type Props = { host: string | null };
 
-// optional: include the stylesheet somewhere in your app
-export const getServerSideProps: GetServerSideProps<Props> = async (context) => ({
-  props: { host: context.req.headers.host || null }
-});
+export const getServerSideProps: GetServerSideProps<Props> =
+  async context => ({ props: { host: context.req.headers.host || null } });
+
+const buttons = [
+  <Button key="one">One</Button>,
+  <Button key="two">Two</Button>,
+  <Button key="three">Three</Button>,
+];
+
 
 const Home = ({ host }) => {
   const remoteVideo = useRef<HTMLVideoElement>(null);
   const remoteAudio = useRef<HTMLAudioElement>(null);
-  let router = useRouter();
-  const [joyStick, setJoyStick] = useState<Joystick[]>([]);
 
-  const [volumeButton, setVolumeButton] = useState<JSX.Element>();
-  const [actions, setActions] = useState<
-    {
-      icon: JSX.Element;
-      name: string;
-      action: () => void;
-    }[]
-  >([]);
+  const router = useRouter();
+  const {signaling, token, fps,bitrate} = router.query
+  const signalingURL   = Buffer.from((signaling?signaling:"d3NzOi8vc2VydmljZS50aGlua21heS5uZXQvaGFuZHNoYWtl" ) as string, "base64").toString()
+  const signalingToken = (token? token : "none") as string
+  var defaultBitrate   = parseInt((bitrate? bitrate : "6000" ) as string,10)
+  var defaultFramerate = parseInt((fps? fps : "55") as string,10)
+  var defaultSoundcard = "Default Audio Render Device";
 
-  const onMove = (stick: IJoystickUpdateEvent) => {
-    //@ts-ignore
-    console.log(`X: ${stick.x}`);
-    console.log(`Y: ${stick.y}`);
-  };
+
 
   const onStop = () => {};
 
+
+  
+
+  let client : WebRTCClient  
   useEffect(() => {
-    if (remoteVideo.current) {
-      let signalingURL =
-        host.split(':')[0] != 'localhost' ? `wss://${host}/handshake` : 'wss://remote.thinkmay.net/handshake';
-      // let signalingURL = "wss://remote.thinkmay.net/handshake";
+  client = (client == null) ? client : new WebRTCClient(signalingURL,remoteVideo, remoteAudio, signalingToken, (async (offer: DeviceSelection) => {
+      LogConnectionEvent(ConnectionEvent.WaitingAvailableDeviceSelection)
 
-      let paramKeyVal = new Map<string, string>();
-      try {
-        const params = router.asPath?.split('?')[1]?.split('&');
-        params.forEach((val: string, index: number) => {
-          let keyval = val.split('=');
-          if (keyval.length == 2) {
-            paramKeyVal.set(keyval[0], keyval[1]);
-          } else {
-            console.log(`invalid param ${val}`);
-          }
-        });
-      } catch {}
+      let ret = new DeviceSelectionResult(offer.soundcards[0].DeviceID,offer.monitors[0].MonitorHandle.toString());
+      if(offer.soundcards.length > 1) {
 
-      if (paramKeyVal.get('token') == '') {
-        window.location.replace('https://service.thinkmay.net/dashboard');
+        let exist = false;
+        if (defaultSoundcard != null) {
+          offer.soundcards.forEach(x => {
+            if (x.Name == defaultSoundcard) {
+              exist = true;
+              ret.SoundcardDeviceID = x.DeviceID;
+              defaultSoundcard = null;
+            }
+          })
+        }
+
+        if (!exist) {
+          ret.SoundcardDeviceID = await AskSelectSoundcard(offer.soundcards)
+          Log(LogLevel.Infor,`selected audio deviceid ${ret.SoundcardDeviceID}`)
+        }
+      }           
+
+      if(offer.monitors.length > 1) {
+        ret.MonitorHandle = await AskSelectDisplay(offer.monitors)
+        Log(LogLevel.Infor,`selected monitor handle ${ret.MonitorHandle}`)
       }
 
-      var defaultSoundcard = 'Default Audio Render Device';
-      var defaultBitrate = paramKeyVal.get('bitrate') ? Number.parseInt(paramKeyVal.get('bitrate')) : null;
-      var defaultFramerate = paramKeyVal.get('fps') ? Number.parseInt(paramKeyVal.get('fps')) : 55;
+      if (defaultBitrate == null) {
+        ret.bitrate= await AskSelectBitrate();
+      } else {
+        ret.bitrate = defaultBitrate;
+      }
+      if (defaultFramerate == null) {
+        ret.framerate = await AskSelectFramerate();
+      } else {
+        ret.framerate = defaultFramerate;
+      }
 
-      let client = new WebRTCClient(
-        signalingURL,
-        remoteVideo,
-        remoteAudio,
-        paramKeyVal.get('token'),
-        async (offer: DeviceSelection) => {
-          LogConnectionEvent(ConnectionEvent.WaitingAvailableDeviceSelection);
+      return ret;
+  })).Notifier(message => {
+    console.log(message);
+    TurnOnStatus(message);
+  }).Alert(message => {
+    TurnOnAlert(message);
+  });  
+  },[])
+  
 
-          let ret = new DeviceSelectionResult(offer.soundcards[0].DeviceID, offer.monitors[0].MonitorHandle.toString());
-          if (offer.soundcards.length > 1) {
-            let exist = false;
-            if (defaultSoundcard != null) {
-              offer.soundcards.forEach((x) => {
-                if (x.Name == defaultSoundcard) {
-                  exist = true;
-                  ret.SoundcardDeviceID = x.DeviceID;
-                  defaultSoundcard = null;
-                }
-              });
-            }
 
-            if (!exist) {
-              ret.SoundcardDeviceID = await AskSelectSoundcard(offer.soundcards);
-              Log(LogLevel.Infor, `selected audio deviceid ${ret.SoundcardDeviceID}`);
-            }
-          }
 
-          if (offer.monitors.length > 1) {
-            ret.MonitorHandle = await AskSelectDisplay(offer.monitors);
-            Log(LogLevel.Infor, `selected monitor handle ${ret.MonitorHandle}`);
-          }
 
-          if (defaultBitrate == null) {
-            ret.bitrate = await AskSelectBitrate();
-          } else {
-            ret.bitrate = defaultBitrate;
-          }
-          if (defaultFramerate == null) {
-            ret.framerate = await AskSelectFramerate();
-          } else {
-            ret.framerate = defaultFramerate;
-          }
 
-          return ret;
-        }
-      )
-        .Notifier((message) => {
-          console.log(message);
-          TurnOnStatus(message);
-        })
-        .Alert((message) => {
-          TurnOnAlert(message);
-        });
 
-      const actions = [
-        {
-          icon: <Fullscreen />,
-          name: 'Framerate',
-          action: async () => {
-            let framerate = await AskSelectFramerate();
-            if (client != null && framerate > 10 && framerate < 61) {
-              console.log(`framerate is change to ${framerate}`);
-              client.ChangeFramerate(framerate);
-            }
-          }
-        },
-        {
-          icon: <Fullscreen />,
-          name: 'Bitrate',
-          action: async () => {
-            let bitrate = await AskSelectBitrate();
-            if (client != null && bitrate > 100 && bitrate < 30000) {
-              console.log(`bitrate is change to ${bitrate}`);
-              client.ChangeBitrate(bitrate);
-            }
-          }
-        },
-        {
-          icon: <VolumeUp />,
-          name: 'Mute',
-          action: async () => {
-            if (remoteAudio.current.muted) {
-              remoteAudio.current.muted = false;
-            } else {
-              remoteAudio.current.muted = true;
-            }
-          }
-        },
-        {
-          icon: <Fullscreen />,
-          name: 'Lock Pointer',
-          action: async () => {
-            client.VideoPointerLock();
-          }
-        },
-        {
-          icon: <Fullscreen />,
-          name: 'Enter fullscreen',
-          action: async () => {
-            document.documentElement.requestFullscreen();
-          }
-        }
-      ];
 
-      setActions([...actions]);
-    }
-  }, []);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
   return (
     <div>
+      <GoogleAnalytics trackPageViews />
       <Head>
         <title>WebRTC remote viewer</title>
         <meta name="description" content="Generated by create next app" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <div className={styles.app}>
-        TODO: <Joystick baseColor="darkgreen" stickColor="black" move={onMove} stop={onStop}></Joystick>
-        <Draggable>
-          <SpeedDial
-            ariaLabel="SpeedDial basic example"
-            sx={{ position: 'absolute', bottom: 16, right: 16 }}
-            icon={<List />}
-          >
-            {actions.map((action) => (
-              <SpeedDialAction
-                key={action.name}
-                icon={action.icon}
-                tooltipTitle={action.name}
-                onClick={action.action}
-              />
-            ))}
-          </SpeedDial>
-        </Draggable>
-        <DPad></DPad>
+        {WebRTCControl({client: client})}
+        {VirtualGamepad()}
       </div>
-      <video ref={remoteVideo} className={styles.remoteVideo} autoPlay muted playsInline loop></video>
+
+      <video ref={remoteVideo} className={styles.remoteVideo} autoPlay muted playsInline loop style={{ zIndex: -1 }}></video>
       <audio ref={remoteAudio} autoPlay controls style={{ zIndex: -1 }}></audio>
     </div>
   );

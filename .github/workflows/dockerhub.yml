@@ -1,9 +1,6 @@
 name: Browser
 on:
   workflow_dispatch:
-  push:
-    branch:
-    - "main"
 
 jobs:
   build:
