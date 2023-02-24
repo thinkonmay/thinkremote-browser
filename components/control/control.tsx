@@ -34,7 +34,16 @@ export const WebRTCControl = (input: {client: WebRTCClient}) =>  {
 		action: async () => { document.documentElement.requestFullscreen(); }, }, {
 		icon: <Fullscreen />,
 		name: "Edit",
-		action: async () => { setDraggable(prev => { return 'draggable'}); }, 
+		action: async () => { setDraggable(prev => { 
+			switch (prev) {
+				case 'disable':
+					return 'static'
+				case 'static':
+					return 'draggable'
+				case 'draggable':
+					return 'disable'
+			}
+		}); }, 
 	},]
 
 	useEffect(() => {
