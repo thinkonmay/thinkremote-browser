@@ -49,7 +49,10 @@ export const JoyStick = (param: { type: 'left' | 'right', draggable: ButtonMode 
     const JoystickRef = useRef<Joystick>(null);
     const move = (event: IJoystickUpdateEvent) => {
         if(event.type == 'move') {
-            param.moveCallback(event.x,event.y)
+            param.moveCallback(event.x,-event.y)
+        }
+        if(event.type == 'stop') {
+            param.moveCallback(0,0)
         }
     };
 

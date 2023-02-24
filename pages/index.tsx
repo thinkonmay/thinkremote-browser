@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Head from "next/head";
 import styles from "../styles/Home.module.css";
 import {
@@ -54,81 +54,70 @@ const Home = ({ host }) => {
     var defaultBitrate = parseInt((bitrate ? bitrate : "6000") as string, 10);
     var defaultFramerate = parseInt((fps ? fps : "55") as string, 10);
     var defaultSoundcard = "Default Audio Render Device";
+    const selectDevice = async (offer: DeviceSelection) => {
+        LogConnectionEvent( ConnectionEvent.WaitingAvailableDeviceSelection);
+        let ret = new DeviceSelectionResult(
+            offer.soundcards[0].DeviceID,
+            offer.monitors[0].MonitorHandle.toString()
+        );
 
-    let client: WebRTCClient;
+        if (offer.soundcards.length > 1) {
+            let exist = false;
+            if (defaultSoundcard != null) {
+                offer.soundcards.forEach((x) => {
+                    if (x.Name == defaultSoundcard) {
+                        exist = true;
+                        ret.SoundcardDeviceID = x.DeviceID;
+                        defaultSoundcard = null;
+                    }
+                });
+            }
+
+            if (!exist) {
+                ret.SoundcardDeviceID =
+                    await AskSelectSoundcard(
+                        offer.soundcards
+                    );
+                Log(
+                    LogLevel.Infor,
+                    `selected audio deviceid ${ret.SoundcardDeviceID}`
+                );
+            }
+        }
+
+        if (offer.monitors.length > 1) {
+            ret.MonitorHandle = await AskSelectDisplay(
+                offer.monitors
+            );
+            Log(
+                LogLevel.Infor,
+                `selected monitor handle ${ret.MonitorHandle}`
+            );
+        }
+
+        if (defaultBitrate == null) {
+            ret.bitrate = await AskSelectBitrate();
+        } else {
+            ret.bitrate = defaultBitrate;
+        }
+        if (defaultFramerate == null) {
+            ret.framerate = await AskSelectFramerate();
+        } else {
+            ret.framerate = defaultFramerate;
+        }
+
+        return ret;
+    }
+
+    const [client,setClient] = useState<WebRTCClient>(null);
     useEffect(() => {
-        client =
-            client != null
-                ? client
-                : new WebRTCClient(
-                      signalingURL,
-                      remoteVideo,
-                      remoteAudio,
-                      signalingToken,
-                      async (offer: DeviceSelection) => {
-                          LogConnectionEvent(
-                              ConnectionEvent.WaitingAvailableDeviceSelection
-                          );
-
-                          let ret = new DeviceSelectionResult(
-                              offer.soundcards[0].DeviceID,
-                              offer.monitors[0].MonitorHandle.toString()
-                          );
-                          if (offer.soundcards.length > 1) {
-                              let exist = false;
-                              if (defaultSoundcard != null) {
-                                  offer.soundcards.forEach((x) => {
-                                      if (x.Name == defaultSoundcard) {
-                                          exist = true;
-                                          ret.SoundcardDeviceID = x.DeviceID;
-                                          defaultSoundcard = null;
-                                      }
-                                  });
-                              }
-
-                              if (!exist) {
-                                  ret.SoundcardDeviceID =
-                                      await AskSelectSoundcard(
-                                          offer.soundcards
-                                      );
-                                  Log(
-                                      LogLevel.Infor,
-                                      `selected audio deviceid ${ret.SoundcardDeviceID}`
-                                  );
-                              }
-                          }
-
-                          if (offer.monitors.length > 1) {
-                              ret.MonitorHandle = await AskSelectDisplay(
-                                  offer.monitors
-                              );
-                              Log(
-                                  LogLevel.Infor,
-                                  `selected monitor handle ${ret.MonitorHandle}`
-                              );
-                          }
-
-                          if (defaultBitrate == null) {
-                              ret.bitrate = await AskSelectBitrate();
-                          } else {
-                              ret.bitrate = defaultBitrate;
-                          }
-                          if (defaultFramerate == null) {
-                              ret.framerate = await AskSelectFramerate();
-                          } else {
-                              ret.framerate = defaultFramerate;
-                          }
-
-                          return ret;
-                      }
-                  )
-                      .Notifier((message) => {
-                          console.log(message);
-                          TurnOnStatus(message);
-                      })
-                      .Alert((message) => {
-                          TurnOnAlert(message);
-                      });
+        setClient(new WebRTCClient( signalingURL, remoteVideo, remoteAudio, signalingToken, selectDevice).Notifier((message) => {
+            console.log(message);
+            TurnOnStatus(message);
+        }).Alert((message) => {
+            console.log(message);
+            TurnOnAlert(message);
+        }));
     }, []);
 
     return (
@@ -146,12 +135,6 @@ const Home = ({ host }) => {
                 ></meta>
                 <link rel="icon" href="/favicon.ico" />
             </Head>
-
-
-
-
-
-
 
             <WebRTCControl client={client}></WebRTCControl>
             <video

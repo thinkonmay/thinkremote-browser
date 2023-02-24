@@ -2,6 +2,7 @@ import { Fullscreen } from "@mui/icons-material";
 import { List, SpeedDial, SpeedDialAction } from "@mui/material";
 import React, { useEffect, useState } from "react"; // we need this to make JSX compile
 import { WebRTCClient } from "webrtc-streaming-core";
+import { EventCode, HIDMsg } from "webrtc-streaming-core/dist/models/keys.model";
 import { getOS } from "webrtc-streaming-core/dist/utils/platform";
 import { AskSelectBitrate } from "../popup/popup";
 import { VirtualGamepad } from "../virtGamepad/virtGamepad";
@@ -124,6 +125,7 @@ export const WebRTCControl = (input: { client: WebRTCClient }) => {
 			setEnableVirtGamepad(true);
 		}
 
+
     }, []);
 
     const _actions = [
@@ -155,8 +157,14 @@ export const WebRTCControl = (input: { client: WebRTCClient }) => {
                         case "disable":
                             return "draggable";
                         case "draggable":
+                            input.client?.hid?.SendFunc((new HIDMsg(EventCode.GamepadConnect,{
+                                gamepad_id: "0",
+                            }).ToString())) 
                             return "static";
                         case "static":
+                            input.client?.hid?.SendFunc((new HIDMsg(EventCode.GamepadDisconnect,{
+                                gamepad_id: "0",
+                            }).ToString())) 
                             return "disable";
                     }
                 });
@@ -172,10 +180,10 @@ export const WebRTCControl = (input: { client: WebRTCClient }) => {
 
 
 	const ACallback = async (x: number, y: number,type: 'left' | 'right') => {
-		input.client?.hid.VirtualGamepadAxis(x,y,type);
+		input.client?.hid?.VirtualGamepadAxis(x,y,type);
 	}
 	const BCallback = async (index: number,type: 'press' | 'release') => {
-		input.client?.hid.VirtualGamepadButtonSlider(type == 'release',index);
+		input.client?.hid?.VirtualGamepadButtonSlider(type == 'release',index);
 	}
 
     return (
