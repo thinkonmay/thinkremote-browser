@@ -2,24 +2,21 @@ import { Button, Stack } from '@mui/material';
 import React, { useState } from 'react'; // we need this to make JSX compile
 import Draggable from 'react-draggable';
 import { IJoystickUpdateEvent, Joystick } from 'react-joystick-component/build/lib/Joystick';
+import { ButtonMode } from '../control/control';
 
 type CardProps = {
   title: string,
   paragraph: string
 }
 
-export const JoyStick = () =>  {
-    return <div>
-        <Draggable>
-            <div style={{zIndex: 1,opacity: 0.3}}>
-                <Joystick > </Joystick> 
+export const JoyStick = (param : {draggable: ButtonMode}) =>  {
+    return <Draggable disabled={param.draggable != 'draggable'}>
+            <div style={{zIndex: 1,opacity: 0.3, color:"#000"}}>
+                <Joystick baseColor='#000' stickColor='hwb(360 51% 76%)'> </Joystick> 
             </div>
         </Draggable>
-
-
-    </div>
 }
-export const ButtonGroup = ():JSX.Element =>  {
+export const ButtonGroup = (input: {draggable: ButtonMode}):JSX.Element =>  {
     const [JoyStick, setJoyStick] = useState<{
         element: JSX.Element;
     }[] >([]);
@@ -31,8 +28,8 @@ export const ButtonGroup = ():JSX.Element =>  {
     };
 
 
-    return <Draggable>
-        <Stack style={{opacity: 0.3, position: "absolute", bottom: 16, left: 16, zIndex: 2 }} direction="column">
+    return <Draggable disabled={input.draggable != 'draggable'}>
+        <Stack style={{opacity: 0.2, position: "absolute", bottom: 16, left: 16, zIndex: 2 }} direction="column">
             <Button
                 onClick={() =>
                 console.log('y')
@@ -59,17 +56,19 @@ export const ButtonGroup = ():JSX.Element =>  {
     </Draggable>
 }
 
-export const VirtualGamepad = () =>  {
+export const VirtualGamepad = (param: {draggable: ButtonMode}) =>  {
     
 
     return <div>
-        <ButtonGroup>
+    {(param.draggable == 'static' || param.draggable == 'draggable') ? 
+    (<div><ButtonGroup draggable={param.draggable}>
         </ButtonGroup>
 
-        <ButtonGroup>
+        <ButtonGroup draggable={param.draggable}>
         </ButtonGroup>
 
-        <JoyStick></JoyStick>
-        <JoyStick></JoyStick>
+        <JoyStick draggable={param.draggable}></JoyStick>
+        <JoyStick draggable={param.draggable}></JoyStick>
+    </div>) : null}
     </div>
 }

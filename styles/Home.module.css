@@ -2,7 +2,7 @@
   position: relative;
   width: 100vw;
   height: 100vh;
-  background-color: #303030;
+  background-color: #2d363b;
 }
 
 .controls {
@@ -27,9 +27,9 @@
   background-color: white;
   background-image: linear-gradient(to bottom, #ffffff 0%, #efefef 100%);
   padding: 4px 12px;
-  border: 2px solid #20639b;
-  color: #20639b;
-  margin-right: 20px;
+  border: 2px solid hwb(0 7% 93%);
+  color: hwb(240 21% 76%);
+  /* margin-right: 20px; */
   cursor: pointer;
 }
 

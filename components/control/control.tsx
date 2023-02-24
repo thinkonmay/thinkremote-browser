@@ -3,9 +3,14 @@ import { List, SpeedDial, SpeedDialAction } from '@mui/material';
 import React, { useEffect, useState } from 'react'; // we need this to make JSX compile
 import { WebRTCClient } from 'webrtc-streaming-core';
 import { AskSelectBitrate } from '../popup/popup';
+import { VirtualGamepad } from '../virtGamepad/virtGamepad';
 
+
+
+export type ButtonMode = 'static' | 'draggable' | 'disable'
 
 export const WebRTCControl = (input: {client: WebRTCClient}) =>  {
+    const [Draggable,setDraggable] = useState<ButtonMode>('disable');
 	const [actions, setActions] = useState<{
 		icon: JSX.Element;
 		name: string;
@@ -16,19 +21,20 @@ export const WebRTCControl = (input: {client: WebRTCClient}) =>  {
 		icon: <Fullscreen/>,
 		name: "Bitrate",  
 		action: async () => {
-		let bitrate = await AskSelectBitrate();
-		if (bitrate < 500 || input.client == null) {
-			return
-		}
-		
-		console.log(`bitrate is change to ${bitrate}`)
-		input.client?.ChangeBitrate(bitrate);
-	}, }, {
+			let bitrate = await AskSelectBitrate();
+			if (bitrate < 500 || input.client == null) {
+				return
+			}
+			console.log(`bitrate is change to ${bitrate}`)
+			input.client?.ChangeBitrate(bitrate);
+		}, 
+	},{
 		icon: <Fullscreen />,
 		name: "Enter fullscreen",
-		action: async () => {
-		document.documentElement.requestFullscreen();
-		}, 
+		action: async () => { document.documentElement.requestFullscreen(); }, }, {
+		icon: <Fullscreen />,
+		name: "Edit",
+		action: async () => { setDraggable(prev => { return 'draggable'}); }, 
 	},]
 
 	useEffect(() => {
@@ -37,7 +43,8 @@ export const WebRTCControl = (input: {client: WebRTCClient}) =>  {
 
 
 
-    return  <SpeedDial
+    return  <div>
+	<SpeedDial
 		ariaLabel="SpeedDial basic example"
 		sx={{ opacity:0.3, position: "absolute", bottom: 16, right: 16 }}
 		icon={<List />}
@@ -51,5 +58,7 @@ export const WebRTCControl = (input: {client: WebRTCClient}) =>  {
 			/>
 		))}
 	</SpeedDial>
+	<VirtualGamepad draggable={Draggable}></VirtualGamepad>
+	</div>
 
 }
