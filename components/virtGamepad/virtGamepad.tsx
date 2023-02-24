@@ -7,6 +7,7 @@ import {
     Joystick,
 } from "react-joystick-component/build/lib/Joystick";
 import { ButtonMode } from "../control/control";
+import YBXA from "../gamepad/y_b_x_a";
 
 type CardProps = {
     title: string;
@@ -72,31 +73,10 @@ export const JoyStick = (param: { type: 'left' | 'right', draggable: ButtonMode 
         </Draggable>
     );
 };
-
-export const ButtonGroup = (param: { draggable: 'draggable' | 'static'}): JSX.Element => {
-    const defaultPosX = JSON.parse(localStorage.getItem("posX")) ?? 500;
-    const defaultPosY = JSON.parse(localStorage.getItem("posX")) ?? 500;
-    const [posBtn, setPosBtn] = useState({
-        deltaPosition: {
-            x: defaultPosX,
-            y: defaultPosY
-        },
-    });
-
-    const handleDrag = (e, ui) => {
-        const { x, y } = posBtn.deltaPosition;
-        setPosBtn({
-            deltaPosition: {
-                x: x + ui.deltaX,
-                y: y + ui.deltaY,
-            },
-        });
-        localStorage.setItem("posX", JSON.stringify(posBtn.deltaPosition.x));
-        localStorage.setItem("posY", JSON.stringify(posBtn.deltaPosition.y));
-    };
-
-    return <Draggable onDrag={handleDrag} defaultPosition={{x: posBtn.deltaPosition.x, y: posBtn.deltaPosition.y}}  disabled={param.draggable != "draggable"}>
-            <Stack
+export const ButtonGroup = (input: { draggable: ButtonMode }): JSX.Element => {
+    return (
+        <Draggable disabled={input.draggable != "draggable"}>
+            {/* <Stack
                 style={{
                     opacity: 0.2,
                     position: "absolute",
@@ -116,7 +96,17 @@ export const ButtonGroup = (param: { draggable: 'draggable' | 'static'}): JSX.El
                     <Button onClick={() => console.log("b")}>B</Button>
                 </Stack>
                 <Button onClick={() => console.log("a")}>A</Button>
-            </Stack>
+            </Stack> */}
+            <YBXA
+              onStartTouchY= {(e: React.TouchEvent) => console.log(e)}
+              onEndTouchY= {(e: React.TouchEvent) => console.log(e)}
+              onStartTouchB= {(e: React.TouchEvent) => console.log(e)}
+              onEndTouchB= {(e: React.TouchEvent) => console.log(e)}
+              onStartTouchX= {(e: React.TouchEvent) => console.log(e)}
+              onEndTouchX= {(e: React.TouchEvent) => console.log(e)}
+              onStartTouchA= {(e: React.TouchEvent) => console.log(e)}
+              onEndTouchA= {(e: React.TouchEvent) => console.log(e)}
+            ></YBXA>
         </Draggable>
 };
 
