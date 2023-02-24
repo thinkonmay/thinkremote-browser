@@ -150,9 +150,10 @@ export const WebRTCControl = (input: {client: WebRTCClient}) =>  {
 
 
     return  <div>
+	<div style={{zIndex: 2}}>
 	<SpeedDial
 		ariaLabel="SpeedDial basic example"
-		sx={{ opacity:0.3, position: "absolute", bottom: 16, right: 16 }}
+		sx={{ opacity:0.3, position: "absolute", bottom: 16, right: 16  }}
 		icon={<List />}
 		>
 		{_actions.map((action) => (
@@ -164,6 +165,7 @@ export const WebRTCControl = (input: {client: WebRTCClient}) =>  {
 			/>
 		))}
 	</SpeedDial>
+	</div>	
 	<VirtualGamepad draggable={Draggable}></VirtualGamepad>
 	</div>
 

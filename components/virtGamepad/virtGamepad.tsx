@@ -17,7 +17,7 @@ export const JoyStick = (param : {draggable: ButtonMode}) =>  {
 
 
     return <Draggable disabled={param.draggable != 'draggable'}>
-            <div style={{opacity: 0.2}}>
+            <div style={{opacity: 0.2, zIndex:2}}>
                 <Joystick start={move} stop={move} move={move} ref={JoystickRef} baseColor='#000' stickColor='hwb(360 51% 76%)' > </Joystick> 
             </div>
         </Draggable>

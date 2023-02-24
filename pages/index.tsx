@@ -136,10 +136,11 @@ const Home = ({ host }) => {
       </Head>
 
 
-      <div className={styles.app}>
+      <video ref={remoteVideo} className={styles.remoteVideo} autoPlay muted playsInline loop style={{ zIndex: -1 }}></video>
+
+      <div className={styles.app} style={{zIndex: -2}}>
         <WebRTCControl></WebRTCControl>
       </div>
-      <video ref={remoteVideo} className={styles.remoteVideo} autoPlay muted playsInline loop style={{ zIndex: 0, backgroundColor: "#0000"}}></video>
       <audio ref={remoteAudio} autoPlay controls style={{ zIndex: -5 ,opacity: 0}}></audio>
     </div>
   );
