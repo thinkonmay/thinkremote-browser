@@ -1,6 +1,7 @@
+import { Translate } from "@mui/icons-material";
 import { Button, Stack } from "@mui/material";
 import React, { useRef, useState, useEffect } from "react"; // we need this to make JSX compile
-import Draggable from "react-draggable";
+import Draggable, { DraggableData, DraggableEvent } from "react-draggable";
 import {
     IJoystickUpdateEvent,
     Joystick,
@@ -12,7 +13,39 @@ type CardProps = {
     paragraph: string;
 };
 
-export const JoyStick = (param: { draggable: ButtonMode , moveCallback: ((x:number,y:number) => Promise<void>) }) => {
+export const JoyStick = (param: { type: 'left' | 'right', draggable: ButtonMode , moveCallback: ((x:number,y:number) => Promise<void>) }) => {
+    const [posBtn, setPosBtn] = useState({ x: 0, y: 0 });
+    useEffect(() => {
+        const {x,y} = JSON.parse(localStorage.getItem(`default${param.type}axis`));
+        if (x == null || y == null) {
+            return;
+        }
+
+        console.log(`get ${x} ${y} from storage`);
+        setPosBtn({x:x,y:y})
+    },[])
+
+    const handleDrag = ( e: DraggableEvent, data: DraggableData) => {
+        const { x, y } = posBtn;
+        setPosBtn({
+            x: data.x,
+            y: data.y,
+        });
+    };
+
+    const handleStop = ( e: DraggableEvent, data: DraggableData) => {
+        const { x, y } = posBtn;
+        if (x == null || y == null) {
+            return;
+        }
+
+        localStorage.setItem(`default${param.type}axis`, JSON.stringify(posBtn));
+        console.log(`set ${x} ${y} to storage`);
+    }
+
+
+
+    
     const JoystickRef = useRef<Joystick>(null);
     const move = (event: IJoystickUpdateEvent) => {
         if(event.type == 'move') {
@@ -21,8 +54,8 @@ export const JoyStick = (param: { draggable: ButtonMode , moveCallback: ((x:numb
     };
 
     return (
-        <Draggable disabled={param.draggable != "draggable"}>
-            <div style={{ opacity: 0.2, zIndex: 2 }}>
+        <Draggable position={{x: posBtn.x, y: posBtn.y}} onStop={handleStop} onDrag={handleDrag} disabled={param.draggable != "draggable"}>
+            <div style={{ opacity: 0.2, zIndex: 2}}>
                 <Joystick
                     start={move}
                     stop={move}
@@ -96,13 +129,13 @@ export const VirtualGamepad = (param: {
                     <ButtonGroup draggable={param.draggable}> </ButtonGroup>
                     <ButtonGroup draggable={param.draggable}> </ButtonGroup>
 
-                    <JoyStick moveCallback={async (x:number,y:number) => {
+                    <JoyStick type={'left'} moveCallback={async (x:number,y:number) => {
                         param.AxisCallback(x,y,'left')
                         return;
                     }} draggable={param.draggable}></JoyStick>
                     {/* left */}
 
-                    <JoyStick moveCallback={async (x:number,y:number) => {
+                    <JoyStick type={'right'} moveCallback={async (x:number,y:number) => {
                         param.AxisCallback(x,y,'right')
                         return;
                     }} draggable={param.draggable}></JoyStick> 

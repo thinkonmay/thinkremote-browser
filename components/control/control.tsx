@@ -34,7 +34,6 @@ function isFullscreen(): boolean {
 export const WebRTCControl = (input: { client: WebRTCClient }) => {
     const [Draggable, setDraggable] = useState<ButtonMode>("disable");
     const [EnableVirtGamepad, setEnableVirtGamepad] = useState<boolean>(true);
-
     const [onGoingTouchs, setTouces] = useState<Map<number, TouchData>>(
         new Map<number, TouchData>()
     );
@@ -121,6 +120,10 @@ export const WebRTCControl = (input: { client: WebRTCClient }) => {
         document.addEventListener("touchstart", handleStart);
         document.addEventListener("touchend", handleEnd);
         document.addEventListener("touchmove", handleMove);
+		if (getOS() == "Android" || getOS() == "iOS") {
+			setEnableVirtGamepad(true);
+		}
+
     }, []);
 
     const _actions = [
@@ -163,9 +166,7 @@ export const WebRTCControl = (input: { client: WebRTCClient }) => {
 
 
 
-	// if (getOS() == "Android" || getOS() == "iOS") {
 
-	// }
 
 
 
@@ -200,7 +201,7 @@ export const WebRTCControl = (input: { client: WebRTCClient }) => {
                     ))}
                 </SpeedDial>
             </div>
-            <VirtualGamepad ButtonCallback={BCallback} AxisCallback={ACallback} draggable={Draggable}></VirtualGamepad>
+            {EnableVirtGamepad ? <VirtualGamepad ButtonCallback={BCallback} AxisCallback={ACallback} draggable={Draggable}></VirtualGamepad> : null} 
         </div>
     );
 };
