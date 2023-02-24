@@ -31,7 +31,7 @@ import { IJoystickUpdateEvent } from "react-joystick-component/build/lib/Joystic
 import { GoogleAnalytics } from "nextjs-google-analytics";
 import Button from "@mui/material/Button";
 import Stack from "@mui/material/Stack";
-import { VirtualGamepad } from "../components/virtGamepad/virtGamepad";
+import { ButtonGroup, VirtualGamepad } from "../components/virtGamepad/virtGamepad";
 import { WebRTCControl } from "../components/control/control";
 import DPad from "../components/gamepad/d_pad";
 import YBXA from "../components/gamepad/y_b_x_a";
