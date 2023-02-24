@@ -22,6 +22,7 @@ import Stack from '@mui/material/Stack';
 import { VirtualGamepad } from "../components/virtGamepad/virtGamepad";
 import { WebRTCControl } from "../components/control/control";
 import DPad from "../components/gamepad/d_pad";
+import YBXA from "../components/gamepad/y_b_x_a";
 
 type Props = { host: string | null };
 
@@ -130,6 +131,7 @@ const Home = ({ host }) => {
   return (
     <div>
       <DPad></DPad>
+      <YBXA></YBXA>
       {/* <GoogleAnalytics trackPageViews />
       <Head>
         <title>WebRTC remote viewer</title>
