@@ -39,39 +39,64 @@ const ButtonA = styled(DefaultButton)`
   transform: translate(-100%, -50%);
 `;
 interface Props {
-  onTouchY: (e: React.TouchEvent) => void;
-  onTouchB: (e: React.TouchEvent) => void;
-  onTouchX: (e: React.TouchEvent) => void;
-  onTouchA: (e: React.TouchEvent) => void;
+  onStartTouchY: (e: React.TouchEvent) => void;
+  onEndTouchY: (e: React.TouchEvent) => void;
+  onStartTouchB: (e: React.TouchEvent) => void;
+  onEndTouchB: (e: React.TouchEvent) => void;
+  onStartTouchX: (e: React.TouchEvent) => void;
+  onEndTouchX: (e: React.TouchEvent) => void;
+  onStartTouchA: (e: React.TouchEvent) => void;
+  onEndTouchA: (e: React.TouchEvent) => void;
 }
 function YBXA(props: Props) {
-  const { onTouchY, onTouchB, onTouchX, onTouchA } = props;
+  const {
+    onStartTouchY,
+    onEndTouchY,
+    onStartTouchB,
+    onEndTouchB,
+    onStartTouchX,
+    onEndTouchX,
+    onStartTouchA,
+    onEndTouchA
+  } = props;
   return (
     <Container>
       <ButtonY
         onTouchStart={(e: React.TouchEvent) => {
-          onTouchY(e);
+          onStartTouchY(e);
+        }}
+        onTouchEnd={(e:React.TouchEvent) =>{
+          onEndTouchY
         }}
       >
         Y
       </ButtonY>
       <ButtonB
         onTouchStart={(e: React.TouchEvent) => {
-          onTouchB(e);
+          onStartTouchB(e);
+        }}
+        onTouchEnd={(e:React.TouchEvent) =>{
+          onEndTouchB
         }}
       >
         B
       </ButtonB>
       <ButtonX
         onTouchStart={(e: React.TouchEvent) => {
-          onTouchX(e);
+          onStartTouchX(e);
+        }}
+        onTouchEnd={(e:React.TouchEvent) =>{
+          onEndTouchX
         }}
       >
         X
       </ButtonX>
       <ButtonA
         onTouchStart={(e: React.TouchEvent) => {
-          onTouchA(e);
+          onStartTouchA(e);
+        }}
+        onTouchEnd={(e:React.TouchEvent) =>{
+          onEndTouchA
         }}
       >
         A

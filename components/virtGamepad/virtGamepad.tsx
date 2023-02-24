@@ -6,6 +6,7 @@ import {
     Joystick,
 } from "react-joystick-component/build/lib/Joystick";
 import { ButtonMode } from "../control/control";
+import YBXA from "../gamepad/y_b_x_a";
 
 type CardProps = {
     title: string;
@@ -38,7 +39,7 @@ export const JoyStick = (param: { draggable: ButtonMode }) => {
 export const ButtonGroup = (input: { draggable: ButtonMode }): JSX.Element => {
     return (
         <Draggable disabled={input.draggable != "draggable"}>
-            <Stack
+            {/* <Stack
                 style={{
                     opacity: 0.2,
                     position: "absolute",
@@ -58,7 +59,17 @@ export const ButtonGroup = (input: { draggable: ButtonMode }): JSX.Element => {
                     <Button onClick={() => console.log("b")}>B</Button>
                 </Stack>
                 <Button onClick={() => console.log("a")}>A</Button>
-            </Stack>
+            </Stack> */}
+            <YBXA
+              onStartTouchY= {(e: React.TouchEvent) => console.log(e)}
+              onEndTouchY= {(e: React.TouchEvent) => console.log(e)}
+              onStartTouchB= {(e: React.TouchEvent) => console.log(e)}
+              onEndTouchB= {(e: React.TouchEvent) => console.log(e)}
+              onStartTouchX= {(e: React.TouchEvent) => console.log(e)}
+              onEndTouchX= {(e: React.TouchEvent) => console.log(e)}
+              onStartTouchA= {(e: React.TouchEvent) => console.log(e)}
+              onEndTouchA= {(e: React.TouchEvent) => console.log(e)}
+            ></YBXA>
         </Draggable>
     );
 };
