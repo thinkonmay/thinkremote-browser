@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef } from "react";
 import Head from "next/head";
 import styles from "../styles/Home.module.css";
 import {
@@ -11,10 +11,6 @@ import {
 } from "../components/popup/popup";
 import { WebRTCClient } from "webrtc-streaming-core/dist/app";
 import { useRouter } from "next/router";
-import SpeedDial from "@mui/material/SpeedDial";
-import SpeedDialAction from "@mui/material/SpeedDialAction";
-import { List, Fullscreen } from "@mui/icons-material";
-import Draggable from "react-draggable";
 import {
     DeviceSelection,
     DeviceSelectionResult,
@@ -26,12 +22,8 @@ import {
     LogLevel,
 } from "webrtc-streaming-core/dist/utils/log";
 import { GetServerSideProps } from "next";
-import { Joystick } from "react-joystick-component";
-import { IJoystickUpdateEvent } from "react-joystick-component/build/lib/Joystick";
 import { GoogleAnalytics } from "nextjs-google-analytics";
 import Button from "@mui/material/Button";
-import Stack from "@mui/material/Stack";
-import { VirtualGamepad } from "../components/virtGamepad/virtGamepad";
 import { WebRTCControl } from "../components/control/control";
 
 type Props = { host: string | null };
@@ -155,6 +147,13 @@ const Home = ({ host }) => {
                 <link rel="icon" href="/favicon.ico" />
             </Head>
 
+
+
+
+
+
+
+            <WebRTCControl client={client}></WebRTCControl>
             <video
                 ref={remoteVideo}
                 className={styles.remoteVideo}
@@ -164,10 +163,6 @@ const Home = ({ host }) => {
                 loop
                 style={{ zIndex: -1 }}
             ></video>
-
-            <div className={styles.app} style={{ zIndex: -2 }}>
-                <WebRTCControl></WebRTCControl>
-            </div>
             <audio
                 ref={remoteAudio}
                 autoPlay

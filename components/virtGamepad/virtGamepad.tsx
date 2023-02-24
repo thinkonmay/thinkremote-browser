@@ -12,10 +12,12 @@ type CardProps = {
     paragraph: string;
 };
 
-export const JoyStick = (param: { draggable: ButtonMode }) => {
+export const JoyStick = (param: { draggable: ButtonMode , moveCallback: ((x:number,y:number) => Promise<void>) }) => {
     const JoystickRef = useRef<Joystick>(null);
     const move = (event: IJoystickUpdateEvent) => {
-        // console.log(JSON.stringify(event));
+        if(event.type == 'move') {
+            param.moveCallback(event.x,event.y)
+        }
     };
 
     return (
@@ -29,15 +31,13 @@ export const JoyStick = (param: { draggable: ButtonMode }) => {
                     baseColor="#000"
                     stickColor="hwb(360 51% 76%)"
                 >
-                    {" "}
                 </Joystick>
             </div>
         </Draggable>
     );
 };
-export const ButtonGroup = (input: { draggable: ButtonMode }): JSX.Element => {
-    return (
-        <Draggable disabled={input.draggable != "draggable"}>
+export const ButtonGroup = (param: { draggable: 'draggable' | 'static'}): JSX.Element => {
+    return <Draggable disabled={param.draggable != "draggable"}>
             <Stack
                 style={{
                     opacity: 0.2,
@@ -60,18 +60,31 @@ export const ButtonGroup = (input: { draggable: ButtonMode }): JSX.Element => {
                 <Button onClick={() => console.log("a")}>A</Button>
             </Stack>
         </Draggable>
-    );
 };
 
-export const VirtualGamepad = (param: { draggable: ButtonMode }) => {
+export const VirtualGamepad = (param: { 
+    draggable: ButtonMode, 
+    AxisCallback:    ((x: number,y: number,type: 'left' | 'right') => Promise<void>),
+    ButtonCallback:  ((index: number,type: 'press' | 'release') => Promise<void>),
+    }) => {
     return (
         <div>
             {param.draggable == "static" || param.draggable == "draggable" ? (
                 <div style={{ zIndex: 2 }}>
                     <ButtonGroup draggable={param.draggable}> </ButtonGroup>
                     <ButtonGroup draggable={param.draggable}> </ButtonGroup>
-                    <JoyStick draggable={param.draggable}></JoyStick>
-                    <JoyStick draggable={param.draggable}></JoyStick>
+
+                    <JoyStick moveCallback={async (x:number,y:number) => {
+                        param.AxisCallback(x,y,'left')
+                        return;
+                    }} draggable={param.draggable}></JoyStick>
+                    {/* left */}
+
+                    <JoyStick moveCallback={async (x:number,y:number) => {
+                        param.AxisCallback(x,y,'right')
+                        return;
+                    }} draggable={param.draggable}></JoyStick> 
+                    {/* right */}
                 </div>
             ) : null}
         </div>
