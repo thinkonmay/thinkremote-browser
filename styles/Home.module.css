@@ -1,9 +1,10 @@
-.app {
+/* .app {
   position: relative;
   width: 100vw;
   height: 100vh;
-  background-color: #2d363b;
-}
+  background-color: #000000;
+  /* opacity: 0.1; */
+/* }  */
 
 .controls {
   position: absolute;
@@ -29,7 +30,6 @@
   padding: 4px 12px;
   border: 2px solid hwb(0 7% 93%);
   color: hwb(240 21% 76%);
-  /* margin-right: 20px; */
   cursor: pointer;
 }
 
