@@ -1,115 +1,118 @@
-import React, { useEffect, useRef, useState } from "react";
-import Head from "next/head";
-import styles from "../styles/Home.module.css";
-import { AskSelectBitrate, AskSelectDisplay, AskSelectFramerate, AskSelectSoundcard, TurnOnAlert, TurnOnStatus} from "../components/popup";
-import { WebRTCClient } from "webrtc-streaming-core/dist/app";
-import { useRouter } from "next/router";
-import SpeedDial from "@mui/material/SpeedDial";
-import SpeedDialAction from "@mui/material/SpeedDialAction";
+import React, { useEffect, useRef, useState } from 'react';
+import Head from 'next/head';
+import styles from '../styles/Home.module.css';
 import {
-  List,
-  VolumeOff,
-  VolumeUp,
-  Fullscreen,
-  FullscreenExit,
-  ArrowBackIos,
-} from "@mui/icons-material";
-import Draggable from "react-draggable";
-import { DeviceSelection, DeviceSelectionResult, Soundcard } from "webrtc-streaming-core/dist/models/devices.model";
-import { ConnectionEvent, Log, LogConnectionEvent, LogLevel } from "webrtc-streaming-core/dist/utils/log";
-import { GetServerSideProps, NextPage } from "next";
+  AskSelectBitrate,
+  AskSelectDisplay,
+  AskSelectFramerate,
+  AskSelectSoundcard,
+  TurnOnAlert,
+  TurnOnStatus
+} from '../components/popup';
+import { WebRTCClient } from 'webrtc-streaming-core/dist/app';
+import { useRouter } from 'next/router';
+import SpeedDial from '@mui/material/SpeedDial';
+import SpeedDialAction from '@mui/material/SpeedDialAction';
+import { List, VolumeOff, VolumeUp, Fullscreen, FullscreenExit, ArrowBackIos } from '@mui/icons-material';
+import Draggable from 'react-draggable';
+import { DeviceSelection, DeviceSelectionResult, Soundcard } from 'webrtc-streaming-core/dist/models/devices.model';
+import { ConnectionEvent, Log, LogConnectionEvent, LogLevel } from 'webrtc-streaming-core/dist/utils/log';
+import { GetServerSideProps, NextPage } from 'next';
 import { Joystick } from 'react-joystick-component';
-import { IJoystickUpdateEvent } from "react-joystick-component/build/lib/Joystick";
+import { IJoystickUpdateEvent } from 'react-joystick-component/build/lib/Joystick';
+import DPad from '../components/gamepad/d_pad';
 
 type Props = { host: string | null };
 
-export const getServerSideProps: GetServerSideProps<Props> =
-  async context => ({ props: { host: context.req.headers.host || null } });
-
-
-
+// optional: include the stylesheet somewhere in your app
+export const getServerSideProps: GetServerSideProps<Props> = async (context) => ({
+  props: { host: context.req.headers.host || null }
+});
 
 const Home = ({ host }) => {
   const remoteVideo = useRef<HTMLVideoElement>(null);
   const remoteAudio = useRef<HTMLAudioElement>(null);
   let router = useRouter();
+  const [joyStick, setJoyStick] = useState<Joystick[]>([]);
 
   const [volumeButton, setVolumeButton] = useState<JSX.Element>();
-  const [actions, setActions] = useState<{
-    icon: JSX.Element;
-    name: string;
-    action: () => void;
-  }[] >([]);
+  const [actions, setActions] = useState<
+    {
+      icon: JSX.Element;
+      name: string;
+      action: () => void;
+    }[]
+  >([]);
 
-
-  const onMove = (stick:IJoystickUpdateEvent) => {
+  const onMove = (stick: IJoystickUpdateEvent) => {
     //@ts-ignore
     console.log(`X: ${stick.x}`);
     console.log(`Y: ${stick.y}`);
-};
+  };
 
-const onStop = () => {
-};
-
+  const onStop = () => {};
 
   useEffect(() => {
     if (remoteVideo.current) {
-      let signalingURL = (host.split(":")[0] != "localhost" )? `wss://${host}/handshake` : "wss://remote.thinkmay.net/handshake";
+      let signalingURL =
+        host.split(':')[0] != 'localhost' ? `wss://${host}/handshake` : 'wss://remote.thinkmay.net/handshake';
       // let signalingURL = "wss://remote.thinkmay.net/handshake";
 
-      let paramKeyVal = new Map<string,string>();
-      try
-      {
-        const params = router.asPath?.split("?")[1]?.split("&");
-        params.forEach((val: string, index: number)=> {
-          let keyval = val.split("=")
+      let paramKeyVal = new Map<string, string>();
+      try {
+        const params = router.asPath?.split('?')[1]?.split('&');
+        params.forEach((val: string, index: number) => {
+          let keyval = val.split('=');
           if (keyval.length == 2) {
-            paramKeyVal.set(keyval[0],keyval[1])
+            paramKeyVal.set(keyval[0], keyval[1]);
           } else {
-            console.log(`invalid param ${val}`)
+            console.log(`invalid param ${val}`);
           }
-        })
-      }catch{}
+        });
+      } catch {}
 
-
-      if (paramKeyVal.get("token") == "") {
-        window.location.replace("https://service.thinkmay.net/dashboard");
+      if (paramKeyVal.get('token') == '') {
+        window.location.replace('https://service.thinkmay.net/dashboard');
       }
 
-      var defaultSoundcard = "Default Audio Render Device";
-      var defaultBitrate   = paramKeyVal.get("bitrate") ? Number.parseInt(paramKeyVal.get("bitrate")) : null;
-      var defaultFramerate = paramKeyVal.get("fps")     ? Number.parseInt(paramKeyVal.get("fps")) : 55;
+      var defaultSoundcard = 'Default Audio Render Device';
+      var defaultBitrate = paramKeyVal.get('bitrate') ? Number.parseInt(paramKeyVal.get('bitrate')) : null;
+      var defaultFramerate = paramKeyVal.get('fps') ? Number.parseInt(paramKeyVal.get('fps')) : 55;
 
-      let client = new WebRTCClient(signalingURL,remoteVideo, remoteAudio, paramKeyVal.get("token"), (async (offer: DeviceSelection) => {
-          LogConnectionEvent(ConnectionEvent.WaitingAvailableDeviceSelection)
+      let client = new WebRTCClient(
+        signalingURL,
+        remoteVideo,
+        remoteAudio,
+        paramKeyVal.get('token'),
+        async (offer: DeviceSelection) => {
+          LogConnectionEvent(ConnectionEvent.WaitingAvailableDeviceSelection);
 
-          let ret = new DeviceSelectionResult(offer.soundcards[0].DeviceID,offer.monitors[0].MonitorHandle.toString());
-          if(offer.soundcards.length > 1) {
-
+          let ret = new DeviceSelectionResult(offer.soundcards[0].DeviceID, offer.monitors[0].MonitorHandle.toString());
+          if (offer.soundcards.length > 1) {
             let exist = false;
             if (defaultSoundcard != null) {
-              offer.soundcards.forEach(x => {
+              offer.soundcards.forEach((x) => {
                 if (x.Name == defaultSoundcard) {
                   exist = true;
                   ret.SoundcardDeviceID = x.DeviceID;
                   defaultSoundcard = null;
                 }
-              })
+              });
             }
 
             if (!exist) {
-              ret.SoundcardDeviceID = await AskSelectSoundcard(offer.soundcards)
-              Log(LogLevel.Infor,`selected audio deviceid ${ret.SoundcardDeviceID}`)
+              ret.SoundcardDeviceID = await AskSelectSoundcard(offer.soundcards);
+              Log(LogLevel.Infor, `selected audio deviceid ${ret.SoundcardDeviceID}`);
             }
-          }           
+          }
 
-          if(offer.monitors.length > 1) {
-            ret.MonitorHandle = await AskSelectDisplay(offer.monitors)
-            Log(LogLevel.Infor,`selected monitor handle ${ret.MonitorHandle}`)
+          if (offer.monitors.length > 1) {
+            ret.MonitorHandle = await AskSelectDisplay(offer.monitors);
+            Log(LogLevel.Infor, `selected monitor handle ${ret.MonitorHandle}`);
           }
 
           if (defaultBitrate == null) {
-            ret.bitrate= await AskSelectBitrate();
+            ret.bitrate = await AskSelectBitrate();
           } else {
             ret.bitrate = defaultBitrate;
           }
@@ -120,55 +123,67 @@ const onStop = () => {
           }
 
           return ret;
-      })).Notifier(message => {
-        console.log(message);
-        TurnOnStatus(message);
-      }).Alert(message => {
-        TurnOnAlert(message);
-      });  
+        }
+      )
+        .Notifier((message) => {
+          console.log(message);
+          TurnOnStatus(message);
+        })
+        .Alert((message) => {
+          TurnOnAlert(message);
+        });
 
-      const actions = [ {
-        icon: <Fullscreen/>,
-        name: "Framerate",
-        action: async () => {
-          let framerate = await AskSelectFramerate();
-          if (client != null && framerate > 10 && framerate < 61) {
-            console.log(`framerate is change to ${framerate}`)
-            client.ChangeFramerate(framerate)
-          } 
-        }, }, {
-        icon: <Fullscreen/>,
-        name: "Bitrate",
-        action: async () => {
-          let bitrate = await AskSelectBitrate();
-          if (client != null && bitrate > 100 && bitrate < 30000) {
-            console.log(`bitrate is change to ${bitrate}`)
-            client.ChangeBitrate(bitrate);
+      const actions = [
+        {
+          icon: <Fullscreen />,
+          name: 'Framerate',
+          action: async () => {
+            let framerate = await AskSelectFramerate();
+            if (client != null && framerate > 10 && framerate < 61) {
+              console.log(`framerate is change to ${framerate}`);
+              client.ChangeFramerate(framerate);
+            }
           }
-        }, }, {
-        icon: <VolumeUp/>,
-        name: "Mute",
-        action: async () => {
-          if (remoteAudio.current.muted) {
-            remoteAudio.current.muted = false;
-          } else {
-            remoteAudio.current.muted = true;
+        },
+        {
+          icon: <Fullscreen />,
+          name: 'Bitrate',
+          action: async () => {
+            let bitrate = await AskSelectBitrate();
+            if (client != null && bitrate > 100 && bitrate < 30000) {
+              console.log(`bitrate is change to ${bitrate}`);
+              client.ChangeBitrate(bitrate);
+            }
           }
-        }, }, {
-        icon: <Fullscreen/>,
-        name: "Lock Pointer",
-        action: async () => {
-          client.VideoPointerLock();
-        }, }, {
-        icon: <Fullscreen />,
-        name: "Enter fullscreen",
-        action: async () => {
-          document.documentElement.requestFullscreen();
-        }, 
-      }, ];
+        },
+        {
+          icon: <VolumeUp />,
+          name: 'Mute',
+          action: async () => {
+            if (remoteAudio.current.muted) {
+              remoteAudio.current.muted = false;
+            } else {
+              remoteAudio.current.muted = true;
+            }
+          }
+        },
+        {
+          icon: <Fullscreen />,
+          name: 'Lock Pointer',
+          action: async () => {
+            client.VideoPointerLock();
+          }
+        },
+        {
+          icon: <Fullscreen />,
+          name: 'Enter fullscreen',
+          action: async () => {
+            document.documentElement.requestFullscreen();
+          }
+        }
+      ];
 
       setActions([...actions]);
-
     }
   }, []);
   return (
@@ -179,11 +194,11 @@ const onStop = () => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <div className={styles.app}>
-      {/* TODO: <Joystick baseColor="darkgreen" stickColor="black" move={onMove} stop={onStop} ></Joystick> */}
+        TODO: <Joystick baseColor="darkgreen" stickColor="black" move={onMove} stop={onStop}></Joystick>
         <Draggable>
           <SpeedDial
             ariaLabel="SpeedDial basic example"
-            sx={{ position: "absolute", bottom: 16, right: 16 }}
+            sx={{ position: 'absolute', bottom: 16, right: 16 }}
             icon={<List />}
           >
             {actions.map((action) => (
@@ -196,11 +211,32 @@ const onStop = () => {
             ))}
           </SpeedDial>
         </Draggable>
+        <DPad></DPad>
       </div>
-      <video ref={remoteVideo} className={styles.remoteVideo} autoPlay muted playsInline loop ></video>
+      <video ref={remoteVideo} className={styles.remoteVideo} autoPlay muted playsInline loop></video>
       <audio ref={remoteAudio} autoPlay controls style={{ zIndex: -1 }}></audio>
     </div>
   );
 };
+// const Home = () => {
+//   console.log('object');
+//   return (
+//     <ReactNipple
+//       // supports all nipplejs options
+//       // see https://github.com/yoannmoinet/nipplejs#options
+//       options={{ mode: 'static', position: { top: '50%', left: '50%' } }}
+//       // any unknown props will be passed to the container element, e.g. 'title', 'style' etc
+//       style={{
+//         outline: '1px dashed red',
+//         width: 150,
+//         height: 150
+//         // if you pass position: 'relative', you don't need to import the stylesheet
+//       }}
+//       // all events supported by nipplejs are available as callbacks
+//       // see https://github.com/yoannmoinet/nipplejs#start
+//       onMove={(evt, data) => console.log(evt, data)}
+//     />
+//   );
+// };
 
 export default Home;
