@@ -1,5 +1,5 @@
 import { Button, Stack } from "@mui/material";
-import React, { useRef, useState } from "react"; // we need this to make JSX compile
+import React, { useRef, useState, useEffect } from "react"; // we need this to make JSX compile
 import Draggable from "react-draggable";
 import {
     IJoystickUpdateEvent,
@@ -35,33 +35,66 @@ export const JoyStick = (param: { draggable: ButtonMode }) => {
         </Draggable>
     );
 };
-export const ButtonGroup = (input: { draggable: ButtonMode }): JSX.Element => {
-    return (
-        <Draggable disabled={input.draggable != "draggable"}>
-            <Stack
-                style={{
-                    opacity: 0.2,
-                    position: "absolute",
-                    bottom: 16,
-                    left: 16,
-                }}
-                direction="column"
-            >
-                <Button onClick={() => console.log("y")}>Y</Button>
-                <Stack direction="row">
-                    <Button
-                        onTouchStart={() => console.log("x start")}
-                        onTouchEnd={() => console.log("x end")}
-                    >
-                        X
-                    </Button>
-                    <Button onClick={() => console.log("b")}>B</Button>
-                </Stack>
-                <Button onClick={() => console.log("a")}>A</Button>
+
+export const ButtonGroup = (input: {draggable: ButtonMode}):JSX.Element =>  {
+    const [JoyStick, setJoyStick] = useState<{
+        element: JSX.Element;
+    }[] >([]);
+    const onMove = (stick:IJoystickUpdateEvent) => {
+        console.log(`X: ${stick.x}`);
+        console.log(`Y: ${stick.y}`);
+    };
+    const onStop = () => {
+    };
+    const defaultPosX = JSON.parse(localStorage.getItem("posX")) ?? 500;
+    const defaultPosY = JSON.parse(localStorage.getItem("posX")) ?? 500;
+    const [posBtn, setPosBtn] = useState({
+        deltaPosition: {
+            x: defaultPosX,
+            y: defaultPosY
+        },
+    });
+
+    const handleDrag = (e, ui) => {
+        const { x, y } = posBtn.deltaPosition;
+        setPosBtn({
+            deltaPosition: {
+                x: x + ui.deltaX,
+                y: y + ui.deltaY,
+            },
+        });
+        localStorage.setItem("posX", JSON.stringify(posBtn.deltaPosition.x));
+        localStorage.setItem("posY", JSON.stringify(posBtn.deltaPosition.y));
+    };
+
+
+    return <Draggable onDrag={handleDrag} defaultPosition={{x: posBtn.deltaPosition.x, y: posBtn.deltaPosition.y}} disabled={input.draggable != 'draggable'}>
+        <Stack style={{opacity: 0.2, position: "absolute", bottom: 16, left: 16, zIndex: 0 }} direction="column">
+            <Button
+                onClick={() =>
+                console.log('y')
+                }
+            >Y</Button>
+            <Stack direction="row">
+                <Button
+                onClick={() =>
+                    console.log('x')
+                }
+                >X</Button>
+                <Button
+                onClick={() =>
+                    console.log('b')
+                }
+                >B</Button>
             </Stack>
-        </Draggable>
-    );
-};
+            <Button
+                onClick={() =>
+                console.log('a')
+                }
+            >A</Button>
+        </Stack>
+    </Draggable>
+}
 
 export const VirtualGamepad = (param: { draggable: ButtonMode }) => {
     return (
