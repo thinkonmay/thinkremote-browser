@@ -2,6 +2,7 @@ import { Fullscreen } from "@mui/icons-material";
 import { List, SpeedDial, SpeedDialAction } from "@mui/material";
 import React, { useEffect, useState } from "react"; // we need this to make JSX compile
 import { WebRTCClient } from "webrtc-streaming-core";
+import { getOS } from "webrtc-streaming-core/dist/utils/platform";
 import { AskSelectBitrate } from "../popup/popup";
 import { VirtualGamepad } from "../virtGamepad/virtGamepad";
 
@@ -32,6 +33,8 @@ function isFullscreen(): boolean {
 
 export const WebRTCControl = (input: { client: WebRTCClient }) => {
     const [Draggable, setDraggable] = useState<ButtonMode>("disable");
+    const [EnableVirtGamepad, setEnableVirtGamepad] = useState<boolean>(true);
+
     const [onGoingTouchs, setTouces] = useState<Map<number, TouchData>>(
         new Map<number, TouchData>()
     );
@@ -158,6 +161,22 @@ export const WebRTCControl = (input: { client: WebRTCClient }) => {
         },
     ];
 
+
+
+	// if (getOS() == "Android" || getOS() == "iOS") {
+
+	// }
+
+
+
+
+	const ACallback = async (x: number, y: number,type: 'left' | 'right') => {
+		input.client?.hid.VirtualGamepadAxis(x,y,type);
+	}
+	const BCallback = async (index: number,type: 'press' | 'release') => {
+		input.client?.hid.VirtualGamepadButtonSlider(type == 'release',index);
+	}
+
     return (
         <div>
             <div style={{ zIndex: 2 }}>
@@ -181,7 +200,7 @@ export const WebRTCControl = (input: { client: WebRTCClient }) => {
                     ))}
                 </SpeedDial>
             </div>
-            <VirtualGamepad draggable={Draggable}></VirtualGamepad>
+            <VirtualGamepad ButtonCallback={BCallback} AxisCallback={ACallback} draggable={Draggable}></VirtualGamepad>
         </div>
     );
 };

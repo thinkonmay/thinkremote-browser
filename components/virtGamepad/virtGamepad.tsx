@@ -12,10 +12,12 @@ type CardProps = {
     paragraph: string;
 };
 
-export const JoyStick = (param: { draggable: ButtonMode }) => {
+export const JoyStick = (param: { draggable: ButtonMode , moveCallback: ((x:number,y:number) => Promise<void>) }) => {
     const JoystickRef = useRef<Joystick>(null);
     const move = (event: IJoystickUpdateEvent) => {
-        // console.log(JSON.stringify(event));
+        if(event.type == 'move') {
+            param.moveCallback(event.x,event.y)
+        }
     };
 
     return (
@@ -29,23 +31,13 @@ export const JoyStick = (param: { draggable: ButtonMode }) => {
                     baseColor="#000"
                     stickColor="hwb(360 51% 76%)"
                 >
-                    {" "}
                 </Joystick>
             </div>
         </Draggable>
     );
 };
 
-export const ButtonGroup = (input: {draggable: ButtonMode}):JSX.Element =>  {
-    const [JoyStick, setJoyStick] = useState<{
-        element: JSX.Element;
-    }[] >([]);
-    const onMove = (stick:IJoystickUpdateEvent) => {
-        console.log(`X: ${stick.x}`);
-        console.log(`Y: ${stick.y}`);
-    };
-    const onStop = () => {
-    };
+export const ButtonGroup = (param: { draggable: 'draggable' | 'static'}): JSX.Element => {
     const defaultPosX = JSON.parse(localStorage.getItem("posX")) ?? 500;
     const defaultPosY = JSON.parse(localStorage.getItem("posX")) ?? 500;
     const [posBtn, setPosBtn] = useState({
@@ -67,44 +59,54 @@ export const ButtonGroup = (input: {draggable: ButtonMode}):JSX.Element =>  {
         localStorage.setItem("posY", JSON.stringify(posBtn.deltaPosition.y));
     };
 
-
-    return <Draggable onDrag={handleDrag} defaultPosition={{x: posBtn.deltaPosition.x, y: posBtn.deltaPosition.y}} disabled={input.draggable != 'draggable'}>
-        <Stack style={{opacity: 0.2, position: "absolute", bottom: 16, left: 16, zIndex: 0 }} direction="column">
-            <Button
-                onClick={() =>
-                console.log('y')
-                }
-            >Y</Button>
-            <Stack direction="row">
-                <Button
-                onClick={() =>
-                    console.log('x')
-                }
-                >X</Button>
-                <Button
-                onClick={() =>
-                    console.log('b')
-                }
-                >B</Button>
+    return <Draggable onDrag={handleDrag} defaultPosition={{x: posBtn.deltaPosition.x, y: posBtn.deltaPosition.y}}  disabled={param.draggable != "draggable"}>
+            <Stack
+                style={{
+                    opacity: 0.2,
+                    position: "absolute",
+                    bottom: 16,
+                    left: 16,
+                }}
+                direction="column"
+            >
+                <Button onClick={() => console.log("y")}>Y</Button>
+                <Stack direction="row">
+                    <Button
+                        onTouchStart={() => console.log("x start")}
+                        onTouchEnd={() => console.log("x end")}
+                    >
+                        X
+                    </Button>
+                    <Button onClick={() => console.log("b")}>B</Button>
+                </Stack>
+                <Button onClick={() => console.log("a")}>A</Button>
             </Stack>
-            <Button
-                onClick={() =>
-                console.log('a')
-                }
-            >A</Button>
-        </Stack>
-    </Draggable>
-}
+        </Draggable>
+};
 
-export const VirtualGamepad = (param: { draggable: ButtonMode }) => {
+export const VirtualGamepad = (param: { 
+    draggable: ButtonMode, 
+    AxisCallback:    ((x: number,y: number,type: 'left' | 'right') => Promise<void>),
+    ButtonCallback:  ((index: number,type: 'press' | 'release') => Promise<void>),
+    }) => {
     return (
         <div>
             {param.draggable == "static" || param.draggable == "draggable" ? (
                 <div style={{ zIndex: 2 }}>
                     <ButtonGroup draggable={param.draggable}> </ButtonGroup>
                     <ButtonGroup draggable={param.draggable}> </ButtonGroup>
-                    <JoyStick draggable={param.draggable}></JoyStick>
-                    <JoyStick draggable={param.draggable}></JoyStick>
+
+                    <JoyStick moveCallback={async (x:number,y:number) => {
+                        param.AxisCallback(x,y,'left')
+                        return;
+                    }} draggable={param.draggable}></JoyStick>
+                    {/* left */}
+
+                    <JoyStick moveCallback={async (x:number,y:number) => {
+                        param.AxisCallback(x,y,'right')
+                        return;
+                    }} draggable={param.draggable}></JoyStick> 
+                    {/* right */}
                 </div>
             ) : null}
         </div>
