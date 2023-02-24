@@ -1,6 +1,7 @@
 import { Button, Stack } from "@mui/material";
 import React, { useRef, useState } from "react"; // we need this to make JSX compile
 import Draggable from "react-draggable";
+import styled from "styled-components";
 import {
     IJoystickUpdateEvent,
     Joystick,
@@ -8,20 +9,16 @@ import {
 import { ButtonMode } from "../control/control";
 import YBXA from "../gamepad/y_b_x_a";
 
-type CardProps = {
-    title: string;
-    paragraph: string;
-};
-
 export const JoyStick = (param: { draggable: ButtonMode }) => {
     const JoystickRef = useRef<Joystick>(null);
     const move = (event: IJoystickUpdateEvent) => {
         // console.log(JSON.stringify(event));
+        console.log(1);
     };
 
     return (
         <Draggable disabled={param.draggable != "draggable"}>
-            <div style={{ opacity: 0.2, zIndex: 2 }}>
+            <WrapperDrag style={{ opacity: 0.2 }}>
                 <Joystick
                     start={move}
                     stop={move}
@@ -29,16 +26,17 @@ export const JoyStick = (param: { draggable: ButtonMode }) => {
                     ref={JoystickRef}
                     baseColor="#000"
                     stickColor="hwb(360 51% 76%)"
-                >
-                    {" "}
-                </Joystick>
-            </div>
+                />
+            </WrapperDrag>
         </Draggable>
     );
 };
-export const ButtonGroup = (input: { draggable: ButtonMode }): JSX.Element => {
+interface ButtonGroupProps {
+    draggable: Partial<ButtonMode>;
+}
+export const ButtonGroup = (props: ButtonGroupProps): JSX.Element => {
     return (
-        <Draggable disabled={input.draggable != "draggable"}>
+        <Draggable disabled={false}>
             {/* <Stack
                 style={{
                     opacity: 0.2,
@@ -60,31 +58,35 @@ export const ButtonGroup = (input: { draggable: ButtonMode }): JSX.Element => {
                 </Stack>
                 <Button onClick={() => console.log("a")}>A</Button>
             </Stack> */}
-            <YBXA
-              onStartTouchY= {(e: React.TouchEvent) => console.log(e)}
-              onEndTouchY= {(e: React.TouchEvent) => console.log(e)}
-              onStartTouchB= {(e: React.TouchEvent) => console.log(e)}
-              onEndTouchB= {(e: React.TouchEvent) => console.log(e)}
-              onStartTouchX= {(e: React.TouchEvent) => console.log(e)}
-              onEndTouchX= {(e: React.TouchEvent) => console.log(e)}
-              onStartTouchA= {(e: React.TouchEvent) => console.log(e)}
-              onEndTouchA= {(e: React.TouchEvent) => console.log(e)}
-            ></YBXA>
+            <WrapperDrag>
+                <YBXA
+                    onStartTouchY={(e: React.TouchEvent) => console.log(e)}
+                    onEndTouchY={(e: React.TouchEvent) => console.log(e)}
+                    onStartTouchB={(e: React.TouchEvent) => console.log(e)}
+                    onEndTouchB={(e: React.TouchEvent) => console.log(e)}
+                    onStartTouchX={(e: React.TouchEvent) => console.log(e)}
+                    onEndTouchX={(e: React.TouchEvent) => console.log(e)}
+                    onStartTouchA={(e: React.TouchEvent) => console.log(e)}
+                    onEndTouchA={(e: React.TouchEvent) => console.log(e)}
+                ></YBXA>
+            </WrapperDrag>
         </Draggable>
     );
 };
 
-export const VirtualGamepad = (param: { draggable: ButtonMode }) => {
+export const VirtualGamepad = (props: { draggable: ButtonMode }) => {
     return (
-        <div>
-            {param.draggable == "static" || param.draggable == "draggable" ? (
-                <div style={{ zIndex: 2 }}>
-                    <ButtonGroup draggable={param.draggable}> </ButtonGroup>
-                    <ButtonGroup draggable={param.draggable}> </ButtonGroup>
-                    <JoyStick draggable={param.draggable}></JoyStick>
-                    <JoyStick draggable={param.draggable}></JoyStick>
-                </div>
-            ) : null}
-        </div>
+        <>
+            <WrapperDrag>
+                <ButtonGroup draggable={props.draggable}/> 
+                <ButtonGroup draggable={props.draggable}/> 
+                <JoyStick draggable={props.draggable}></JoyStick>
+                <JoyStick draggable={props.draggable}></JoyStick>
+            </WrapperDrag>
+        </>
     );
 };
+
+const WrapperDrag = styled.div`
+    max-width: max-content;
+`;
