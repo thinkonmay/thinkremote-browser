@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import Head from "next/head";
 import styles from "../styles/Home.module.css";
-import { AskSelectBitrate, AskSelectDisplay, AskSelectFramerate, AskSelectSoundcard, TurnOnAlert, TurnOnStatus} from "../components/popup";
+import { AskSelectBitrate, AskSelectDisplay, AskSelectFramerate, AskSelectSoundcard, TurnOnAlert, TurnOnStatus} from "../components/popup/popup";
 import { WebRTCClient } from "webrtc-streaming-core/dist/app";
 import { useRouter } from "next/router";
 import SpeedDial from "@mui/material/SpeedDial";
@@ -19,6 +19,8 @@ import { IJoystickUpdateEvent } from "react-joystick-component/build/lib/Joystic
 import { GoogleAnalytics } from "nextjs-google-analytics";
 import Button from '@mui/material/Button';
 import Stack from '@mui/material/Stack';
+import { VirtualGamepad } from "../components/virtGamepad/virtGamepad";
+import { WebRTCControl } from "../components/control/control";
 
 type Props = { host: string | null };
 
@@ -44,25 +46,9 @@ const Home = ({ host }) => {
   var defaultFramerate = parseInt((fps? fps : "55") as string,10)
   var defaultSoundcard = "Default Audio Render Device";
 
-  const [actions, setActions] = useState<{
-    icon: JSX.Element;
-    name: string;
-    action: () => void;
-  }[] >([]);
-
-  const [JoyStick, setJoyStick] = useState<{
-    element: JSX.Element;
-  }[] >([]);
 
 
 
-  const onMove = (stick:IJoystickUpdateEvent) => {
-    console.log(`X: ${stick.x}`);
-    console.log(`Y: ${stick.y}`);
-  };
-
-  const onStop = () => {
-  };
 
   
 
@@ -114,89 +100,12 @@ const Home = ({ host }) => {
   }).Alert(message => {
     TurnOnAlert(message);
   });  
-
-
-
-  const _actions = [ {
-    icon: <Fullscreen/>,
-    name: "Bitrate",  
-    action: async () => {
-      let bitrate = await AskSelectBitrate();
-      if (bitrate < 500) {
-        return
-      }
-      
-      console.log(`bitrate is change to ${bitrate}`)
-      client.ChangeBitrate(bitrate);
-    }, }, {
-    icon: <Fullscreen />,
-    name: "Enter fullscreen",
-    action: async () => {
-      document.documentElement.requestFullscreen();
-    }, 
-  },]
-
-  setActions([..._actions]);
-  remoteVideo.current?.addEventListener('touchstart',  (ev) => {
-    const touches = ev.changedTouches[0];
-
-    setJoyStick(prev => [...prev,{
-      element: 
-      <div style={{transform: `translate(${touches.screenX}px,${touches.screenY}px)`}}>
-      <Joystick>
-      </Joystick> 
-      </div>
-    }])
-  });
-  remoteVideo.current?.addEventListener('touchend',    () => {
-    setJoyStick(prev => {
-      return prev.slice(0,prev.length -1)
-    })
-  });
-  remoteVideo.current?.addEventListener('touchcancel', () => {
-
-  });
-  remoteVideo.current?.addEventListener('touchmove',   () => {
-
-  });
   },[])
+  
 
 
 
-  const onmove = (event: IJoystickUpdateEvent) => {
-    // console.log(event.x)
-    // console.log(event.y)
-  }
 
-
-  const abxyGroup = 
-        <Draggable>
-          <Stack style={{ position: "absolute", bottom: 16, left: 16, zIndex: 2 }} direction="column">
-            <Button
-              onClick={() =>
-                console.log('y')
-              }
-            >Y</Button>
-            <Stack direction="row">
-              <Button
-                onClick={() =>
-                  console.log('x')
-                }
-              >X</Button>
-              <Button
-                onClick={() =>
-                  console.log('b')
-                }
-              >B</Button>
-            </Stack>
-            <Button
-              onClick={() =>
-                console.log('a')
-              }
-            >A</Button>
-          </Stack>
-
-        </Draggable>
 
 
 
@@ -225,36 +134,11 @@ const Home = ({ host }) => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <div className={styles.app}>
-      {/* TODO: <Joystick baseColor="darkgreen" stickColor="black" move={onMove} stop={onStop} ></Joystick> */}
-        <Draggable>
-          <SpeedDial
-            ariaLabel="SpeedDial basic example"
-            sx={{ position: "absolute", bottom: 16, right: 16 }}
-            icon={<List />}
-          >
-            {actions.map((action) => (
-              <SpeedDialAction
-                key={action.name}
-                icon={action.icon}
-                tooltipTitle={action.name}
-                onClick={action.action}
-              />
-            ))}
-          </SpeedDial>
-        </Draggable>
-
-        {abxyGroup}
-
-
-        {JoyStick.map((val,index,arr) => { 
-          return val.element
-        })}
-        {/* <Draggable>
-          <Stack style={{ position: "absolute", bottom: 16, left: 16, zIndex: 2 }} direction="column">
-          </Stack>
-        </Draggable> */}
+        {WebRTCControl({client: client})}
+        {VirtualGamepad()}
       </div>
-      <video ref={remoteVideo} className={styles.remoteVideo} autoPlay muted playsInline loop ></video>
+
+      <video ref={remoteVideo} className={styles.remoteVideo} autoPlay muted playsInline loop style={{ zIndex: -1 }}></video>
       <audio ref={remoteAudio} autoPlay controls style={{ zIndex: -1 }}></audio>
     </div>
   );
