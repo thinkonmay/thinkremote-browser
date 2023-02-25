@@ -2,8 +2,8 @@ import React from 'react';
 import styled from 'styled-components';
 import { IconCircle, DPadTop, DPadRight, DPadBottom, DPadLeft } from '../../public/assets/svg/svg_cpn';
 const Container = styled.div`
-  width: calc(5px * 5);
-  height: calc(5px * 5);
+  width:  ${props => props.size ?? '20'}px;
+  height: ${props => props.size ?? '20'}px;
   /* background-color: red; */
   position: relative;
 `;
@@ -38,6 +38,7 @@ const Bottom = styled(DefaultButton)`
   transform: translate(50%, 100%);
 `;
 interface Props {
+  size,
   onStartTouchTop: (e: React.TouchEvent) => void;
   onEndTouchTop: (e: React.TouchEvent) => void;
   onStartTouchBottom: (e: React.TouchEvent) => void;
@@ -49,6 +50,7 @@ interface Props {
 }
 const DPad = (props: Props) => {
   const {
+    size,
     onStartTouchTop,
     onEndTouchTop,
     onStartTouchBottom,
@@ -59,7 +61,7 @@ const DPad = (props: Props) => {
     onEndTouchLeft
   } = props;
   return (
-    <Container>
+    <Container size={size}>
       <Top
         onTouchStart={(e: React.TouchEvent) => {
           onStartTouchTop(e);

@@ -157,14 +157,8 @@ export const WebRTCControl = (input: { client: WebRTCClient }) => {
                         case "disable":
                             return "draggable";
                         case "draggable":
-                            input.client?.hid?.SendFunc((new HIDMsg(EventCode.GamepadConnect,{
-                                gamepad_id: "0",
-                            }).ToString())) 
                             return "static";
                         case "static":
-                            input.client?.hid?.SendFunc((new HIDMsg(EventCode.GamepadDisconnect,{
-                                gamepad_id: "0",
-                            }).ToString())) 
                             return "disable";
                     }
                 });

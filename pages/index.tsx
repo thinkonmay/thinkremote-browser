@@ -119,7 +119,7 @@ const Home = ({ host }) => {
 
     const [client,setClient] = useState<WebRTCClient>(null);
     useEffect(() => {
-        setClient(new WebRTCClient( signalingURL, remoteVideo, remoteAudio, signalingToken, selectDevice).Notifier((message) => {
+        setClient(new WebRTCClient( signalingURL, remoteVideo.current, remoteAudio.current, signalingToken, selectDevice, 'mobile').Notifier((message) => {
             console.log(message);
             TurnOnStatus(message);
         }).Alert((message) => {
@@ -128,6 +128,8 @@ const Home = ({ host }) => {
         }));
     }, []);
 
+            // onMouseUp={(e) => {e.preventDefault()}}
+            // onMouseDown={(e) => {e.preventDefault()}}
     return (
         <Body>
             <GoogleAnalytics trackPageViews />

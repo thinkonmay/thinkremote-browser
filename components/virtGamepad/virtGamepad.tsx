@@ -84,14 +84,15 @@ export const ButtonGroupRight = (param: ButtonGroupProps): JSX.Element => {
         >
             <WrapperDrag>
                 <YBXA
-                    onStartTouchY={(e: React.TouchEvent) => console.log(e)}
-                    onEndTouchY={(e: React.TouchEvent) => console.log(e)}
-                    onStartTouchB={(e: React.TouchEvent) => console.log(e)}
-                    onEndTouchB={(e: React.TouchEvent) => console.log(e)}
-                    onStartTouchX={(e: React.TouchEvent) => console.log(e)}
-                    onEndTouchX={(e: React.TouchEvent) => console.log(e)}
-                    onStartTouchA={(e: React.TouchEvent) => console.log(e)}
-                    onEndTouchA={(e: React.TouchEvent) => console.log(e)}
+                    size={50}
+                    onStartTouchY={(e: React.TouchEvent) => console.log(`onStartTouchY`)}
+                    onEndTouchY={(e: React.TouchEvent) => console.log(`onEndTouchY`)}
+                    onStartTouchB={(e: React.TouchEvent) => console.log(`onStartTouchB`)}
+                    onEndTouchB={(e: React.TouchEvent) => console.log(`onEndTouchB`)}
+                    onStartTouchX={(e: React.TouchEvent) => console.log(`onStartTouchX`)}
+                    onEndTouchX={(e: React.TouchEvent) => console.log(`onEndTouchX`)}
+                    onStartTouchA={(e: React.TouchEvent) => console.log(`onStartTouchA`)}
+                    onEndTouchA={(e: React.TouchEvent) => console.log(`onEndTouchA`)}
                 ></YBXA>
 
                 <JoyStick type={'right'} moveCallback={async (x:number,y:number) => {
@@ -143,14 +144,15 @@ export const ButtonGroupLeft = (param: ButtonGroupProps): JSX.Element => {
         >
             <WrapperDrag>
                 <DPad
-                    onStartTouchTop={(e: React.TouchEvent) => console.log(JSON.stringify(e))}
-                    onEndTouchTop={(e: React.TouchEvent) => console.log(JSON.stringify(e))}
-                    onStartTouchBottom={(e: React.TouchEvent) => console.log(JSON.stringify(e))}
-                    onEndTouchBottom={(e: React.TouchEvent) => console.log(JSON.stringify(e))}
-                    onStartTouchRight={(e: React.TouchEvent) => console.log(JSON.stringify(e))}
-                    onEndTouchRight={(e: React.TouchEvent) => console.log(JSON.stringify(e))}
-                    onStartTouchLeft={(e: React.TouchEvent) => console.log(JSON.stringify(e))}
-                    onEndTouchLeft={(e: React.TouchEvent) => console.log(JSON.stringify(e))}
+                    size={50}
+                    onStartTouchTop={(e: React.TouchEvent) => console.log(`onStartTouchTop`)}
+                    onEndTouchTop={(e: React.TouchEvent) => console.log(`onEndTouchTop`)}
+                    onStartTouchBottom={(e: React.TouchEvent) => console.log(`onStartTouchBottom`)}
+                    onEndTouchBottom={(e: React.TouchEvent) => console.log(`onEndTouchBottom`)}
+                    onStartTouchRight={(e: React.TouchEvent) => console.log(`onStartTouchRight`)}
+                    onEndTouchRight={(e: React.TouchEvent) => console.log(`onEndTouchRight`)}
+                    onStartTouchLeft={(e: React.TouchEvent) => console.log(`onStartTouchLeft`)}
+                    onEndTouchLeft={(e: React.TouchEvent) => console.log(`onEndTouchLeft`)}
                 >
                 </DPad>
 
@@ -186,8 +188,16 @@ export const VirtualGamepad = (param: {
                 </div>
             ) : null}
         </div>
-    );
+    )
 };
+
+// export const DPadGroup = () =>{
+//   return (<Draggable>
+//     <WrapperDrag>
+//       <DPad></DPad>
+//     </WrapperDrag>
+//   </Draggable>)
+// }
 
 const WrapperDrag = styled.div`
     max-width: max-content;
