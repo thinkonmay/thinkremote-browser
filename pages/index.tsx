@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import Head from "next/head";
 import styles from "../styles/Home.module.css";
+import styled from "styled-components";
 import {
     AskSelectBitrate,
     AskSelectDisplay,
@@ -25,7 +26,10 @@ import { GetServerSideProps } from "next";
 import { GoogleAnalytics } from "nextjs-google-analytics";
 import Button from "@mui/material/Button";
 import Stack from "@mui/material/Stack";
-import { ButtonGroup, VirtualGamepad } from "../components/virtGamepad/virtGamepad";
+import {
+    ButtonGroup,
+    VirtualGamepad,
+} from "../components/virtGamepad/virtGamepad";
 import { WebRTCControl } from "../components/control/control";
 import DPad from "../components/gamepad/d_pad";
 import YBXA from "../components/gamepad/y_b_x_a";
@@ -125,7 +129,7 @@ const Home = ({ host }) => {
     }, []);
 
     return (
-        <div>
+        <Body>
             <GoogleAnalytics trackPageViews />
             <Head>
                 <title>WebRTC remote viewer</title>
@@ -140,44 +144,51 @@ const Home = ({ host }) => {
                 <link rel="icon" href="/favicon.ico" />
             </Head>
 
-            <WebRTCControl client={client}></WebRTCControl>
-            <video
+            <RemoteVideo
                 ref={remoteVideo}
-                className={styles.remoteVideo}
                 autoPlay
                 muted
                 playsInline
                 loop
-                style={{ zIndex: -1 }}
-            ></video>
+            ></RemoteVideo>
+
+            <App >
+                <WebRTCControl client={client}></WebRTCControl>
+            </App>
             <audio
                 ref={remoteAudio}
                 autoPlay
                 controls
                 style={{ zIndex: -5, opacity: 0 }}
             ></audio>
-        </div>
+        </Body>
     );
 };
-// const Home = () => {
-//   console.log('object');
-//   return (
-//     <ReactNipple
-//       // supports all nipplejs options
-//       // see https://github.com/yoannmoinet/nipplejs#options
-//       options={{ mode: 'static', position: { top: '50%', left: '50%' } }}
-//       // any unknown props will be passed to the container element, e.g. 'title', 'style' etc
-//       style={{
-//         outline: '1px dashed red',
-//         width: 150,
-//         height: 150
-//         // if you pass position: 'relative', you don't need to import the stylesheet
-//       }}
-//       // all events supported by nipplejs are available as callbacks
-//       // see https://github.com/yoannmoinet/nipplejs#start
-//       onMove={(evt, data) => console.log(evt, data)}
-//     />
-//   );
-// };
 
+const RemoteVideo = styled.video`
+    position: absolute;
+    top: 0px;
+    right: 0px;
+    bottom: 0px;
+    left: 0px;
+    margin: 0;
+    width: 100%;
+    height: 100%;
+    max-height: 100%;
+    max-width: 100%;
+`;
+const Body = styled.div`
+    width: 100%;
+    height: 100vh;
+    padding: 0;
+    margin: 0;
+    border: 0;
+    overflow: hidden;
+    background-color: black;
+`;
+const App = styled.div`
+    position: relative;
+    width: 100vw;   
+    height: 100vh;
+`;
 export default Home;

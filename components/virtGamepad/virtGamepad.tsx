@@ -2,6 +2,7 @@ import { Translate } from "@mui/icons-material";
 import { Button, Stack } from "@mui/material";
 import React, { useRef, useState, useEffect } from "react"; // we need this to make JSX compile
 import Draggable, { DraggableData, DraggableEvent } from "react-draggable";
+import styled from "styled-components";
 import {
     IJoystickUpdateEvent,
     Joystick,
@@ -59,7 +60,7 @@ export const JoyStick = (param: { type: 'left' | 'right', draggable: ButtonMode 
 
     return (
         <Draggable position={{x: posBtn.x, y: posBtn.y}} onStop={handleStop} onDrag={handleDrag} disabled={param.draggable != "draggable"}>
-            <div style={{ opacity: 0.2, zIndex: 2}}>
+            <WrapperDrag style={{ opacity: 0.2 }}>
                 <Joystick
                     start={move}
                     stop={move}
@@ -67,46 +68,29 @@ export const JoyStick = (param: { type: 'left' | 'right', draggable: ButtonMode 
                     ref={JoystickRef}
                     baseColor="#000"
                     stickColor="hwb(360 51% 76%)"
-                >
-                </Joystick>
-            </div>
+                />
+            </WrapperDrag>
         </Draggable>
     );
 };
-export const ButtonGroup = (input: { draggable: ButtonMode }): JSX.Element => {
+interface ButtonGroupProps {
+    draggable: Partial<ButtonMode>;
+}
+export const ButtonGroup = (props: ButtonGroupProps): JSX.Element => {
     return (
-        <Draggable disabled={input.draggable != "draggable"}>
-            {/* <Stack
-                style={{
-                    opacity: 0.2,
-                    position: "absolute",
-                    bottom: 16,
-                    left: 16,
-                }}
-                direction="column"
-            >
-                <Button onClick={() => console.log("y")}>Y</Button>
-                <Stack direction="row">
-                    <Button
-                        onTouchStart={() => console.log("x start")}
-                        onTouchEnd={() => console.log("x end")}
-                    >
-                        X
-                    </Button>
-                    <Button onClick={() => console.log("b")}>B</Button>
-                </Stack>
-                <Button onClick={() => console.log("a")}>A</Button>
-            </Stack> */}
-            <YBXA
-              onStartTouchY= {(e: React.TouchEvent) => console.log(e)}
-              onEndTouchY= {(e: React.TouchEvent) => console.log(e)}
-              onStartTouchB= {(e: React.TouchEvent) => console.log(e)}
-              onEndTouchB= {(e: React.TouchEvent) => console.log(e)}
-              onStartTouchX= {(e: React.TouchEvent) => console.log(e)}
-              onEndTouchX= {(e: React.TouchEvent) => console.log(e)}
-              onStartTouchA= {(e: React.TouchEvent) => console.log(e)}
-              onEndTouchA= {(e: React.TouchEvent) => console.log(e)}
-            ></YBXA>
+        <Draggable disabled={false}>
+            <WrapperDrag>
+                <YBXA
+                    onStartTouchY={(e: React.TouchEvent) => console.log(e)}
+                    onEndTouchY={(e: React.TouchEvent) => console.log(e)}
+                    onStartTouchB={(e: React.TouchEvent) => console.log(e)}
+                    onEndTouchB={(e: React.TouchEvent) => console.log(e)}
+                    onStartTouchX={(e: React.TouchEvent) => console.log(e)}
+                    onEndTouchX={(e: React.TouchEvent) => console.log(e)}
+                    onStartTouchA={(e: React.TouchEvent) => console.log(e)}
+                    onEndTouchA={(e: React.TouchEvent) => console.log(e)}
+                ></YBXA>
+            </WrapperDrag>
         </Draggable>
      )
 };
@@ -139,3 +123,7 @@ export const VirtualGamepad = (param: {
         </div>
     );
 };
+
+const WrapperDrag = styled.div`
+    max-width: max-content;
+`;
