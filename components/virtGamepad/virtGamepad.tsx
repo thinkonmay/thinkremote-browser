@@ -77,7 +77,7 @@ export const ButtonGroupRight = (param: ButtonGroupProps): JSX.Element => {
     
     return (
         <Draggable 
-            disabled={false} 
+            disabled={param.draggable != 'draggable'} 
             position={{x: posBtn.x, y: posBtn.y}} 
             onStop={handleStop} 
             onDrag={handleDrag}
@@ -135,10 +135,11 @@ export const ButtonGroupLeft = (param: ButtonGroupProps): JSX.Element => {
     }
     return (
         <Draggable 
-            disabled={false} 
+            disabled={param.draggable != 'draggable'} 
             position={{x: posBtn.x, y: posBtn.y}} 
             onStop={handleStop} 
             onDrag={handleDrag}
+            
         >
             <WrapperDrag>
                 <DPad
@@ -190,4 +191,5 @@ export const VirtualGamepad = (param: {
 
 const WrapperDrag = styled.div`
     max-width: max-content;
+    opacity: 0.3;
 `;
