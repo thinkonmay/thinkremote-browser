@@ -1,6 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
 import Head from "next/head";
-import styles from "../styles/Home.module.css";
 import styled from "styled-components";
 import {
     AskSelectBitrate,
@@ -25,14 +24,7 @@ import {
 import { GetServerSideProps } from "next";
 import { GoogleAnalytics } from "nextjs-google-analytics";
 import Button from "@mui/material/Button";
-import Stack from "@mui/material/Stack";
-import {
-    ButtonGroup,
-    VirtualGamepad,
-} from "../components/virtGamepad/virtGamepad";
 import { WebRTCControl } from "../components/control/control";
-import DPad from "../components/gamepad/d_pad";
-import YBXA from "../components/gamepad/y_b_x_a";
 
 type Props = { host: string | null };
 
@@ -128,10 +120,8 @@ const Home = ({ host }) => {
         }));
     }, []);
 
-            // onMouseUp={(e) => {e.preventDefault()}}
-            // onMouseDown={(e) => {e.preventDefault()}}
     return (
-        <Body>
+        <Body >
             <GoogleAnalytics trackPageViews />
             <Head>
                 <title>WebRTC remote viewer</title>
@@ -154,7 +144,14 @@ const Home = ({ host }) => {
                 loop
             ></RemoteVideo>
 
-            <App >
+            <App 
+                onContextMenu= {(e) => e.preventDefault()}
+                onMouseUp=   {(e :MouseEvent)    => {e.preventDefault()}}
+                onMouseDown= {(e :MouseEvent)    => {e.preventDefault()}}
+                onKeyUp=     {(e :KeyboardEvent) => {e.preventDefault()}}
+                onKeyDown=   {(e :KeyboardEvent) => {e.preventDefault()}}
+
+            >
                 <WebRTCControl client={client}></WebRTCControl>
             </App>
             <audio
@@ -189,6 +186,7 @@ const Body = styled.div`
     background-color: black;
 `;
 const App = styled.div`
+    touch-action: none;
     position: relative;
     width: 100vw;   
     height: 100vh;
