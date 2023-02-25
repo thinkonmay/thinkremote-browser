@@ -85,14 +85,9 @@ export const ButtonGroupRight = (param: ButtonGroupProps): JSX.Element => {
             <WrapperDrag>
                 <YBXA
                     size={50}
-                    onStartTouchY={(e: React.TouchEvent) => console.log(`onStartTouchY`)}
-                    onEndTouchY={(e: React.TouchEvent) => console.log(`onEndTouchY`)}
-                    onStartTouchB={(e: React.TouchEvent) => console.log(`onStartTouchB`)}
-                    onEndTouchB={(e: React.TouchEvent) => console.log(`onEndTouchB`)}
-                    onStartTouchX={(e: React.TouchEvent) => console.log(`onStartTouchX`)}
-                    onEndTouchX={(e: React.TouchEvent) => console.log(`onEndTouchX`)}
-                    onStartTouchA={(e: React.TouchEvent) => console.log(`onStartTouchA`)}
-                    onEndTouchA={(e: React.TouchEvent) => console.log(`onEndTouchA`)}
+                    onTouch={(e: React.TouchEvent,type,index) => {
+                        param.ButtonCallback(index,type == 'up' ? 'press' : 'release')
+                    }}
                 ></YBXA>
 
                 <JoyStick type={'right'} moveCallback={async (x:number,y:number) => {
@@ -145,14 +140,9 @@ export const ButtonGroupLeft = (param: ButtonGroupProps): JSX.Element => {
             <WrapperDrag>
                 <DPad
                     size={50}
-                    onStartTouchTop={(e: React.TouchEvent) => console.log(`onStartTouchTop`)}
-                    onEndTouchTop={(e: React.TouchEvent) => console.log(`onEndTouchTop`)}
-                    onStartTouchBottom={(e: React.TouchEvent) => console.log(`onStartTouchBottom`)}
-                    onEndTouchBottom={(e: React.TouchEvent) => console.log(`onEndTouchBottom`)}
-                    onStartTouchRight={(e: React.TouchEvent) => console.log(`onStartTouchRight`)}
-                    onEndTouchRight={(e: React.TouchEvent) => console.log(`onEndTouchRight`)}
-                    onStartTouchLeft={(e: React.TouchEvent) => console.log(`onStartTouchLeft`)}
-                    onEndTouchLeft={(e: React.TouchEvent) => console.log(`onEndTouchLeft`)}
+                    onTouch={(e: React.TouchEvent,type,index) => {
+                        param.ButtonCallback(index,type == 'up' ? 'press' : 'release')
+                    }}
                 >
                 </DPad>
 

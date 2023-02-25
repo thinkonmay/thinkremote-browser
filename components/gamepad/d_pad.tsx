@@ -38,67 +38,37 @@ const Bottom = styled(DefaultButton)`
   transform: translate(50%, 100%);
 `;
 interface Props {
+  onTouch: (e: React.TouchEvent, type: 'up' | 'down', index: number) => void;
   size,
-  onStartTouchTop: (e: React.TouchEvent) => void;
-  onEndTouchTop: (e: React.TouchEvent) => void;
-  onStartTouchBottom: (e: React.TouchEvent) => void;
-  onEndTouchBottom: (e: React.TouchEvent) => void;
-  onStartTouchRight: (e: React.TouchEvent) => void;
-  onEndTouchRight: (e: React.TouchEvent) => void;
-  onStartTouchLeft: (e: React.TouchEvent) => void;
-  onEndTouchLeft: (e: React.TouchEvent) => void;
 }
 const DPad = (props: Props) => {
   const {
+    onTouch, 
     size,
-    onStartTouchTop,
-    onEndTouchTop,
-    onStartTouchBottom,
-    onEndTouchBottom,
-    onStartTouchRight,
-    onEndTouchRight,
-    onStartTouchLeft,
-    onEndTouchLeft
   } = props;
   return (
     <Container size={size}>
       <Top
-        onTouchStart={(e: React.TouchEvent) => {
-          onStartTouchTop(e);
-        }}
-        onTouchEnd={(e: React.TouchEvent) => {
-          onEndTouchTop(e);
-        }}
+        onTouchStart=           {(e: React.TouchEvent) => onTouch(e,'down',12) }
+        onTouchEnd=             {(e: React.TouchEvent) => onTouch(e,'up',12) }
       >
         <DPadTop></DPadTop>
       </Top>
       <Bottom
-        onTouchStart={(e: React.TouchEvent) => {
-          onStartTouchBottom(e);
-        }}
-        onTouchEnd={(e: React.TouchEvent) => {
-          onEndTouchBottom(e);
-        }}
+        onTouchStart=           {(e: React.TouchEvent) => onTouch(e,'down',13) }
+        onTouchEnd=             {(e: React.TouchEvent) => onTouch(e,'up',13) }
       >
         <DPadBottom></DPadBottom>
       </Bottom>
       <Right
-        onTouchStart={(e: React.TouchEvent) => {
-          onStartTouchRight(e);
-        }}
-        onTouchEnd={(e: React.TouchEvent) => {
-          onEndTouchRight(e);
-        }}
+        onTouchStart=           {(e: React.TouchEvent) => onTouch(e,'down',14) }
+        onTouchEnd=             {(e: React.TouchEvent) => onTouch(e,'up',14) }
       >
         <DPadRight></DPadRight>
       </Right>
       <Left
-        onTouchStart={(e: React.TouchEvent) => {
-          onStartTouchLeft(e);
-        }}
-        onTouchEnd={(e: React.TouchEvent) => {
-          onEndTouchLeft(e);
-        }}
+        onTouchStart=           {(e: React.TouchEvent) => onTouch(e,'down',15) }
+        onTouchEnd=             {(e: React.TouchEvent) => onTouch(e,'up',15) }
       >
         <DPadLeft></DPadLeft>
       </Left>
