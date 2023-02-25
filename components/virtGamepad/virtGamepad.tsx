@@ -8,6 +8,7 @@ import {
 } from "react-joystick-component/build/lib/Joystick";
 import { ButtonMode } from "../control/control";
 import YBXA from "../gamepad/y_b_x_a";
+import DPad from "../gamepad/d_pad";
 
 export const JoyStick = (param: { draggable: ButtonMode }) => {
     const JoystickRef = useRef<Joystick>(null);
@@ -60,6 +61,7 @@ export const ButtonGroup = (props: ButtonGroupProps): JSX.Element => {
             </Stack> */}
             <WrapperDrag>
                 <YBXA
+                    size={30}
                     onStartTouchY={(e: React.TouchEvent) => console.log(e)}
                     onEndTouchY={(e: React.TouchEvent) => console.log(e)}
                     onStartTouchB={(e: React.TouchEvent) => console.log(e)}
@@ -73,13 +75,20 @@ export const ButtonGroup = (props: ButtonGroupProps): JSX.Element => {
         </Draggable>
     );
 };
-
+export const DPadGroup = () =>{
+  return (<Draggable>
+    <WrapperDrag>
+      <DPad></DPad>
+    </WrapperDrag>
+  </Draggable>)
+}
 export const VirtualGamepad = (props: { draggable: ButtonMode }) => {
     return (
         <>
             <WrapperDrag>
                 <ButtonGroup draggable={props.draggable}/> 
-                <ButtonGroup draggable={props.draggable}/> 
+                {/* <ButtonGroup draggable={props.draggable}/>  */}
+                <DPadGroup/>
                 <JoyStick draggable={props.draggable}></JoyStick>
                 <JoyStick draggable={props.draggable}></JoyStick>
             </WrapperDrag>
