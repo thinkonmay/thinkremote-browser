@@ -17,68 +17,79 @@ function isFullscreen(): boolean {
 export const WebRTCControl = (input: { client: WebRTCClient, platform: Platform}) => {
     const [enableVGamepad, setenableVGamepad] = useState<ButtonMode>("disable");
     const [enableVMouse, setenableVMouse] = useState<ButtonMode>("disable");
+    const [actions,setactions] = useState<any[]>([]);
 
-    let actions = [
-        {
-            icon: <Fullscreen />,
-            name: "Bitrate",
-            action: async () => {
-                let bitrate = await AskSelectBitrate();
-                if (bitrate < 500 || input.client == null) {
-                    return;
-                }
-                console.log(`bitrate is change to ${bitrate}`);
-                input.client?.ChangeBitrate(bitrate);
-            },
-        },
-    ];
-
-
-    if (input.platform == 'mobile') {
-        actions = [...actions,
-        {
-            icon: <Fullscreen />,
-            name: "Edit VGamepad",
-            action: async () => {
-                setenableVGamepad((prev) => {
-                    switch (prev) {
-                        case "disable":
-                            return "draggable";
-                        case "draggable":
-                            return "static";
-                        case "static":
-                            return "disable";
+    useEffect(()  => {
+        console.log(`configuring menu on ${input.platform}`)
+        if (input.platform == 'mobile') {
+            setactions([{
+                icon: <Fullscreen />,
+                name: "Bitrate",
+                action: async () => {
+                    let bitrate = await AskSelectBitrate();
+                    if (bitrate < 500 || input.client == null) {
+                        return;
                     }
-                });
+                    console.log(`bitrate is change to ${bitrate}`);
+                    input.client?.ChangeBitrate(bitrate);
+                },
             },
-        }, {
-            icon: <Fullscreen />,
-            name: "Enable VMouse",
-            action: async () => {
-                setenableVMouse((prev) => {
-                    switch (prev) {
-                        case "disable":
-                            try { input.client.hid.disableMouse = true; } catch {}
-                            return "draggable";
-                        case "draggable":
-                            return "static";
-                        case "static":
-                            try { input.client.hid.disableMouse = false; } catch {}
-                            return "disable";
+            {
+                icon: <Fullscreen />,
+                name: "Edit VGamepad",
+                action: async () => {
+                    setenableVGamepad((prev) => {
+                        switch (prev) {
+                            case "disable":
+                                return "draggable";
+                            case "draggable":
+                                return "static";
+                            case "static":
+                                return "disable";
+                        }
+                    });
+                },
+            }, {
+                icon: <Fullscreen />,
+                name: "Enable VMouse",
+                action: async () => {
+                    setenableVMouse((prev) => {
+                        switch (prev) {
+                            case "disable":
+                                try { input.client.hid.disableMouse = true; } catch {}
+                                return "draggable";
+                            case "draggable":
+                                return "static";
+                            case "static":
+                                try { input.client.hid.disableMouse = false; } catch {}
+                                return "disable";
+                        }
+                    });
+                },
+            } ])
+        } else {
+            setactions([{
+                icon: <Fullscreen />,
+                name: "Bitrate",
+                action: async () => {
+                    let bitrate = await AskSelectBitrate();
+                    if (bitrate < 500 || input.client == null) {
+                        return;
                     }
-                });
+                    console.log(`bitrate is change to ${bitrate}`);
+                    input.client?.ChangeBitrate(bitrate);
+                },
             },
-        } ]
-    } else {
-        actions = [...actions,
-        {
-            icon: <Fullscreen />,
-            name: "Enter fullscreen",
-            action: async () => {
-                document.documentElement.requestFullscreen();
-            },
-        }]
-    }
+            {
+                icon: <Fullscreen />,
+                name: "Enter fullscreen",
+                action: async () => {
+                    document.documentElement.requestFullscreen();
+                },
+            }])
+        }
+    },[input.platform])
+
     
 
 
@@ -107,7 +118,7 @@ export const WebRTCControl = (input: { client: WebRTCClient, platform: Platform}
 
     let filter = 0;
 	const MouseJTcallback = async (x: number, y: number) => { // translate cordinate
-        if (filter == 70) {
+        if (filter == 30) {
             input.client?.hid?.mouseMoveRel({movementX:x*10,movementY:y*10});
             filter = 0;
         }

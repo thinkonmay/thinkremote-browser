@@ -17,6 +17,7 @@ import {
 } from "webrtc-streaming-core/dist/models/devices.model";
 import {
     ConnectionEvent,
+    EventMessage,
     Log,
     LogConnectionEvent,
     LogLevel,
@@ -25,6 +26,7 @@ import { GetServerSideProps } from "next";
 import { GoogleAnalytics } from "nextjs-google-analytics";
 import Button from "@mui/material/Button";
 import { WebRTCControl } from "../components/control/control";
+import { getPlatform, Platform } from "webrtc-streaming-core/dist/utils/platform";
 
 type Props = { host: string | null };
 export const getServerSideProps: GetServerSideProps<Props> = async (
@@ -35,7 +37,6 @@ export const getServerSideProps: GetServerSideProps<Props> = async (
 const Home = ({ host }) => {
     const remoteVideo = useRef<HTMLVideoElement>(null);
     const remoteAudio = useRef<HTMLAudioElement>(null);
-    const platform = 'mobile'
 
     const router = useRouter();
     const { signaling, token, fps, bitrate } = router.query;
@@ -104,15 +105,17 @@ const Home = ({ host }) => {
         return ret;
     }
 
+    const [platform,setplatform] = useState<Platform>('desktop');
     const [client,setClient] = useState<WebRTCClient>(null);
     useEffect(() => {
-        setClient(new WebRTCClient( signalingURL, remoteVideo.current, remoteAudio.current, signalingToken, selectDevice, platform).Notifier((message) => {
+        setplatform(getPlatform())
+        setClient(new WebRTCClient( signalingURL, remoteVideo.current, remoteAudio.current, signalingToken, selectDevice, getPlatform()).Notifier((message: EventMessage) => {
+            if(message == 'WebRTCConnectionClosed') {
+              location.reload();
+            }
             console.log(message);
             TurnOnStatus(message);
-        }).Alert((message) => {
-            console.log(message);
-            TurnOnAlert(message);
-        }));
+        }))
     }, []);
 
     return (
