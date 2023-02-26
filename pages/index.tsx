@@ -131,7 +131,7 @@ const Home = ({ host }) => {
                 <link rel="icon" href="/favicon.ico" />
             </Head>
 
-            <RemoteVideo
+             <RemoteVideo
                 ref={remoteVideo}
                 autoPlay
                 muted
@@ -145,7 +145,6 @@ const Home = ({ host }) => {
                 onMouseDown= {(e :MouseEvent)    => {e.preventDefault()}}
                 onKeyUp=     {(e :KeyboardEvent) => {e.preventDefault()}}
                 onKeyDown=   {(e :KeyboardEvent) => {e.preventDefault()}}
-
             >
                 <WebRTCControl platform={platform} client={client}></WebRTCControl>
             </App>
