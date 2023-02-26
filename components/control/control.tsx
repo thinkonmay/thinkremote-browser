@@ -94,8 +94,8 @@ export const WebRTCControl = (input: { client: WebRTCClient, platform: Platform}
 	const GamepadACallback = async (x: number, y: number,type: 'left' | 'right') => {
 		input.client?.hid?.VirtualGamepadAxis(x,y,type);
 	}
-	const GamepadBCallback = async (index: number,type: 'press' | 'release') => {
-		input.client?.hid?.VirtualGamepadButtonSlider(type == 'release',index);
+	const GamepadBCallback = async (index: number,type: 'up' | 'down') => {
+		input.client?.hid?.VirtualGamepadButtonSlider(type == 'down',index);
 	}
 
     let filter = 0;

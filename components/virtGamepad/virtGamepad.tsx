@@ -10,6 +10,7 @@ import {
 import { ButtonMode } from "../control/control";
 import {YBXA} from "../gamepad/y_b_x_a";
 import DPad from "../gamepad/d_pad";
+import { LeftFuncButton, RightFuncButton } from "../gamepad/func_button";
 
 
 
@@ -45,7 +46,7 @@ export const JoyStick = (param: { draggable: ButtonMode , moveCallback: ((x:numb
 interface ButtonGroupProps {
     draggable: Partial<ButtonMode>;
     AxisCallback:    ((x: number,y: number,type: 'left' | 'right') => Promise<void>),
-    ButtonCallback:  ((index: number,type: 'press' | 'release') => Promise<void>),
+    ButtonCallback:  ((index: number,type: 'up' | 'down') => Promise<void>),
 }
 export const ButtonGroupRight = (param: ButtonGroupProps) => {
     const [posBtn, setPosBtn] = useState({ x: 0, y: 0 });
@@ -89,18 +90,24 @@ export const ButtonGroupRight = (param: ButtonGroupProps) => {
             onDrag={handleDrag}
         >
             <WrapperDrag>
+                <RightFuncButton
+                    Touch={(index,type) => param.ButtonCallback(index,type)}
+                >
+
+                </RightFuncButton>
                 <YBXA
                     size={50}
                     onTouch={(e: React.TouchEvent,type,index) => {
-                        param.ButtonCallback(index,type == 'up' ? 'press' : 'release')
+                        param.ButtonCallback(index,type)
                     }}
                 ></YBXA>
 
                 <JoyStick moveCallback={async (x:number,y:number) => {
-                    param.AxisCallback(x,y,'right')
-                    return;
-                }} draggable={param.draggable}></JoyStick> 
-                {/* right */}
+                        param.AxisCallback(x,y,'right')
+                        return;
+                    }} draggable={param.draggable}>
+                </JoyStick> 
+
             </WrapperDrag>
         </Draggable>
      )
@@ -114,7 +121,6 @@ export const ButtonGroupLeft = (param: ButtonGroupProps) => {
             return;
         }
 
-        console.log(`get ${x} ${y} from storage`);
         setPosBtn({x:x,y:y})
     },[])
 
@@ -133,7 +139,6 @@ export const ButtonGroupLeft = (param: ButtonGroupProps) => {
         }
 
         localStorage.setItem(`left_group_pos`, JSON.stringify(posBtn));
-        console.log(`set ${x} ${y} to storage`);
     }
     return (
         <Draggable 
@@ -144,10 +149,15 @@ export const ButtonGroupLeft = (param: ButtonGroupProps) => {
             
         >
             <WrapperDrag>
+                <LeftFuncButton
+                    Touch={(index,type) => param.ButtonCallback(index,type)}
+                >
+
+                </LeftFuncButton>
                 <DPad
                     size={50}
                     onTouch={(e: React.TouchEvent,type,index) => {
-                        param.ButtonCallback(index,type == 'up' ? 'press' : 'release')
+                        param.ButtonCallback(index,type)
                     }}
                 >
                 </DPad>
@@ -155,8 +165,9 @@ export const ButtonGroupLeft = (param: ButtonGroupProps) => {
                 <JoyStick moveCallback={async (x:number,y:number) => {
                         param.AxisCallback(x,y,'left')
                         return;
-                    }} draggable={param.draggable}></JoyStick>
-                    {/* left */}
+                    }} draggable={param.draggable}>
+                </JoyStick>
+
             </WrapperDrag>
         </Draggable>
      )
@@ -165,7 +176,7 @@ export const ButtonGroupLeft = (param: ButtonGroupProps) => {
 export const VirtualGamepad = (param: { 
     draggable: ButtonMode, 
     AxisCallback:    ((x: number,y: number,type: 'left' | 'right') => Promise<void>),
-    ButtonCallback:  ((index: number,type: 'press' | 'release') => Promise<void>),
+    ButtonCallback:  ((index: number,type: 'up' | 'down') => Promise<void>),
     }) => {
     return (
         <div>

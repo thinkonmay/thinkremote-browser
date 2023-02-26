@@ -36,66 +36,39 @@ export const TriggerBtn = styled.button`
     }
 `;
 
-interface PropsRight {
-    onStartTouchRb: (e: React.TouchEvent) => void;
-    onEndTouchRb: (e: React.TouchEvent) => void;
-    onStartTouchRt: (e: React.TouchEvent) => void;
-    onEndTouchRt: (e: React.TouchEvent) => void;
+interface PropsTrigger {
+    Touch: (index: number, type : 'up' | 'down') => void;
 }
 
-export function RightFuncButton(props: PropsRight) {
-    const { onStartTouchRb, onEndTouchRb, onStartTouchRt, onEndTouchRt } =
+export function RightFuncButton(props: PropsTrigger) {
+    const { Touch } =
         props;
     return (
         <ContainerRightBtn>
             <TriggerBtn
-                onTouchStart={(e: React.TouchEvent) => {
-                    onStartTouchRt && onStartTouchRt(e);
-                }}
-                onTouchEnd={(e: React.TouchEvent) => {
-                    onEndTouchRt && onEndTouchRt(e);
-                }}
+                onTouchStart={(e: React.TouchEvent) => Touch(7,'down')}
+                onTouchEnd={(e: React.TouchEvent) => Touch(7,'up')}
             ></TriggerBtn>
             <BumperBtn
-                onTouchStart={(e: React.TouchEvent) => {
-                    onStartTouchRb && onStartTouchRb(e);
-                }}
-                onTouchEnd={(e: React.TouchEvent) => {
-                    onEndTouchRb && onEndTouchRb(e);
-                }}
+                onTouchStart={(e: React.TouchEvent) => Touch(5,'down')}
+                onTouchEnd={(e: React.TouchEvent) => Touch(5,'up')}
             ></BumperBtn>
         </ContainerRightBtn>
     );
 }
-interface PropsLeft {
-    onStartTouchLb?: (e: React.TouchEvent) => void;
-    onEndTouchLb?: (e: React.TouchEvent) => void;
-    onStartTouchLt?: (e: React.TouchEvent) => void;
-    onEndTouchLt?: (e: React.TouchEvent) => void;
-}
-export function LeftFuncButton(props: PropsLeft) {
-    const { onStartTouchLb, onEndTouchLb, onStartTouchLt, onEndTouchLt } =
+
+export function LeftFuncButton(props: PropsTrigger) {
+    const { Touch } =
         props;
     return (
         <ContainerLeftBtn>
             <TriggerBtn
-                onTouchStart={(e: React.TouchEvent) => {
-                    onStartTouchLb && onStartTouchLt(e);
-                    console.log("Touch LT");
-                }}
-                onTouchEnd={(e: React.TouchEvent) => {
-                    onEndTouchLt && onEndTouchLt(e);
-                }}
+                onTouchStart={(e: React.TouchEvent) => Touch(6,'down')}
+                onTouchEnd={(e: React.TouchEvent) => Touch(6,'up')}
             ></TriggerBtn>
             <BumperBtn
-                onTouchStart={(e: React.TouchEvent) => {
-                    onStartTouchLb && onStartTouchLb(e);
-                    console.log("Touch Lb");
-                }}
-                onTouchEnd={(e: React.TouchEvent) => {
-                    console.log("End touch LB");
-                    onEndTouchLb && onEndTouchLb(e);
-                }}
+                onTouchStart={(e: React.TouchEvent) => Touch(4,'down')}
+                onTouchEnd={(e: React.TouchEvent) => Touch(4,'up')}
             ></BumperBtn>
         </ContainerLeftBtn>
     );
