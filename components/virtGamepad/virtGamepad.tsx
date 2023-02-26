@@ -97,22 +97,20 @@ export const ButtonGroupRight = (param: ButtonGroupProps) => {
             onDrag={handleDrag}
         >
             <WrapperGroupBtn>
-                <RightFuncButton />
+                <RightFuncButton
+                    Touch={(index, type) => param.ButtonCallback(index, type)}
+                />
                 <YBXA
-                    size={35}
-                    onTouch={(e: React.TouchEvent, type, index) => {
-                        param.ButtonCallback(
-                            index,
-                            type == "up" ? "press" : "release"
-                        );
-                    }}
+                    size={50}
+                    onTouch={(e: React.TouchEvent, type, index) =>
+                        param.ButtonCallback(index, type)
+                    }
                 />
                 <StartBtn />
                 <JoyStickRight
-                    moveCallback={async (x: number, y: number) => {
-                        param.AxisCallback(x, y, "right");
-                        return;
-                    }}
+                    moveCallback={(x: number, y: number) =>
+                        param.AxisCallback(x, y, "right")
+                    }
                     draggable={param.draggable}
                 />
                 {/* right */}
@@ -131,7 +129,6 @@ export const ButtonGroupLeft = (param: ButtonGroupProps) => {
             return;
         }
 
-        console.log(`get ${x} ${y} from storage`);
         setPosBtn({ x: x, y: y });
     }, []);
 
@@ -150,7 +147,6 @@ export const ButtonGroupLeft = (param: ButtonGroupProps) => {
         }
 
         localStorage.setItem(`left_group_pos`, JSON.stringify(posBtn));
-        console.log(`set ${x} ${y} to storage`);
     };
     return (
         <Draggable
@@ -160,7 +156,15 @@ export const ButtonGroupLeft = (param: ButtonGroupProps) => {
             onDrag={handleDrag}
         >
             <WrapperGroupBtn>
-                <LeftFuncButton />
+                <LeftFuncButton
+                    Touch={(index, type) => param.ButtonCallback(index, type)}
+                />
+                <DPad
+                    size={50}
+                    onTouch={(e: React.TouchEvent, type, index) => {
+                        param.ButtonCallback(index, type);
+                    }}
+                />
 
                 <JoyStickLeft
                     moveCallback={async (x: number, y: number) => {
@@ -169,16 +173,6 @@ export const ButtonGroupLeft = (param: ButtonGroupProps) => {
                     }}
                     draggable={param.draggable}
                 />
-                <SelectBtn />
-                <DPad
-                    size={50}
-                    onTouch={(e: React.TouchEvent, type, index) => {
-                        param.ButtonCallback(
-                            index,
-                            type == "up" ? "press" : "release"
-                        );
-                    }}
-                ></DPad>
                 {/* left */}
             </WrapperGroupBtn>
         </Draggable>
@@ -196,35 +190,25 @@ export const VirtualGamepad = (param: {
 }) => {
     return (
         <div>
-            {/* {param.draggable == "static" || param.draggable == "draggable" ? ( */}
-            <ContainerVirGamepad style={{ zIndex: 2 }}>
-                <ButtonGroupLeft
-                    AxisCallback={param.AxisCallback}
-                    ButtonCallback={param.ButtonCallback}
-                    draggable={param.draggable}
-                >
-                    {" "}
-                </ButtonGroupLeft>
-                <ButtonGroupRight
-                    AxisCallback={param.AxisCallback}
-                    ButtonCallback={param.ButtonCallback}
-                    draggable={param.draggable}
-                >
-                    {" "}
-                </ButtonGroupRight>
-            </ContainerVirGamepad>
-            {/* ) : null} */}
+            {param.draggable == "static" || param.draggable == "draggable" ? (
+                <ContainerVirGamepad style={{ zIndex: 2 }}>
+                    <ButtonGroupLeft
+                        AxisCallback={param.AxisCallback}
+                        ButtonCallback={param.ButtonCallback}
+                        draggable={param.draggable}
+                    />
+                    
+                    <ButtonGroupRight
+                        AxisCallback={param.AxisCallback}
+                        ButtonCallback={param.ButtonCallback}
+                        draggable={param.draggable}
+                    />
+                </ContainerVirGamepad>
+            ) : null}
         </div>
     );
 };
 
-// export const DPadGroup = () =>{
-//   return (<Draggable>
-//     <WrapperDrag>
-//       <DPad></DPad>
-//     </WrapperDrag>
-//   </Draggable>)
-// }
 
 const ContainerVirGamepad = styled.div`
     display: flex;
