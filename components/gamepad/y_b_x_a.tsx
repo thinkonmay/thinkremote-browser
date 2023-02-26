@@ -10,7 +10,9 @@ const DefaultButton = styled.button`
     /* depened on Container */
     width: inherit;
     height: inherit;
-
+    :active {
+        background-color: rgba(0, 0, 0, 0.05);
+    }
     border: 1px solid;
     border-radius: 50%;
     position: absolute;
