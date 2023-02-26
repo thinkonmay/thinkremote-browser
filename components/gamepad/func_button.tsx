@@ -8,9 +8,15 @@ const DefautContainer = styled.div`
 `;
 const ContainerRightBtn = styled(DefautContainer)`
     align-items: flex-start;
+    position: absolute;
+    top: 5%;
+    right: 35%;
 `;
 const ContainerLeftBtn = styled(DefautContainer)`
     align-items: flex-end;
+    position: absolute;
+    top: 5%;
+    left: 35%;
 `;
 export const BumperBtn = styled.button`
     outline: none;
@@ -37,10 +43,10 @@ export const TriggerBtn = styled.button`
 `;
 
 interface PropsRight {
-    onStartTouchRb: (e: React.TouchEvent) => void;
-    onEndTouchRb: (e: React.TouchEvent) => void;
-    onStartTouchRt: (e: React.TouchEvent) => void;
-    onEndTouchRt: (e: React.TouchEvent) => void;
+    onStartTouchRb?: (e: React.TouchEvent) => void;
+    onEndTouchRb?: (e: React.TouchEvent) => void;
+    onStartTouchRt?: (e: React.TouchEvent) => void;
+    onEndTouchRt?: (e: React.TouchEvent) => void;
 }
 
 export function RightFuncButton(props: PropsRight) {

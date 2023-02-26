@@ -25,6 +25,7 @@ import { GetServerSideProps } from "next";
 import { GoogleAnalytics } from "nextjs-google-analytics";
 import Button from "@mui/material/Button";
 import { WebRTCControl } from "../components/control/control";
+import { VirtualGamepad } from "../components/virtGamepad/virtGamepad";
 
 type Props = { host: string | null };
 export const getServerSideProps: GetServerSideProps<Props> = async (
@@ -154,6 +155,7 @@ const Home = ({ host }) => {
                 controls
                 style={{ zIndex: -5, opacity: 0 }}
             ></audio>
+            <VirtualGamepad draggable={'draggable'}></VirtualGamepad>
         </Body>
     );
 };
@@ -177,7 +179,7 @@ const Body = styled.div`
     margin: 0;
     border: 0;
     overflow: hidden;
-    background-color: black;
+    /* background-color: black; */
 `;
 const App = styled.div`
     touch-action: none;

@@ -11,7 +11,9 @@ const Container = styled.div`
     width: ${(props) => props.size ?? "20"}px;
     height: ${(props) => props.size ?? "20"}px;
     /* background-color: red; */
-    position: relative;
+    position: absolute;
+    right: 25%;
+    bottom: 15%;
 `;
 // Ban kinh gap 5 lan chieu rong
 // chieu dai gap 2.25 chieu rong

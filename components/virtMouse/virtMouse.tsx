@@ -6,27 +6,25 @@ import {
     Joystick,
 } from "react-joystick-component/build/lib/Joystick";
 import { ButtonMode } from "../control/control";
-import {LR} from "../gamepad/y_b_x_a";
+import { LR } from "../gamepad/y_b_x_a";
 
-
-
-
-
-export const JoyStick = (param: {draggable: ButtonMode , moveCallback: ((x:number,y:number) => Promise<void>) }) => {
-    const [enableJT,setenableJT] = useState<boolean>(false);
-
+export const JoyStick = (param: {
+    draggable: ButtonMode;
+    moveCallback: (x: number, y: number) => Promise<void>;
+}) => {
+    const [enableJT, setenableJT] = useState<boolean>(false);
 
     const move = (event: IJoystickUpdateEvent) => {
-        if(event.type == 'move') {
+        if (event.type == "move") {
             if (!enableJT) {
-                param.moveCallback(0,0)
-                return
+                param.moveCallback(0, 0);
+                return;
             }
-            param.moveCallback(event.x,-event.y)
-        } else if(event.type == 'stop') {
+            param.moveCallback(event.x, -event.y);
+        } else if (event.type == "stop") {
             setenableJT(false);
-            param.moveCallback(0,0)
-        } else if(event.type == 'start') {
+            param.moveCallback(0, 0);
+        } else if (event.type == "start") {
             setenableJT(true);
         }
     };
@@ -42,27 +40,79 @@ export const JoyStick = (param: {draggable: ButtonMode , moveCallback: ((x:numbe
     );
 };
 
-
-
 interface ButtonGroupProps {
     draggable: Partial<ButtonMode>;
-    AxisCallback:    ((x: number,y: number) => Promise<void>),
-    ButtonCallback:  ((index: number,type: 'up' | 'down') => Promise<void>),
+    AxisCallback: (x: number, y: number) => Promise<void>;
+    ButtonCallback: (index: number, type: "up" | "down") => Promise<void>;
 }
-export const JoystickGroup = (param: ButtonGroupProps) => {
+
+const MouseGroup = (param: ButtonGroupProps) => {
     const [posBtn, setPosBtn] = useState({ x: 0, y: 0 });
     useEffect(() => {
-        let cache = localStorage.getItem(`right_group_pos`)
-        const {x,y} = JSON.parse(cache != null ? cache : `{"x": 0, "y" : 0}`);
+        let cache = localStorage.getItem(`mouse_group_pos`);
+        const { x, y } = JSON.parse(
+            cache != null ? cache : `{"x": 25, "y" : 140}`
+        );
         if (x == null || y == null) {
             return;
         }
 
         console.log(`get ${x} ${y} from storage`);
-        setPosBtn({x:x,y:y})
-    },[])
+        setPosBtn({ x: x, y: y });
+    }, []);
 
-    const handleDrag = ( e: DraggableEvent, data: DraggableData) => {
+    const handleDrag = (e: DraggableEvent, data: DraggableData) => {
+        setPosBtn({
+            x: data.x,
+            y: data.y,
+        });
+    };
+
+    const handleStop = (e: DraggableEvent, data: DraggableData) => {
+        const { x, y } = posBtn;
+        if (x == null || y == null) {
+            return;
+        }
+
+        localStorage.setItem(`mouse_group_pos`, JSON.stringify(posBtn));
+        console.log(`set ${x} ${y} to storage`);
+    };
+
+    return (
+        <Draggable
+            disabled={param.draggable != "draggable"}
+            position={{ x: posBtn.x, y: posBtn.y }}
+            onStop={handleStop}
+            onDrag={handleDrag}
+        >
+            <WrapperDrag>
+                <LR
+                    size={120}
+                    onTouch={(e: React.TouchEvent, type, index) => {
+                        param.ButtonCallback(index, type);
+                    }}
+                ></LR>
+                {/* <JoyStick moveCallback={param.AxisCallback} draggable={param.draggable}></JoyStick>  */}
+            </WrapperDrag>
+        </Draggable>
+    );
+};
+const JoyStickBtn = (param: ButtonGroupProps) => {
+    const [posBtn, setPosBtn] = useState({ x: 0, y: 0 });
+    useEffect(() => {
+        let cache = localStorage.getItem(`joystick_btn_pos`);
+        const { x, y } = JSON.parse(
+            cache != null ? cache : `{"x": 160, "y" : 25}`
+        );
+        if (x == null || y == null) {
+            return;
+        }
+
+        console.log(`get ${x} ${y} from storage`);
+        setPosBtn({ x: x, y: y });
+    }, []);
+
+    const handleDrag = (e: DraggableEvent, data: DraggableData) => {
         const { x, y } = posBtn;
         setPosBtn({
             x: data.x,
@@ -70,57 +120,61 @@ export const JoystickGroup = (param: ButtonGroupProps) => {
         });
     };
 
-    const handleStop = ( e: DraggableEvent, data: DraggableData) => {
+    const handleStop = (e: DraggableEvent, data: DraggableData) => {
         const { x, y } = posBtn;
         if (x == null || y == null) {
             return;
         }
 
-        localStorage.setItem(`right_group_pos`, JSON.stringify(posBtn));
+        localStorage.setItem(`joystick_btn_pos`, JSON.stringify(posBtn));
         console.log(`set ${x} ${y} to storage`);
-    }
+    };
 
-
-
-    
     return (
-        <Draggable 
-            disabled={param.draggable != 'draggable'} 
-            position={{x: posBtn.x, y: posBtn.y}} 
-            onStop={handleStop} 
+        <Draggable
+            disabled={param.draggable != "draggable"}
+            position={{ x: posBtn.x, y: posBtn.y }}
+            onStop={handleStop}
             onDrag={handleDrag}
         >
             <WrapperDrag>
-                <LR
-                    size={120}
-                    onTouch={(e: React.TouchEvent,type,index) => { param.ButtonCallback(index,type) }}
-                ></LR>
-                <JoyStick moveCallback={param.AxisCallback} draggable={param.draggable}></JoyStick> 
+                <JoyStick
+                    moveCallback={param.AxisCallback}
+                    draggable={param.draggable}
+                ></JoyStick>
             </WrapperDrag>
         </Draggable>
-     )
+    );
 };
-
-export const VirtualMouse = (param: { 
-    draggable: ButtonMode, 
-    MouseMoveCallback:    ((move_x: number,move_y: number) => Promise<void>),
-    MouseButtonCallback:  ((index: number,type: 'up' | 'down') => Promise<void>),
-    }) => {
+export const VirtualMouse = (param: {
+    draggable: ButtonMode;
+    MouseMoveCallback: (move_x: number, move_y: number) => Promise<void>;
+    MouseButtonCallback: (index: number, type: "up" | "down") => Promise<void>;
+}) => {
     return (
         <div>
             {param.draggable == "static" || param.draggable == "draggable" ? (
-                <div style={{ zIndex: 2 }}>
-                    <JoystickGroup  
-                        AxisCallback={param.MouseMoveCallback} 
-                        ButtonCallback={param.MouseButtonCallback} 
+                <ContainerVirtMouse >
+                    <MouseGroup
+                        AxisCallback={param.MouseMoveCallback}
+                        ButtonCallback={param.MouseButtonCallback}
                         draggable={param.draggable}
-                    > </JoystickGroup>
-                </div>
+                    />
+                    <JoyStickBtn
+                        AxisCallback={param.MouseMoveCallback}
+                        ButtonCallback={param.MouseButtonCallback}
+                        draggable={param.draggable}
+                    />
+                </ContainerVirtMouse>
             ) : null}
         </div>
-    )
+    );
 };
 
+const ContainerVirtMouse = styled.div`
+    display: flex;
+    align-items: center;
+`;
 const WrapperDrag = styled.div`
     max-width: max-content;
     opacity: 0.3;

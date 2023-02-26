@@ -1,8 +1,13 @@
 import styled from "styled-components";
 
+const Wrapper = styled.div`
+    position: absolute;
+    top: 48%;
+    right: 30%;
+`;
 const Container = styled.div`
-    width:  ${props => props.size ?? '20'}px;
-    height: ${props => props.size ?? '20'}px;
+    width: ${(props) => props.size ?? "20"}px;
+    height: ${(props) => props.size ?? "20"}px;
     /* background: red; */
     position: relative;
 `;
@@ -43,67 +48,69 @@ const ButtonA = styled(DefaultButton)`
     transform: translate(-100%, -50%);
 `;
 interface Props {
-    onTouch: (e: React.TouchEvent, type: 'up' | 'down', index: number) => void;
+    onTouch: (e: React.TouchEvent, type: "up" | "down", index: number) => void;
     size?: number;
+    className?: string;
 }
 
-
-
-
 export function YBXA(props: Props) {
-    const {
-        onTouch,
-        size,
-    } = props;
+    const { onTouch, size, className } = props;
     return (
-        <Container size={size}>
-            <ButtonY
-                onTouchStart={(e: React.TouchEvent) => onTouch(e,'down',3) }
-                onTouchEnd={(e: React.TouchEvent) => onTouch(e,'up',3) }
-            >
-                Y
-            </ButtonY>
-            <ButtonB
-                onTouchStart={(e: React.TouchEvent) => onTouch(e,'down',1) }
-                onTouchEnd={(e: React.TouchEvent) => onTouch(e,'up',1) }
-            >
-                B
-            </ButtonB>
-            <ButtonX
-                onTouchStart={(e: React.TouchEvent) => onTouch(e,'down',2) }
-                onTouchEnd={(e: React.TouchEvent) => onTouch(e,'up',2) }
-            >
-                X
-            </ButtonX>
-            <ButtonA
-                onTouchStart={(e: React.TouchEvent) => onTouch(e,'down',0) }
-                onTouchEnd={(e: React.TouchEvent) => onTouch(e,'up',0) }
-            >
-                A
-            </ButtonA>
-        </Container>
+        <Wrapper className={className}>
+            <Container size={size}>
+                <ButtonY
+                    onTouchStart={(e: React.TouchEvent) =>
+                        onTouch(e, "down", 3)
+                    }
+                    onTouchEnd={(e: React.TouchEvent) => onTouch(e, "up", 3)}
+                >
+                    Y
+                </ButtonY>
+                <ButtonB
+                    onTouchStart={(e: React.TouchEvent) =>
+                        onTouch(e, "down", 1)
+                    }
+                    onTouchEnd={(e: React.TouchEvent) => onTouch(e, "up", 1)}
+                >
+                    B
+                </ButtonB>
+                <ButtonX
+                    onTouchStart={(e: React.TouchEvent) =>
+                        onTouch(e, "down", 2)
+                    }
+                    onTouchEnd={(e: React.TouchEvent) => onTouch(e, "up", 2)}
+                >
+                    X
+                </ButtonX>
+                <ButtonA
+                    onTouchStart={(e: React.TouchEvent) =>
+                        onTouch(e, "down", 0)
+                    }
+                    onTouchEnd={(e: React.TouchEvent) => onTouch(e, "up", 0)}
+                >
+                    A
+                </ButtonA>
+            </Container>
+        </Wrapper>
     );
 }
 
 export function LR(props: Props) {
-    const {
-        onTouch,
-        size,
-    } = props;
+    const { onTouch, size } = props;
     return (
         <Container size={size}>
-            <ButtonX
-                onTouchStart={(e: React.TouchEvent) => onTouch(e,'down',2) }
-                onTouchEnd={(e: React.TouchEvent) => onTouch(e,'up',2) }
+            <ButtonY
+                onTouchStart={(e: React.TouchEvent) => onTouch(e, "down", 2)}
+                onTouchEnd={(e: React.TouchEvent) => onTouch(e, "up", 2)}
             >
-                Right 
-            </ButtonX>
-            <ButtonA
-                onTouchStart={(e: React.TouchEvent) => onTouch(e,'down',0) }
-                onTouchEnd={(e: React.TouchEvent) => onTouch(e,'up',0) }
+                Right
+            </ButtonY>
+            <ButtonB
+                onTouchStart={(e: React.TouchEvent) => onTouch(e, "down", 0)}
+                onTouchEnd={(e: React.TouchEvent) => onTouch(e, "up", 0)}
             >
                 Left
-            </ButtonA>
+            </ButtonB>
         </Container>
     );
 }
