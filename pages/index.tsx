@@ -27,20 +27,15 @@ import Button from "@mui/material/Button";
 import { WebRTCControl } from "../components/control/control";
 
 type Props = { host: string | null };
-
 export const getServerSideProps: GetServerSideProps<Props> = async (
     context
 ) => ({ props: { host: context.req.headers.host || null } });
 
-const buttons = [
-    <Button key="one">One</Button>,
-    <Button key="two">Two</Button>,
-    <Button key="three">Three</Button>,
-];
 
 const Home = ({ host }) => {
     const remoteVideo = useRef<HTMLVideoElement>(null);
     const remoteAudio = useRef<HTMLAudioElement>(null);
+    const platform = 'mobile'
 
     const router = useRouter();
     const { signaling, token, fps, bitrate } = router.query;
@@ -111,7 +106,7 @@ const Home = ({ host }) => {
 
     const [client,setClient] = useState<WebRTCClient>(null);
     useEffect(() => {
-        setClient(new WebRTCClient( signalingURL, remoteVideo.current, remoteAudio.current, signalingToken, selectDevice, 'mobile').Notifier((message) => {
+        setClient(new WebRTCClient( signalingURL, remoteVideo.current, remoteAudio.current, signalingToken, selectDevice, platform).Notifier((message) => {
             console.log(message);
             TurnOnStatus(message);
         }).Alert((message) => {
@@ -152,7 +147,7 @@ const Home = ({ host }) => {
                 onKeyDown=   {(e :KeyboardEvent) => {e.preventDefault()}}
 
             >
-                <WebRTCControl client={client}></WebRTCControl>
+                <WebRTCControl platform={platform} client={client}></WebRTCControl>
             </App>
             <audio
                 ref={remoteAudio}

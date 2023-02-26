@@ -8,21 +8,27 @@ import {
     Joystick,
 } from "react-joystick-component/build/lib/Joystick";
 import { ButtonMode } from "../control/control";
-import YBXA from "../gamepad/y_b_x_a";
+import {YBXA} from "../gamepad/y_b_x_a";
 import DPad from "../gamepad/d_pad";
 
-type CardProps = {
-    title: string;
-    paragraph: string;
-};
 
-export const JoyStick = (param: { type: 'left' | 'right', draggable: ButtonMode , moveCallback: ((x:number,y:number) => Promise<void>) }) => {
+
+export const JoyStick = (param: { draggable: ButtonMode , moveCallback: ((x:number,y:number) => Promise<void>) }) => {
+    const [enableJT,setenableJT] = useState<boolean>(false);
+
+
     const move = (event: IJoystickUpdateEvent) => {
         if(event.type == 'move') {
+            if (!enableJT) {
+                param.moveCallback(0,0)
+                return
+            }
             param.moveCallback(event.x,-event.y)
-        }
-        if(event.type == 'stop') {
+        } else if(event.type == 'stop') {
+            setenableJT(false);
             param.moveCallback(0,0)
+        } else if(event.type == 'start') {
+            setenableJT(true);
         }
     };
 
@@ -41,7 +47,7 @@ interface ButtonGroupProps {
     AxisCallback:    ((x: number,y: number,type: 'left' | 'right') => Promise<void>),
     ButtonCallback:  ((index: number,type: 'press' | 'release') => Promise<void>),
 }
-export const ButtonGroupRight = (param: ButtonGroupProps): JSX.Element => {
+export const ButtonGroupRight = (param: ButtonGroupProps) => {
     const [posBtn, setPosBtn] = useState({ x: 0, y: 0 });
     useEffect(() => {
         let cache = localStorage.getItem(`right_group_pos`)
@@ -90,7 +96,7 @@ export const ButtonGroupRight = (param: ButtonGroupProps): JSX.Element => {
                     }}
                 ></YBXA>
 
-                <JoyStick type={'right'} moveCallback={async (x:number,y:number) => {
+                <JoyStick moveCallback={async (x:number,y:number) => {
                     param.AxisCallback(x,y,'right')
                     return;
                 }} draggable={param.draggable}></JoyStick> 
@@ -99,7 +105,7 @@ export const ButtonGroupRight = (param: ButtonGroupProps): JSX.Element => {
         </Draggable>
      )
 };
-export const ButtonGroupLeft = (param: ButtonGroupProps): JSX.Element => {
+export const ButtonGroupLeft = (param: ButtonGroupProps) => {
     const [posBtn, setPosBtn] = useState({ x: 0, y: 0 });
     useEffect(() => {
         let cache = localStorage.getItem(`left_group_pos`)
@@ -146,7 +152,7 @@ export const ButtonGroupLeft = (param: ButtonGroupProps): JSX.Element => {
                 >
                 </DPad>
 
-                <JoyStick type={'left'} moveCallback={async (x:number,y:number) => {
+                <JoyStick moveCallback={async (x:number,y:number) => {
                         param.AxisCallback(x,y,'left')
                         return;
                     }} draggable={param.draggable}></JoyStick>

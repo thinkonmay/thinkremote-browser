@@ -44,7 +44,11 @@ interface Props {
     onTouch: (e: React.TouchEvent, type: 'up' | 'down', index: number) => void;
     size?: number;
 }
-function YBXA(props: Props) {
+
+
+
+
+export function YBXA(props: Props) {
     const {
         onTouch,
         size,
@@ -79,4 +83,25 @@ function YBXA(props: Props) {
     );
 }
 
-export default YBXA;
+export function LR(props: Props) {
+    const {
+        onTouch,
+        size,
+    } = props;
+    return (
+        <Container size={size}>
+            <ButtonX
+                onTouchStart={(e: React.TouchEvent) => onTouch(e,'down',2) }
+                onTouchEnd={(e: React.TouchEvent) => onTouch(e,'up',2) }
+            >
+                Right 
+            </ButtonX>
+            <ButtonA
+                onTouchStart={(e: React.TouchEvent) => onTouch(e,'down',0) }
+                onTouchEnd={(e: React.TouchEvent) => onTouch(e,'up',0) }
+            >
+                Left
+            </ButtonA>
+        </Container>
+    );
+}
