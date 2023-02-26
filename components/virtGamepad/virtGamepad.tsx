@@ -92,21 +92,16 @@ export const ButtonGroupRight = (param: ButtonGroupProps) => {
             <WrapperDrag>
                 <RightFuncButton
                     Touch={(index,type) => param.ButtonCallback(index,type)}
-                >
+                />
 
-                </RightFuncButton>
                 <YBXA
                     size={50}
-                    onTouch={(e: React.TouchEvent,type,index) => {
-                        param.ButtonCallback(index,type)
-                    }}
+                    onTouch={(e: React.TouchEvent,type,index) => param.ButtonCallback(index,type)}
                 ></YBXA>
 
-                <JoyStick moveCallback={async (x:number,y:number) => {
-                        param.AxisCallback(x,y,'right')
-                        return;
-                    }} draggable={param.draggable}>
-                </JoyStick> 
+                <JoyStick 
+                    moveCallback={(x:number,y:number) => param.AxisCallback(x,y,'right')} 
+                    draggable={param.draggable}/>
 
             </WrapperDrag>
         </Draggable>
@@ -151,22 +146,19 @@ export const ButtonGroupLeft = (param: ButtonGroupProps) => {
             <WrapperDrag>
                 <LeftFuncButton
                     Touch={(index,type) => param.ButtonCallback(index,type)}
-                >
+                />
 
-                </LeftFuncButton>
                 <DPad
                     size={50}
                     onTouch={(e: React.TouchEvent,type,index) => {
                         param.ButtonCallback(index,type)
                     }}
-                >
-                </DPad>
+                />
 
                 <JoyStick moveCallback={async (x:number,y:number) => {
                         param.AxisCallback(x,y,'left')
                         return;
-                    }} draggable={param.draggable}>
-                </JoyStick>
+                    }} draggable={param.draggable}/>
 
             </WrapperDrag>
         </Draggable>
@@ -186,12 +178,12 @@ export const VirtualGamepad = (param: {
                         AxisCallback={param.AxisCallback} 
                         ButtonCallback={param.ButtonCallback} 
                         draggable={param.draggable}
-                    > </ButtonGroupLeft>
+                    />
                     <ButtonGroupRight  
                         AxisCallback={param.AxisCallback} 
                         ButtonCallback={param.ButtonCallback} 
                         draggable={param.draggable}
-                    > </ButtonGroupRight>
+                    /> 
                 </div>
             ) : null}
         </div>

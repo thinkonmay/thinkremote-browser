@@ -91,22 +91,31 @@ export const WebRTCControl = (input: { client: WebRTCClient, platform: Platform}
 
 
 
+    let Afilter = 0;
 	const GamepadACallback = async (x: number, y: number,type: 'left' | 'right') => {
-		input.client?.hid?.VirtualGamepadAxis(x,y,type);
+        if (Afilter == 1) {
+		    input.client?.hid?.VirtualGamepadAxis(x,y,type);
+            Afilter = 0;
+        }
+
+        Afilter++;
 	}
+
 	const GamepadBCallback = async (index: number,type: 'up' | 'down') => {
 		input.client?.hid?.VirtualGamepadButtonSlider(type == 'down',index);
 	}
 
     let filter = 0;
 	const MouseJTcallback = async (x: number, y: number) => { // translate cordinate
-        if (filter == 20) {
+        if (filter == 70) {
+            input.client?.hid?.mouseMoveRel({movementX:x*10,movementY:y*10});
             filter = 0;
-            return;
         }
-        input.client?.hid?.mouseMoveRel({movementX:x*5,movementY:y*5});
+
         filter++;
 	}
+
+
 	const MouseBTcallback = async (index: number,type: 'up' | 'down' ) => {
 		type == 'down' ? input.client?.hid?.MouseButtonDown({button: index}) : input.client?.hid?.MouseButtonUp({button: index})
 	}
@@ -138,14 +147,12 @@ export const WebRTCControl = (input: { client: WebRTCClient, platform: Platform}
             <VirtualMouse
                 MouseMoveCallback={MouseJTcallback} 
                 MouseButtonCallback={MouseBTcallback} 
-                draggable={enableVMouse}>
-            </VirtualMouse> 
+                draggable={enableVMouse}/>
 
             <VirtualGamepad 
                 ButtonCallback={GamepadBCallback} 
                 AxisCallback={GamepadACallback} 
-                draggable={enableVGamepad}>
-            </VirtualGamepad> 
+                draggable={enableVGamepad}/>
         </div>
     );
 };
