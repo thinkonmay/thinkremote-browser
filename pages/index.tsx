@@ -28,6 +28,8 @@ import Button from "@mui/material/Button";
 import { WebRTCControl } from "../components/control/control";
 import { VirtualGamepad } from "../components/virtGamepad/virtGamepad";
 import { getPlatform, Platform } from "webrtc-streaming-core/dist/utils/platform";
+import { Analytics } from '@vercel/analytics/react';
+
 
 type Props = { host: string | null };
 export const getServerSideProps: GetServerSideProps<Props> = async (
@@ -122,6 +124,8 @@ const Home = ({ host }) => {
     return (
         <Body >
             <GoogleAnalytics trackPageViews />
+            <Analytics />
+
             <Head>
                 <title>WebRTC remote viewer</title>
                 <meta
