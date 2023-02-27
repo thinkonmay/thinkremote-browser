@@ -54,7 +54,7 @@ interface ButtonGroupProps {
         y: number,
         type: "left" | "right"
     ) => Promise<void>;
-    ButtonCallback: (index: number, type: "press" | "release") => Promise<void>;
+    ButtonCallback: (index: number, type: "up" | "down") => Promise<void>;
 }
 export const ButtonGroupRight = (param: ButtonGroupProps) => {
     const [posBtn, setPosBtn] = useState({ x: 0, y: 0 });
@@ -186,7 +186,7 @@ export const VirtualGamepad = (param: {
         y: number,
         type: "left" | "right"
     ) => Promise<void>;
-    ButtonCallback: (index: number, type: "press" | "release") => Promise<void>;
+    ButtonCallback: (index: number, type: "up" | "down") => Promise<void>;
 }) => {
     return (
         <div>
@@ -245,11 +245,13 @@ const StartBtn = styled(CssDefaultCenterBtn)`
 
 const JoyStickRight = styled(JoyStick)`
     position: absolute;
+    opacity: 0.3;
     bottom: 10%;
     right: 50%;
 `;
 const JoyStickLeft = styled(JoyStick)`
     position: absolute;
+    opacity: 0.3;
     top: 50%;
     right: 50%;
 `;

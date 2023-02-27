@@ -66,14 +66,14 @@ const DPad = (props: Props) => {
                 <DPadBottom></DPadBottom>
             </Bottom>
             <Right
-                onTouchStart={(e: React.TouchEvent) => onTouch(e, "down", 14)}
-                onTouchEnd={(e: React.TouchEvent) => onTouch(e, "up", 14)}
+                onTouchStart={(e: React.TouchEvent) => onTouch(e, "down", 15)}
+                onTouchEnd={(e: React.TouchEvent) => onTouch(e, "up", 15)}
             >
                 <DPadRight></DPadRight>
             </Right>
             <Left
-                onTouchStart={(e: React.TouchEvent) => onTouch(e, "down", 15)}
-                onTouchEnd={(e: React.TouchEvent) => onTouch(e, "up", 15)}
+                onTouchStart={(e: React.TouchEvent) => onTouch(e, "down", 14)}
+                onTouchEnd={(e: React.TouchEvent) => onTouch(e, "up", 14)}
             >
                 <DPadLeft></DPadLeft>
             </Left>

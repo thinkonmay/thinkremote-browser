@@ -1,4 +1,7 @@
-import { Fullscreen } from "@mui/icons-material";
+import { Fullscreen  } from "@mui/icons-material";
+import SportsEsportsOutlinedIcon from '@mui/icons-material/SportsEsportsOutlined';
+import MouseOutlinedIcon from '@mui/icons-material/MouseOutlined';
+import VideoSettingsOutlinedIcon from '@mui/icons-material/VideoSettingsOutlined';
 import { List, SpeedDial, SpeedDialAction } from "@mui/material";
 import React, { useEffect, useState } from "react"; // we need this to make JSX compile
 import { WebRTCClient } from "webrtc-streaming-core";
@@ -10,10 +13,6 @@ import { VirtualMouse } from "../virtMouse/virtMouse";
 
 export type ButtonMode = "static" | "draggable" | "disable";
 
-function isFullscreen(): boolean {
-    return document.fullscreenElement != null;
-}
-
 export const WebRTCControl = (input: { client: WebRTCClient, platform: Platform}) => {
     const [enableVGamepad, setenableVGamepad] = useState<ButtonMode>("disable");
     const [enableVMouse, setenableVMouse] = useState<ButtonMode>("disable");
@@ -23,7 +22,7 @@ export const WebRTCControl = (input: { client: WebRTCClient, platform: Platform}
         console.log(`configuring menu on ${input.platform}`)
         if (input.platform == 'mobile') {
             setactions([{
-                icon: <Fullscreen />,
+                icon: <VideoSettingsOutlinedIcon />,
                 name: "Bitrate",
                 action: async () => {
                     let bitrate = await AskSelectBitrate();
@@ -35,41 +34,47 @@ export const WebRTCControl = (input: { client: WebRTCClient, platform: Platform}
                 },
             },
             {
-                icon: <Fullscreen />,
+                icon: <SportsEsportsOutlinedIcon />,
                 name: "Edit VGamepad",
                 action: async () => {
-                    setenableVGamepad((prev) => {
+                    setenableVGamepad((prev) => { try { 
                         switch (prev) {
                             case "disable":
+                                    input.client.hid.disableMouse = true; 
+                                    input.client.hid.disableTouch(true);
                                 return "draggable";
                             case "draggable":
                                 return "static";
                             case "static":
+                                    input.client.hid.disableMouse = false; 
+                                    input.client.hid.disableTouch(false);
                                 return "disable";
-                        }
-                    });
+                        } } catch {} });
                 },
             }, {
-                icon: <Fullscreen />,
+                icon: <MouseOutlinedIcon />,
                 name: "Enable VMouse",
                 action: async () => {
-                    setenableVMouse((prev) => {
+                    setenableVMouse((prev) => { try { 
                         switch (prev) {
                             case "disable":
-                                try { input.client.hid.disableMouse = true; } catch {}
+                                input.client.hid.disableMouse = true; 
+                                input.client.hid.disableTouch(true);
                                 return "draggable";
                             case "draggable":
                                 return "static";
                             case "static":
-                                try { input.client.hid.disableMouse = false; } catch {}
+                                input.client.hid.disableMouse = false; 
+                                input.client.hid.disableTouch(false);
                                 return "disable";
-                        }
+                            }
+                        } catch {}
                     });
                 },
             } ])
         } else {
             setactions([{
-                icon: <Fullscreen />,
+                icon: <VideoSettingsOutlinedIcon />,
                 name: "Bitrate",
                 action: async () => {
                     let bitrate = await AskSelectBitrate();

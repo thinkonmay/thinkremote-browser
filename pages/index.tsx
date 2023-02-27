@@ -111,11 +111,11 @@ const Home = ({ host }) => {
     useEffect(() => {
         setplatform(getPlatform())
         setClient(new WebRTCClient( signalingURL, remoteVideo.current, remoteAudio.current, signalingToken, selectDevice, getPlatform()).Notifier((message: EventMessage) => {
+            console.log(message);
+            TurnOnStatus(message);
             if(message == 'WebRTCConnectionClosed') {
               location.reload();
             }
-            console.log(message);
-            TurnOnStatus(message);
         }))
     }, []);
 
@@ -158,7 +158,6 @@ const Home = ({ host }) => {
                 controls
                 style={{ zIndex: -5, opacity: 0 }}
             ></audio>
-            <VirtualGamepad draggable={'draggable'}></VirtualGamepad>
         </Body>
     );
 };
@@ -182,7 +181,7 @@ const Body = styled.div`
     margin: 0;
     border: 0;
     overflow: hidden;
-    /* background-color: black; */
+    background-color: black; 
 `;
 const App = styled.div`
     touch-action: none;

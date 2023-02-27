@@ -59,36 +59,28 @@ export function YBXA(props: Props) {
         <Wrapper className={className}>
             <Container size={size}>
                 <ButtonY
-                    onTouchStart={(e: React.TouchEvent) =>
-                        onTouch(e, "down", 3)
-                    }
+                    onTouchStart={(e: React.TouchEvent) => onTouch(e, "down", 3) }
                     onTouchEnd={(e: React.TouchEvent) => onTouch(e, "up", 3)}
                 >
                     Y
                 </ButtonY>
                 <ButtonB
-                    onTouchStart={(e: React.TouchEvent) =>
-                        onTouch(e, "down", 1)
-                    }
-                    onTouchEnd={(e: React.TouchEvent) => onTouch(e, "up", 1)}
-                >
-                    B
-                </ButtonB>
-                <ButtonX
-                    onTouchStart={(e: React.TouchEvent) =>
-                        onTouch(e, "down", 2)
-                    }
-                    onTouchEnd={(e: React.TouchEvent) => onTouch(e, "up", 2)}
-                >
-                    X
-                </ButtonX>
-                <ButtonA
-                    onTouchStart={(e: React.TouchEvent) =>
-                        onTouch(e, "down", 0)
-                    }
+                    onTouchStart={(e: React.TouchEvent) => onTouch(e, "down", 0) }
                     onTouchEnd={(e: React.TouchEvent) => onTouch(e, "up", 0)}
                 >
                     A
+                </ButtonB>
+                <ButtonX
+                    onTouchStart={(e: React.TouchEvent) => onTouch(e, "down", 1) }
+                    onTouchEnd={(e: React.TouchEvent) => onTouch(e, "up", 1)}
+                >
+                    B
+                </ButtonX>
+                <ButtonA
+                    onTouchStart={(e: React.TouchEvent) => onTouch(e, "down", 2) }
+                    onTouchEnd={(e: React.TouchEvent) => onTouch(e, "up", 2)}
+                >
+                    X
                 </ButtonA>
             </Container>
         </Wrapper>
