@@ -154,22 +154,33 @@ const Home = ({ host }) => {
                 onKeyUp=     {(e :KeyboardEvent) => {e.preventDefault()}}
                 onKeyDown=   {(e :KeyboardEvent) => {e.preventDefault()}}
             >
-                <WebRTCControl platform={platform} client={client} 
-                    toggle_mouse_touch_callback={(enable: boolean) => { try {
+                <WebRTCControl platform={platform} client={client}
+                toggle_mouse_touch_callback={(enable: boolean) => { try {
                         if (client == null) {
                             console.log(`client is not ready yet`);
+                            return;
                         }
                         client.hid.disableTouch(!enable);
                         client.hid.disableMouse = !enable;
-                    }catch {} }}
+                    } catch { }
+                } }
 
-                    bitrate_callback={(bitrate: number) => { try {
+                bitrate_callback={(bitrate: number) => { try {
                         if (client == null) {
                             console.log(`client is not ready yet`);
+                            return;
                         }
-                        client.ChangeBitrate(bitrate)
-                    } catch {} } }
-                ></WebRTCControl>
+                        client.ChangeBitrate(bitrate);
+                    } catch { }
+                } } GamepadACallback={async function(x: number, y: number, type: "left" | "right"): Promise<void> {
+                    client?.hid?.VirtualGamepadAxis(x,y,type);
+                } } GamepadBCallback={async function(index: number, type: "up" | "down"): Promise<void> {
+                    client?.hid?.VirtualGamepadButtonSlider(type == 'down',index);
+                } } MouseMoveCallback={async function (x: number, y: number): Promise<void> {
+                    client?.hid?.mouseMoveRel({movementX:x*10,movementY:y*10});
+                } } MouseButtonCallback={async function (index: number, type: "up" | "down"): Promise<void> {
+                    type == 'down' ? client?.hid?.MouseButtonDown({button: index}) : client?.hid?.MouseButtonUp({button: index})
+                } }                ></WebRTCControl>
             </App>
             <audio
                 ref={remoteAudio}

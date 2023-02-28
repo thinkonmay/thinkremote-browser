@@ -14,7 +14,11 @@ import { VirtualMouse } from "../virtMouse/virtMouse";
 export type ButtonMode = "static" | "draggable" | "disable";
 
 export const WebRTCControl = (input: { 
-        client: WebRTCClient,
+	    GamepadACallback: (x: number, y: number,type: 'left' | 'right') => Promise<void>,
+	    GamepadBCallback: (index: number,type: 'up' | 'down') => Promise<void>,
+        MouseMoveCallback: (x: number, y: number) => Promise<void>,
+        MouseButtonCallback: (index: number,type: 'up' | 'down' ) => Promise<void>,
+
         bitrate_callback: (bitrate: number) => void, 
         toggle_mouse_touch_callback: (enable: boolean) => void, platform: Platform}) => {
     const [enableVGamepad, setenableVGamepad] = useState<ButtonMode>("disable");
@@ -105,33 +109,16 @@ export const WebRTCControl = (input: {
 
 
 
-    let Afilter = 0;
-	const GamepadACallback = async (x: number, y: number,type: 'left' | 'right') => {
-        if (Afilter == 1) {
-		    input.client?.hid?.VirtualGamepadAxis(x,y,type);
-            Afilter = 0;
-        }
-
-        Afilter++;
-	}
-
-	const GamepadBCallback = async (index: number,type: 'up' | 'down') => {
-		input.client?.hid?.VirtualGamepadButtonSlider(type == 'down',index);
-	}
-
     let filter = 0;
 	const MouseJTcallback = async (x: number, y: number) => { // translate cordinate
         if (filter == 30) {
-            input.client?.hid?.mouseMoveRel({movementX:x*10,movementY:y*10});
+            input.MouseMoveCallback(x*10,y*10);
             filter = 0;
         }
-
         filter++;
 	}
 
-	const MouseBTcallback = async (index: number,type: 'up' | 'down' ) => {
-		type == 'down' ? input.client?.hid?.MouseButtonDown({button: index}) : input.client?.hid?.MouseButtonUp({button: index})
-	}
+
 
     return (
         <div>
@@ -159,12 +146,12 @@ export const WebRTCControl = (input: {
 
             <VirtualMouse
                 MouseMoveCallback={MouseJTcallback} 
-                MouseButtonCallback={MouseBTcallback} 
+                MouseButtonCallback={input.MouseButtonCallback} 
                 draggable={enableVMouse}/>
 
             <VirtualGamepad 
-                ButtonCallback={GamepadBCallback} 
-                AxisCallback={GamepadACallback} 
+                ButtonCallback={input.GamepadBCallback} 
+                AxisCallback={input.GamepadACallback} 
                 draggable={enableVGamepad}/>
         </div>
     );
