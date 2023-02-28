@@ -154,12 +154,22 @@ const Home = ({ host }) => {
                 onKeyUp=     {(e :KeyboardEvent) => {e.preventDefault()}}
                 onKeyDown=   {(e :KeyboardEvent) => {e.preventDefault()}}
             >
-                <WebRTCControl platform={platform} client={client} bitrate_callback={(bitrate: number) => {
-                    if (client == null) {
-                        console.log(`client is not ready yet`);
-                    }
-                    client.ChangeBitrate(bitrate)
-                }}></WebRTCControl>
+                <WebRTCControl platform={platform} client={client} 
+                    toggle_mouse_touch_callback={(enable: boolean) => { try {
+                        if (client == null) {
+                            console.log(`client is not ready yet`);
+                        }
+                        client.hid.disableTouch(!enable);
+                        client.hid.disableMouse = !enable;
+                    }catch {} }}
+
+                    bitrate_callback={(bitrate: number) => { try {
+                        if (client == null) {
+                            console.log(`client is not ready yet`);
+                        }
+                        client.ChangeBitrate(bitrate)
+                    } catch {} } }
+                ></WebRTCControl>
             </App>
             <audio
                 ref={remoteAudio}
