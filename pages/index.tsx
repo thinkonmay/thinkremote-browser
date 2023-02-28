@@ -109,16 +109,16 @@ const Home = ({ host }) => {
     }
 
     const [platform,setplatform] = useState<Platform>('desktop');
-    const [client,setClient] = useState<WebRTCClient>(null);
+    let client :WebRTCClient = null;
     useEffect(() => {
         setplatform(getPlatform())
-        setClient(new WebRTCClient( signalingURL, remoteVideo.current, remoteAudio.current, signalingToken, selectDevice, getPlatform()).Notifier((message: EventMessage) => {
+        client = new WebRTCClient( signalingURL, remoteVideo.current, remoteAudio.current, signalingToken, selectDevice, getPlatform()).Notifier((message: EventMessage) => {
             console.log(message);
             TurnOnStatus(message);
             if(message == 'WebRTCConnectionClosed') {
               location.reload();
             }
-        }))
+        })
     }, []);
 
     return (
