@@ -165,7 +165,7 @@ const Home = ({ host }) => {
                 } } GamepadBCallback={async function(index: number, type: "up" | "down"): Promise<void> {
                     client?.hid?.VirtualGamepadButtonSlider(type == 'down',index);
                 } } MouseMoveCallback={async function (x: number, y: number): Promise<void> {
-                    client?.hid?.mouseMoveRel({movementX:x*10,movementY:y*10});
+                    client?.hid?.mouseMoveRel({movementX:x,movementY:y});
                 } } MouseButtonCallback={async function (index: number, type: "up" | "down"): Promise<void> {
                     type == 'down' ? client?.hid?.MouseButtonDown({button: index}) : client?.hid?.MouseButtonUp({button: index})
                 } }                ></WebRTCControl>
