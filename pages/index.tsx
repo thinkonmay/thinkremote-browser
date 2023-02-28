@@ -109,17 +109,39 @@ const Home = ({ host }) => {
     }
 
     const [platform,setplatform] = useState<Platform>('desktop');
-    let client :WebRTCClient = null;
+    const [client,setclient] = useState<WebRTCClient>(null); //always useState for WebRTCClient, trust me
     useEffect(() => {
         setplatform(getPlatform())
-        client = new WebRTCClient( signalingURL, remoteVideo.current, remoteAudio.current, signalingToken, selectDevice, getPlatform()).Notifier((message: EventMessage) => {
+        setclient(new WebRTCClient( signalingURL, remoteVideo.current, remoteAudio.current, signalingToken, selectDevice, getPlatform())
+        .Notifier((message: EventMessage) => {
             console.log(message);
             TurnOnStatus(message);
             if(message == 'WebRTCConnectionClosed') {
               location.reload();
             }
-        })
+        }))
     }, []);
+        
+    const toggle_mouse_touch_callback=(enable: boolean) => { 
+        client?.hid.disableTouch(!enable);
+        client != null ? client.hid != null ? client.hid.disableMouse = !enable : null : null;
+    } 
+    const bitrate_callback=(bitrate: number) => { 
+        client?.ChangeBitrate(bitrate);
+    } 
+    const GamepadACallback=async function(x: number, y: number, type: "left" | "right"): Promise<void> {
+        client?.hid?.VirtualGamepadAxis(x,y,type);
+    } 
+    const GamepadBCallback=async function(index: number, type: "up" | "down"): Promise<void> {
+        client?.hid?.VirtualGamepadButtonSlider(type == 'down',index);
+    }  
+    const MouseMoveCallback=async function (x: number, y: number): Promise<void> {
+        console.log(x);
+        client?.hid?.mouseMoveRel({movementX:x,movementY:y});
+    } 
+    const MouseButtonCallback=async function (index: number, type: "up" | "down"): Promise<void> {
+        type == 'down' ? client?.hid?.MouseButtonDown({button: index}) : client?.hid?.MouseButtonUp({button: index})
+    } 
 
     return (
         <Body >
@@ -155,20 +177,13 @@ const Home = ({ host }) => {
                 onKeyDown=   {(e :KeyboardEvent) => {e.preventDefault()}}
             >
                 <WebRTCControl platform={platform} 
-                toggle_mouse_touch_callback={(enable: boolean) => { 
-                    client?.hid.disableTouch(!enable);
-                    client != null ? client.hid != null ? client.hid.disableMouse = !enable : null : null;
-                } } bitrate_callback={(bitrate: number) => { 
-                    client?.ChangeBitrate(bitrate);
-                } } GamepadACallback={async function(x: number, y: number, type: "left" | "right"): Promise<void> {
-                    client?.hid?.VirtualGamepadAxis(x,y,type);
-                } } GamepadBCallback={async function(index: number, type: "up" | "down"): Promise<void> {
-                    client?.hid?.VirtualGamepadButtonSlider(type == 'down',index);
-                } } MouseMoveCallback={async function (x: number, y: number): Promise<void> {
-                    client?.hid?.mouseMoveRel({movementX:x,movementY:y});
-                } } MouseButtonCallback={async function (index: number, type: "up" | "down"): Promise<void> {
-                    type == 'down' ? client?.hid?.MouseButtonDown({button: index}) : client?.hid?.MouseButtonUp({button: index})
-                } }                ></WebRTCControl>
+                toggle_mouse_touch_callback={toggle_mouse_touch_callback}
+                bitrate_callback={bitrate_callback}
+                GamepadACallback={GamepadACallback}
+                GamepadBCallback={GamepadBCallback}
+                MouseMoveCallback={MouseMoveCallback}
+                MouseButtonCallback={MouseButtonCallback}
+                ></WebRTCControl>
             </App>
             <audio
                 ref={remoteAudio}
