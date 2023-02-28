@@ -157,7 +157,7 @@ const Home = ({ host }) => {
                 <WebRTCControl platform={platform} 
                 toggle_mouse_touch_callback={(enable: boolean) => { 
                     client?.hid.disableTouch(!enable);
-                    client.hid.disableMouse = !enable;
+                    client != null ? client.hid != null ? client.hid.disableMouse = !enable : null : null;
                 } } bitrate_callback={(bitrate: number) => { 
                     client?.ChangeBitrate(bitrate);
                 } } GamepadACallback={async function(x: number, y: number, type: "left" | "right"): Promise<void> {

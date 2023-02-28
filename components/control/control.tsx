@@ -20,7 +20,8 @@ export const WebRTCControl = (input: {
         MouseButtonCallback: (index: number,type: 'up' | 'down' ) => Promise<void>,
 
         bitrate_callback: (bitrate: number) => void, 
-        toggle_mouse_touch_callback: (enable: boolean) => void, platform: Platform}) => {
+        toggle_mouse_touch_callback: (enable: boolean) => void, 
+        platform: Platform}) => {
     const [enableVGamepad, setenableVGamepad] = useState<ButtonMode>("disable");
     const [enableVMouse, setenableVMouse] = useState<ButtonMode>("disable");
     const [actions,setactions] = useState<any[]>([]);
