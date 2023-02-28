@@ -154,7 +154,12 @@ const Home = ({ host }) => {
                 onKeyUp=     {(e :KeyboardEvent) => {e.preventDefault()}}
                 onKeyDown=   {(e :KeyboardEvent) => {e.preventDefault()}}
             >
-                <WebRTCControl platform={platform} client={client}></WebRTCControl>
+                <WebRTCControl platform={platform} client={client} bitrate_callback={(bitrate: number) => {
+                    if (client == null) {
+                        console.log(`client is not ready yet`);
+                    }
+                    client.ChangeBitrate(bitrate)
+                }}></WebRTCControl>
             </App>
             <audio
                 ref={remoteAudio}

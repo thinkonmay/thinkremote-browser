@@ -13,7 +13,7 @@ import { VirtualMouse } from "../virtMouse/virtMouse";
 
 export type ButtonMode = "static" | "draggable" | "disable";
 
-export const WebRTCControl = (input: { client: WebRTCClient, platform: Platform}) => {
+export const WebRTCControl = (input: { bitrate_callback: (bitrate: number) => void, client: WebRTCClient, platform: Platform}) => {
     const [enableVGamepad, setenableVGamepad] = useState<ButtonMode>("disable");
     const [enableVMouse, setenableVMouse] = useState<ButtonMode>("disable");
     const [actions,setactions] = useState<any[]>([]);
@@ -30,7 +30,7 @@ export const WebRTCControl = (input: { client: WebRTCClient, platform: Platform}
                         return;
                     }
                     console.log(`bitrate is change to ${bitrate}`);
-                    input.client.ChangeBitrate(bitrate);
+                    input.bitrate_callback(bitrate);
                 } catch {}},
             },
             {
@@ -82,7 +82,7 @@ export const WebRTCControl = (input: { client: WebRTCClient, platform: Platform}
                         return;
                     }
                     console.log(`bitrate is change to ${bitrate}`);
-                    input.client.ChangeBitrate(bitrate);
+                    input.bitrate_callback(bitrate);
                 } catch {}},
             },
             {
