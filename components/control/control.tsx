@@ -24,14 +24,14 @@ export const WebRTCControl = (input: { client: WebRTCClient, platform: Platform}
             setactions([{
                 icon: <VideoSettingsOutlinedIcon />,
                 name: "Bitrate",
-                action: async () => {
+                action: async () => { try {
                     let bitrate = await AskSelectBitrate();
-                    if (bitrate < 500 || input.client == null) {
+                    if (bitrate < 500) {
                         return;
                     }
                     console.log(`bitrate is change to ${bitrate}`);
-                    input.client?.ChangeBitrate(bitrate);
-                },
+                    input.client.ChangeBitrate(bitrate);
+                } catch {}},
             },
             {
                 icon: <SportsEsportsOutlinedIcon />,
@@ -76,14 +76,14 @@ export const WebRTCControl = (input: { client: WebRTCClient, platform: Platform}
             setactions([{
                 icon: <VideoSettingsOutlinedIcon />,
                 name: "Bitrate",
-                action: async () => {
+                action: async () => { try {
                     let bitrate = await AskSelectBitrate();
-                    if (bitrate < 500 || input.client == null) {
+                    if (bitrate < 500) {
                         return;
                     }
                     console.log(`bitrate is change to ${bitrate}`);
-                    input.client?.ChangeBitrate(bitrate);
-                },
+                    input.client.ChangeBitrate(bitrate);
+                } catch {}},
             },
             {
                 icon: <Fullscreen />,
