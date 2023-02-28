@@ -154,7 +154,7 @@ const Home = ({ host }) => {
                 onKeyUp=     {(e :KeyboardEvent) => {e.preventDefault()}}
                 onKeyDown=   {(e :KeyboardEvent) => {e.preventDefault()}}
             >
-                <WebRTCControl platform={platform} client={client}
+                <WebRTCControl platform={platform} 
                 toggle_mouse_touch_callback={(enable: boolean) => { try {
                         if (client == null) {
                             console.log(`client is not ready yet`);
