@@ -13,7 +13,15 @@ import { VirtualMouse } from "../virtMouse/virtMouse";
 
 export type ButtonMode = "static" | "draggable" | "disable";
 
-export const WebRTCControl = (input: { client: WebRTCClient, platform: Platform}) => {
+export const WebRTCControl = (input: { 
+	    GamepadACallback: (x: number, y: number,type: 'left' | 'right') => Promise<void>,
+	    GamepadBCallback: (index: number,type: 'up' | 'down') => Promise<void>,
+        MouseMoveCallback: (x: number, y: number) => Promise<void>,
+        MouseButtonCallback: (index: number,type: 'up' | 'down' ) => Promise<void>,
+
+        bitrate_callback: (bitrate: number) => void, 
+        toggle_mouse_touch_callback: (enable: boolean) => void, 
+        platform: Platform}) => {
     const [enableVGamepad, setenableVGamepad] = useState<ButtonMode>("disable");
     const [enableVMouse, setenableVMouse] = useState<ButtonMode>("disable");
     const [actions,setactions] = useState<any[]>([]);
@@ -24,51 +32,46 @@ export const WebRTCControl = (input: { client: WebRTCClient, platform: Platform}
             setactions([{
                 icon: <VideoSettingsOutlinedIcon />,
                 name: "Bitrate",
-                action: async () => {
+                action: async () => { 
                     let bitrate = await AskSelectBitrate();
-                    if (bitrate < 500 || input.client == null) {
+                    if (bitrate < 500) {
                         return;
                     }
                     console.log(`bitrate is change to ${bitrate}`);
-                    input.client?.ChangeBitrate(bitrate);
+                    input.bitrate_callback(bitrate);
                 },
             },
             {
                 icon: <SportsEsportsOutlinedIcon />,
                 name: "Edit VGamepad",
                 action: async () => {
-                    setenableVGamepad((prev) => { try { 
+                    setenableVGamepad((prev) => { 
                         switch (prev) {
                             case "disable":
-                                    input.client.hid.disableMouse = true; 
-                                    input.client.hid.disableTouch(true);
+                                input.toggle_mouse_touch_callback(false);
                                 return "draggable";
                             case "draggable":
                                 return "static";
                             case "static":
-                                    input.client.hid.disableMouse = false; 
-                                    input.client.hid.disableTouch(false);
+                                input.toggle_mouse_touch_callback(true);
                                 return "disable";
-                        } } catch {} });
+                        } });
                 },
             }, {
                 icon: <MouseOutlinedIcon />,
                 name: "Enable VMouse",
                 action: async () => {
-                    setenableVMouse((prev) => { try { 
+                    setenableVMouse((prev) => { 
                         switch (prev) {
                             case "disable":
-                                input.client.hid.disableMouse = true; 
-                                input.client.hid.disableTouch(true);
+                                input.toggle_mouse_touch_callback(false);
                                 return "draggable";
                             case "draggable":
                                 return "static";
                             case "static":
-                                input.client.hid.disableMouse = false; 
-                                input.client.hid.disableTouch(false);
+                                input.toggle_mouse_touch_callback(true);
                                 return "disable";
                             }
-                        } catch {}
                     });
                 },
             } ])
@@ -76,14 +79,14 @@ export const WebRTCControl = (input: { client: WebRTCClient, platform: Platform}
             setactions([{
                 icon: <VideoSettingsOutlinedIcon />,
                 name: "Bitrate",
-                action: async () => {
+                action: async () => { try {
                     let bitrate = await AskSelectBitrate();
-                    if (bitrate < 500 || input.client == null) {
+                    if (bitrate < 500) {
                         return;
                     }
                     console.log(`bitrate is change to ${bitrate}`);
-                    input.client?.ChangeBitrate(bitrate);
-                },
+                    input.bitrate_callback(bitrate);
+                } catch {}},
             },
             {
                 icon: <Fullscreen />,
@@ -107,34 +110,16 @@ export const WebRTCControl = (input: { client: WebRTCClient, platform: Platform}
 
 
 
-    let Afilter = 0;
-	const GamepadACallback = async (x: number, y: number,type: 'left' | 'right') => {
-        if (Afilter == 1) {
-		    input.client?.hid?.VirtualGamepadAxis(x,y,type);
-            Afilter = 0;
-        }
-
-        Afilter++;
-	}
-
-	const GamepadBCallback = async (index: number,type: 'up' | 'down') => {
-		input.client?.hid?.VirtualGamepadButtonSlider(type == 'down',index);
-	}
-
     let filter = 0;
 	const MouseJTcallback = async (x: number, y: number) => { // translate cordinate
         if (filter == 30) {
-            input.client?.hid?.mouseMoveRel({movementX:x*10,movementY:y*10});
+            input.MouseMoveCallback(x*10,y*10);
             filter = 0;
         }
-
         filter++;
 	}
 
 
-	const MouseBTcallback = async (index: number,type: 'up' | 'down' ) => {
-		type == 'down' ? input.client?.hid?.MouseButtonDown({button: index}) : input.client?.hid?.MouseButtonUp({button: index})
-	}
 
     return (
         <div>
@@ -162,12 +147,12 @@ export const WebRTCControl = (input: { client: WebRTCClient, platform: Platform}
 
             <VirtualMouse
                 MouseMoveCallback={MouseJTcallback} 
-                MouseButtonCallback={MouseBTcallback} 
+                MouseButtonCallback={input.MouseButtonCallback} 
                 draggable={enableVMouse}/>
 
             <VirtualGamepad 
-                ButtonCallback={GamepadBCallback} 
-                AxisCallback={GamepadACallback} 
+                ButtonCallback={input.GamepadBCallback} 
+                AxisCallback={input.GamepadACallback} 
                 draggable={enableVGamepad}/>
         </div>
     );
