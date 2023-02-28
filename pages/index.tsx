@@ -155,23 +155,11 @@ const Home = ({ host }) => {
                 onKeyDown=   {(e :KeyboardEvent) => {e.preventDefault()}}
             >
                 <WebRTCControl platform={platform} 
-                toggle_mouse_touch_callback={(enable: boolean) => { try {
-                        if (client == null) {
-                            console.log(`client is not ready yet`);
-                            return;
-                        }
-                        client.hid.disableTouch(!enable);
-                        client.hid.disableMouse = !enable;
-                    } catch { }
-                } }
-
-                bitrate_callback={(bitrate: number) => { try {
-                        if (client == null) {
-                            console.log(`client is not ready yet`);
-                            return;
-                        }
-                        client.ChangeBitrate(bitrate);
-                    } catch { }
+                toggle_mouse_touch_callback={(enable: boolean) => { 
+                    client?.hid.disableTouch(!enable);
+                    client.hid.disableMouse = !enable;
+                } } bitrate_callback={(bitrate: number) => { 
+                    client?.ChangeBitrate(bitrate);
                 } } GamepadACallback={async function(x: number, y: number, type: "left" | "right"): Promise<void> {
                     client?.hid?.VirtualGamepadAxis(x,y,type);
                 } } GamepadBCallback={async function(index: number, type: "up" | "down"): Promise<void> {
