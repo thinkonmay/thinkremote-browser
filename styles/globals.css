@@ -9,6 +9,10 @@ body {
     font-size: 10px;
     font-family: Roboto, sans-serif; */
 }
+body > button {
+    color: #c3b5b5;
+    border: 1px solid #c3b5b5;
+}
 a {
     color: inherit;
     text-decoration: none;

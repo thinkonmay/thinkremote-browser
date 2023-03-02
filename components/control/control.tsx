@@ -3,6 +3,7 @@ import SportsEsportsOutlinedIcon from '@mui/icons-material/SportsEsportsOutlined
 import MouseOutlinedIcon from '@mui/icons-material/MouseOutlined';
 import VideoSettingsOutlinedIcon from '@mui/icons-material/VideoSettingsOutlined';
 import { List, SpeedDial, SpeedDialAction } from "@mui/material";
+import ListIcon from '@mui/icons-material/List';
 import React, { useEffect, useState } from "react"; // we need this to make JSX compile
 import { WebRTCClient } from "webrtc-streaming-core";
 import { getOS , Platform} from "webrtc-streaming-core/dist/utils/platform";
@@ -131,8 +132,9 @@ export const WebRTCControl = (input: {
                         position: "absolute",
                         bottom: 16,
                         right: 16,
+                        '& .MuiFab-primary': { backgroundColor: 'white', color: 'white' } 
                     }}
-                    icon={<List />}
+                    icon={<ListIcon sx={{color: 'black'}}/>}
                 >
                     {actions.map((action) => (
                         <SpeedDialAction

@@ -18,10 +18,10 @@ const DefaultButton = styled.button`
     :active {
         background-color: rgba(0, 0, 0, 0.05);
     }
-    border: 1px solid;
+    color: #C3B5B5;
+    border: 1px solid currentColor;
     border-radius: 50%;
     position: absolute;
-    color: black;
     background-color: transparent;
 `;
 
