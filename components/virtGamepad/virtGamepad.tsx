@@ -229,7 +229,8 @@ const CssDefaultCenterBtn = styled.button`
     height: 25px;
     outline: none;
     background-color: transparent;
-    border: 1px solid;
+    color: #C3B5B5;
+    border: 1px solid #C3B5B5;
     border-radius: 50%;
 `;
 const SelectBtn = styled(CssDefaultCenterBtn)`

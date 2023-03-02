@@ -123,8 +123,8 @@ const Home = ({ host }) => {
     }, []);
         
     const toggle_mouse_touch_callback=async function(enable: boolean) { 
-        client?.hid.disableTouch(!enable);
-        client != null ? client.hid != null ? client.hid.disableMouse = !enable : null : null;
+        client?.hid?.disableTouch(!enable);
+        // TODO
     } 
     const bitrate_callback=async function (bitrate: number) { 
         client?.ChangeBitrate(bitrate);
