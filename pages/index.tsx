@@ -42,7 +42,7 @@ const Home = ({ host }) => {
     const remoteAudio = useRef<HTMLAudioElement>(null);
 
     const router = useRouter();
-    const { signaling, token, fps, bitrate } = router.query;
+    const { signaling, token, fps, bitrate,platform } = router.query;
     const signalingURL = Buffer.from(
         (signaling
             ? signaling
@@ -53,6 +53,7 @@ const Home = ({ host }) => {
     var defaultBitrate = parseInt((bitrate ? bitrate : "6000") as string, 10);
     var defaultFramerate = parseInt((fps ? fps : "55") as string, 10);
     var defaultSoundcard = "Default Audio Render Device";
+    var defaultPlatform: Platform = platform == 'mobile' ? 'mobile' : (platform == 'desktop' ? 'desktop' : null);
     const selectDevice = async (offer: DeviceSelection) => {
         LogConnectionEvent( ConnectionEvent.WaitingAvailableDeviceSelection);
         let ret = new DeviceSelectionResult(
@@ -108,11 +109,15 @@ const Home = ({ host }) => {
         return ret;
     }
 
-    const [platform,setplatform] = useState<Platform>('desktop');
+    const [Platform,setPlatform] = useState<Platform>(null);
     const [client,setclient] = useState<WebRTCClient>(null); //always useState for WebRTCClient, trust me
     useEffect(() => {
-        setplatform(getPlatform())
-        setclient(new WebRTCClient( signalingURL, remoteVideo.current, remoteAudio.current, signalingToken, selectDevice, getPlatform())
+        let newplatform = defaultPlatform;
+        if (defaultPlatform == null) {
+            newplatform = getPlatform()
+        }
+        setPlatform(newplatform)
+        setclient(new WebRTCClient( signalingURL, remoteVideo.current, remoteAudio.current, signalingToken, selectDevice, newplatform)
         .Notifier((message: EventMessage) => {
             console.log(message);
             TurnOnStatus(message);
@@ -160,7 +165,7 @@ const Home = ({ host }) => {
                 <link rel="icon" href="/favicon.ico" />
             </Head>
 
-             <RemoteVideo
+            <RemoteVideo
                 ref={remoteVideo}
                 autoPlay
                 muted
@@ -175,7 +180,7 @@ const Home = ({ host }) => {
                 onKeyUp=     {(e :KeyboardEvent) => {e.preventDefault()}}
                 onKeyDown=   {(e :KeyboardEvent) => {e.preventDefault()}}
             >
-                <WebRTCControl platform={platform} 
+                <WebRTCControl platform={Platform} 
                 toggle_mouse_touch_callback={toggle_mouse_touch_callback}
                 bitrate_callback={bitrate_callback}
                 GamepadACallback={GamepadACallback}
