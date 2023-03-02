@@ -19,8 +19,8 @@ export const WebRTCControl = (input: {
         MouseMoveCallback: (x: number, y: number) => Promise<void>,
         MouseButtonCallback: (index: number,type: 'up' | 'down' ) => Promise<void>,
 
-        bitrate_callback: (bitrate: number) => void, 
-        toggle_mouse_touch_callback: (enable: boolean) => void, 
+        bitrate_callback: (bitrate: number) => Promise<void>, 
+        toggle_mouse_touch_callback: (enable: boolean) => Promise<void>, 
         platform: Platform}) => {
     const [enableVGamepad, setenableVGamepad] = useState<ButtonMode>("disable");
     const [enableVMouse, setenableVMouse] = useState<ButtonMode>("disable");
@@ -38,22 +38,21 @@ export const WebRTCControl = (input: {
                         return;
                     }
                     console.log(`bitrate is change to ${bitrate}`);
-                    input.bitrate_callback(bitrate);
+                    await input.bitrate_callback(bitrate); // don't touch async await here, you'll regret that
                 },
             },
             {
                 icon: <SportsEsportsOutlinedIcon />,
                 name: "Edit VGamepad",
                 action: async () => {
+                    await input.toggle_mouse_touch_callback(enableVGamepad != 'disable');
                     setenableVGamepad((prev) => { 
                         switch (prev) {
                             case "disable":
-                                input.toggle_mouse_touch_callback(false);
                                 return "draggable";
                             case "draggable":
                                 return "static";
                             case "static":
-                                input.toggle_mouse_touch_callback(true);
                                 return "disable";
                         } });
                 },
@@ -61,15 +60,14 @@ export const WebRTCControl = (input: {
                 icon: <MouseOutlinedIcon />,
                 name: "Enable VMouse",
                 action: async () => {
+                    await input.toggle_mouse_touch_callback(enableVMouse != "disable");
                     setenableVMouse((prev) => { 
                         switch (prev) {
                             case "disable":
-                                input.toggle_mouse_touch_callback(false);
                                 return "draggable";
                             case "draggable":
                                 return "static";
                             case "static":
-                                input.toggle_mouse_touch_callback(true);
                                 return "disable";
                             }
                     });
@@ -85,7 +83,7 @@ export const WebRTCControl = (input: {
                         return;
                     }
                     console.log(`bitrate is change to ${bitrate}`);
-                    input.bitrate_callback(bitrate);
+                    await input.bitrate_callback(bitrate);
                 } catch {}},
             },
             {

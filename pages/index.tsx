@@ -122,11 +122,11 @@ const Home = ({ host }) => {
         }))
     }, []);
         
-    const toggle_mouse_touch_callback=(enable: boolean) => { 
+    const toggle_mouse_touch_callback=async function(enable: boolean) { 
         client?.hid.disableTouch(!enable);
         client != null ? client.hid != null ? client.hid.disableMouse = !enable : null : null;
     } 
-    const bitrate_callback=(bitrate: number) => { 
+    const bitrate_callback=async function (bitrate: number) { 
         client?.ChangeBitrate(bitrate);
     } 
     const GamepadACallback=async function(x: number, y: number, type: "left" | "right"): Promise<void> {
@@ -136,7 +136,6 @@ const Home = ({ host }) => {
         client?.hid?.VirtualGamepadButtonSlider(type == 'down',index);
     }  
     const MouseMoveCallback=async function (x: number, y: number): Promise<void> {
-        console.log(x);
         client?.hid?.mouseMoveRel({movementX:x,movementY:y});
     } 
     const MouseButtonCallback=async function (index: number, type: "up" | "down"): Promise<void> {
