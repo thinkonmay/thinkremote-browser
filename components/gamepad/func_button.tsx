@@ -22,7 +22,7 @@ export const BumperBtn = styled.button`
     outline: none;
     width: 55px;
     height: 25px;
-    border: 2px solid;
+    border: 2px solid #C3B5B5;
     border-radius: 10px;
     background-color: transparent;
     :active {
@@ -33,7 +33,7 @@ export const TriggerBtn = styled.button`
     outline: none;
     width: 40px;
     height: 55px;
-    border: 2px solid;
+    border: 2px solid #C3B5B5;
     border-top-left-radius: 20px;
     border-top-right-radius: 20px;
     background-color: transparent;
