@@ -9,6 +9,7 @@ import { getOS , Platform} from "webrtc-streaming-core/dist/utils/platform";
 import { AskSelectBitrate } from "../popup/popup";
 import { VirtualGamepad } from "../virtGamepad/virtGamepad";
 import { VirtualMouse } from "../virtMouse/virtMouse";
+import { PayPalButtons, PayPalScriptProvider } from "@paypal/react-paypal-js";
 
 
 export type ButtonMode = "static" | "draggable" | "disable";
@@ -159,6 +160,47 @@ export const WebRTCControl = (input: { client: WebRTCClient, platform: Platform}
                     ))}
                 </SpeedDial>
             </div>
+
+            <PayPalScriptProvider options={{
+                "client-id": "AdxCRX7LxtFK0cPQMNwaK7k_0f3zo9ss582ggaFZyuWrsvxzf-KZ5EZMeJKnEcKNMj6pmi2TU_Oa5N5M",
+                // "data-client-token": "EJPWK-KL1eYYndvnq_3p4vby028oN8ICwWmWd-UvNyFq35_oZR257bUgaHGC8MVtzrUWd1gM4d_H2BsI",
+            }}>
+                <PayPalButtons
+                    createOrder={(data, actions) => {
+                        return actions.order.create({
+                            purchase_units: [
+                                {
+                                    amount: {
+                                        value: "0.99",
+                                    }
+                                }
+                            ]
+                        });
+                    }}
+                    onApprove={(data, actions) => {
+                        return actions.order.capture().then(function (details){
+                            alert("Transaction completed by" + details.payer.name.given_name)
+                        });
+                    }}
+                />
+           {/* <BraintreePayPalButtons
+                createOrder={(data, actions) => {
+                    return actions.braintree.createPayment({
+                        flow: "checkout",
+                        amount: "10.0",
+                        currency: "USD",
+                        intent: "capture",  
+                    });
+                }}
+                onApprove={(data, actions) => {
+                    return actions.braintree
+                        .tokenizePayment(data)
+                        .then((payload) => {
+                            // call server-side endpoint to finish the sale
+                        });
+                }}
+            /> */}
+        </PayPalScriptProvider>
 
             <VirtualMouse
                 MouseMoveCallback={MouseJTcallback} 

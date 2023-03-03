@@ -156,3 +156,9 @@ export async function AskSelectBitrate(): Promise<number> {
 
     return Number.parseInt(bitrate);
 }
+
+export async function AskPayment(): Promise<number> {
+    TurnOffStatus();
+    
+    return 10;
+}
