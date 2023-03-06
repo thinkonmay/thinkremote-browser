@@ -1,4 +1,4 @@
-import { Fullscreen  } from "@mui/icons-material";
+import { Fullscreen, Key  } from "@mui/icons-material";
 import SportsEsportsOutlinedIcon from '@mui/icons-material/SportsEsportsOutlined';
 import MouseOutlinedIcon from '@mui/icons-material/MouseOutlined';
 import VideoSettingsOutlinedIcon from '@mui/icons-material/VideoSettingsOutlined';
@@ -8,7 +8,7 @@ import ListIcon from '@mui/icons-material/List';
 import React, { useEffect, useState } from "react"; // we need this to make JSX compile
 import { WebRTCClient } from "webrtc-streaming-core";
 import { getOS , Platform} from "webrtc-streaming-core/dist/utils/platform";
-import { AskSelectBitrate } from "../popup/popup";
+import { AskSelectBitrate, TurnOnClipboard } from "../popup/popup";
 import { VirtualGamepad } from "../virtGamepad/virtGamepad";
 import { VirtualMouse } from "../virtMouse/virtMouse";
 
@@ -75,6 +75,13 @@ export const WebRTCControl = (input: {
                                 return "disable";
                             }
                     });
+                },
+            }, {
+                icon: <KeyboardIcon/>,
+                name: "Write to clipboard",
+                action: async () => {
+                    const text = await TurnOnClipboard()
+                    console.log(text)
                 },
             } ])
         } else {
