@@ -2,6 +2,7 @@ import { Fullscreen  } from "@mui/icons-material";
 import SportsEsportsOutlinedIcon from '@mui/icons-material/SportsEsportsOutlined';
 import MouseOutlinedIcon from '@mui/icons-material/MouseOutlined';
 import VideoSettingsOutlinedIcon from '@mui/icons-material/VideoSettingsOutlined';
+import KeyboardIcon from '@mui/icons-material/Keyboard';
 import { List, SpeedDial, SpeedDialAction } from "@mui/material";
 import ListIcon from '@mui/icons-material/List';
 import React, { useEffect, useState } from "react"; // we need this to make JSX compile
@@ -19,6 +20,7 @@ export const WebRTCControl = (input: {
 	    GamepadBCallback: (index: number,type: 'up' | 'down') => Promise<void>,
         MouseMoveCallback: (x: number, y: number) => Promise<void>,
         MouseButtonCallback: (index: number,type: 'up' | 'down' ) => Promise<void>,
+        keystuckCallback: () => Promise<void>, 
 
         bitrate_callback: (bitrate: number) => Promise<void>, 
         toggle_mouse_touch_callback: (enable: boolean) => Promise<void>, 
@@ -87,13 +89,14 @@ export const WebRTCControl = (input: {
                     console.log(`bitrate is change to ${bitrate}`);
                     await input.bitrate_callback(bitrate);
                 } catch {}},
-            },
-            {
+            }, {
                 icon: <Fullscreen />,
                 name: "Enter fullscreen",
-                action: async () => {
-                    document.documentElement.requestFullscreen();
-                },
+                action: () => { document.documentElement.requestFullscreen() }
+            }, {
+                icon: <KeyboardIcon />,
+                name: "If some of your key is stuck",
+                action: () => { input.keystuckCallback() },
             }])
         }
     },[input.platform])

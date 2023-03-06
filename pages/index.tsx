@@ -146,6 +146,9 @@ const Home = ({ host }) => {
     const MouseButtonCallback=async function (index: number, type: "up" | "down"): Promise<void> {
         type == 'down' ? client?.hid?.MouseButtonDown({button: index}) : client?.hid?.MouseButtonUp({button: index})
     } 
+    const keystuckCallback= async function (): Promise<void> {
+        client?.hid?.ResetKeyStuck(null);
+    }
 
     return (
         <Body >
@@ -187,6 +190,7 @@ const Home = ({ host }) => {
                 GamepadBCallback={GamepadBCallback}
                 MouseMoveCallback={MouseMoveCallback}
                 MouseButtonCallback={MouseButtonCallback}
+                keystuckCallback={keystuckCallback}
                 ></WebRTCControl>
             </App>
             <audio
