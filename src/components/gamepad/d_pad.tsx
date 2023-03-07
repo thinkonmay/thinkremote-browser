@@ -6,7 +6,7 @@ import {
     DPadRight,
     DPadBottom,
     DPadLeft,
-} from "../../public/assets/svg/svg_cpn";
+} from "../../../public/assets/svg/svg_cpn";
 const Container = styled.div`
     width: ${(props) => props.size ?? "20"}px;
     height: ${(props) => props.size ?? "20"}px;
