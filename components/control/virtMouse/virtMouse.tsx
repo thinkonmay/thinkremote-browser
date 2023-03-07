@@ -5,8 +5,8 @@ import {
     IJoystickUpdateEvent,
     Joystick,
 } from "react-joystick-component/build/lib/Joystick";
-import { ButtonMode } from "../control/control";
-import { LR } from "../gamepad/y_b_x_a";
+import { ButtonMode } from "../control";
+import { LR } from "../virtGamepad/gamepad/ybxaBtn";
 
 export const JoyStick = (param: {
     draggable: ButtonMode;

@@ -9,8 +9,8 @@ import React, { useEffect, useState } from "react"; // we need this to make JSX 
 import { WebRTCClient } from "webrtc-streaming-core";
 import { getOS , Platform} from "webrtc-streaming-core/dist/utils/platform";
 import { AskSelectBitrate } from "../popup/popup";
-import { VirtualGamepad } from "../virtGamepad/virtGamepad";
-import { VirtualMouse } from "../virtMouse/virtMouse";
+import { VirtualGamepad } from "./virtGamepad/virtGamepad";
+import { VirtualMouse } from "./virtMouse/virtMouse";
 
 
 export type ButtonMode = "static" | "draggable" | "disable";

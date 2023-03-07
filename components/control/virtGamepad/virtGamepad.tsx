@@ -7,10 +7,10 @@ import {
     IJoystickUpdateEvent,
     Joystick,
 } from "react-joystick-component/build/lib/Joystick";
-import { ButtonMode } from "../control/control";
-import { YBXA } from "../gamepad/y_b_x_a";
-import DPad from "../gamepad/d_pad";
-import { LeftFuncButton, RightFuncButton } from "../gamepad/func_button";
+import { ButtonMode } from "../control";
+import { YBXA } from "./gamepad/ybxaBtn";
+import DPad from "./gamepad/dPad";
+import { LeftFuncButton, RightFuncButton } from "./gamepad/funcButton";
 
 export const JoyStick = (param: {
     draggable: ButtonMode;

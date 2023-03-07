@@ -8,7 +8,7 @@ import {
     AskSelectSoundcard,
     TurnOnAlert,
     TurnOnStatus,
-} from "../src/components/popup/popup";
+} from "../components/popup/popup";
 import { WebRTCClient } from "webrtc-streaming-core/dist/app";
 import { useRouter } from "next/router";
 import {
@@ -25,8 +25,8 @@ import {
 import { GetServerSideProps } from "next";
 import { GoogleAnalytics } from "nextjs-google-analytics";
 import Button from "@mui/material/Button";
-import { WebRTCControl } from "../src/components/control/control";
-import { VirtualGamepad } from "../src/components/virtGamepad/virtGamepad";
+import { WebRTCControl } from "../components/control/control";
+import { VirtualGamepad } from "../components/control/virtGamepad/virtGamepad";
 import { getPlatform, Platform } from "webrtc-streaming-core/dist/utils/platform";
 import { Analytics } from '@vercel/analytics/react';
 
