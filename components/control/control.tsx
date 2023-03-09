@@ -122,15 +122,6 @@ export const WebRTCControl = (input: {
 
 
 
-    let filter = 0;
-	const MouseJTcallback = async (x: number, y: number) => { // translate cordinate
-        if (filter == 30) {
-            input.MouseMoveCallback(x*10,y*10);
-            filter = 0;
-        }
-        filter++;
-	}
-
 
 
     return (
@@ -159,7 +150,7 @@ export const WebRTCControl = (input: {
             </div>
 
             <VirtualMouse
-                MouseMoveCallback={MouseJTcallback} 
+                MouseMoveCallback={input.MouseMoveCallback} 
                 MouseButtonCallback={input.MouseButtonCallback} 
                 draggable={enableVMouse}/>
 
