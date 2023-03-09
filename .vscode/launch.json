@@ -5,7 +5,7 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "type": "pwa-chrome",
+            "type": "chrome",
             "request": "launch",
             "name": "Launch Chrome against localhost",
             "url": "http://localhost:3000/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyZWNpcGllbnQiOiIxMTciLCJpc1NlcnZlciI6IkZhbHNlIiwiaWQiOiIxMjciLCJuYmYiOjE2NjUyMTQ3MDgsImV4cCI6MTY2NTQ3MzkwOCwiaWF0IjoxNjY1MjE0NzA4fQ.NtbI3fLOWmitAcX4Z-xVQWbBH4G1BBDHN-FFqYFMaCQ",

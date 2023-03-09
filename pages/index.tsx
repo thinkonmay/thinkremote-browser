@@ -29,6 +29,7 @@ import { WebRTCControl } from "../components/control/control";
 import { VirtualGamepad } from "../components/control/virtGamepad/virtGamepad";
 import { getPlatform, Platform } from "webrtc-streaming-core/dist/utils/platform";
 import { Analytics } from '@vercel/analytics/react';
+import { useAuth } from "../context/authContext";
 
 
 type Props = { host: string | null };
@@ -38,6 +39,10 @@ export const getServerSideProps: GetServerSideProps<Props> = async (
 
 
 const Home = ({ host }) => {
+
+    const { user } = useAuth();
+    console.log(user);
+
     const remoteVideo = useRef<HTMLVideoElement>(null);
     const remoteAudio = useRef<HTMLAudioElement>(null);
 

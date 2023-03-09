@@ -14,10 +14,7 @@ import Container from "@mui/material/Container";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { default as NextLink } from "next/link";
 import { AppRoutes } from "../constants/appRoutes";
-import { SIGN_IN_ROUTE } from "./sign_in";
 
-
-export const SIGN_UP_ROUTE = 'sign_up'
 function Copyright(props: any) {
     return (
         <Typography
@@ -138,7 +135,7 @@ export default function SignUp() {
                         <Grid container justifyContent="flex-end">
                             <Grid item>
                                 {/* <Link variant="body2"> */}
-                                    <NextLink href={SIGN_IN_ROUTE}>
+                                    <NextLink href={AppRoutes.SIGN_IN}>
                                         Already have an account? Sign in
                                     </NextLink>
                                 {/* </Link> */}

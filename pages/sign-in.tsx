@@ -14,10 +14,12 @@ import Container from "@mui/material/Container";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { default as NextLink } from "next/link";
 import { AppRoutes } from "../constants/appRoutes";
-import { SIGN_UP_ROUTE } from "./sign_up";
-import { LinkToRoute } from "../components/buttons/link";
-
-export const SIGN_IN_ROUTE = "/sign_in";
+import GoogleIcon from "@mui/icons-material/Google";
+import { IconButton, Stack } from "@mui/material";
+import { supabase, VirtualOSBrowserCore } from "../supabase";
+import { useAuth } from "../context/authContext";
+import { redirect } from "next/navigation";
+import { useRouter } from "next/navigation";
 
 export function Copyright(props) {
     return (
@@ -40,15 +42,27 @@ export function Copyright(props) {
 const theme = createTheme();
 
 export default function SignIn() {
-    const handleSubmit = (event) => {
-        event.preventDefault();
-        const data = new FormData(event.currentTarget);
-        console.log({
-            email: data.get("email"),
-            password: data.get("password"),
-        });
-    };
+    const { isUserAuthenticated, user } = useAuth();
+    const router = useRouter();
 
+    React.useEffect(() => {
+        if (isUserAuthenticated()) {
+            // router.push('/')
+            // router.replace(`/`);
+            console.log("chang roue");
+        }
+    }, [user]);
+
+    const clientSupabase = new VirtualOSBrowserCore();
+    const handleSubmit = async (event) => {
+        event.preventDefault();
+        const dataForm = new FormData(event.currentTarget);
+        const { data, error } = await supabase.auth.signUp({
+            email: dataForm.get("email"),
+            password: dataForm.get("password"),
+        });
+        console.log(data);
+    };
     return (
         <ThemeProvider theme={theme}>
             <Container component="main" maxWidth="xs">
@@ -104,6 +118,9 @@ export default function SignIn() {
                             fullWidth
                             variant="contained"
                             sx={{ mt: 3, mb: 2 }}
+                            onClick={() => {
+                                // router.push("/");
+                            }}
                         >
                             Sign In
                         </Button>
@@ -119,6 +136,30 @@ export default function SignIn() {
                                     {"Don't have an account? Sign Up"}
                                 </NextLink>
                                 {/* </Link> */}
+                            </Grid>
+                        </Grid>
+                        <Stack></Stack>
+                        <Grid
+                            container
+                            justifyContent={"center"}
+                            alignItems="center"
+                        >
+                            <Grid item xs="auto">
+                                <Typography variant="h5">
+                                    Or sign in with:
+                                </Typography>{" "}
+                            </Grid>
+                            <Grid item xs={"auto"}>
+                                <IconButton
+                                    onClick={async () => {
+                                        await clientSupabase.LoginWithGoogle();
+                                    }}
+                                >
+                                    <GoogleIcon
+                                        sx={{ fontSize: 30 }}
+                                        color="primary"
+                                    />
+                                </IconButton>
                             </Grid>
                         </Grid>
                     </Box>
