@@ -50,8 +50,9 @@ export async function TurnOnClipboard(): Promise<string | null> {
         inputAttributes: {
             'aria-label': 'Type your message here'
         },
-        showCancelButton: true
+        showCancelButton: false
     })
+    Swal.close();
 
     if (text) {
         return text

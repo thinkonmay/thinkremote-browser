@@ -128,8 +128,8 @@ const Home = ({ host }) => {
     }, []);
         
     const toggle_mouse_touch_callback=async function(enable: boolean) { 
-        client?.hid?.disableTouch(!enable);
-        // TODO
+        client?.hid?.DisableTouch(!enable);
+        client?.hid?.DisableMouse(!enable);
     } 
     const bitrate_callback=async function (bitrate: number) { 
         client?.ChangeBitrate(bitrate);
@@ -147,7 +147,12 @@ const Home = ({ host }) => {
         type == 'down' ? client?.hid?.MouseButtonDown({button: index}) : client?.hid?.MouseButtonUp({button: index})
     } 
     const keystuckCallback= async function (): Promise<void> {
-        client?.hid?.ResetKeyStuck(null);
+        client?.hid?.ResetKeyStuck();
+    }
+    const clipboardSetCallback= async function (val: string): Promise<void> {
+        console.log(val)
+        client?.hid?.SetClipboard(val)
+        client?.hid?.PasteClipboard()
     }
 
     return (
@@ -191,6 +196,7 @@ const Home = ({ host }) => {
                 MouseMoveCallback={MouseMoveCallback}
                 MouseButtonCallback={MouseButtonCallback}
                 keystuckCallback={keystuckCallback}
+                clipboardSetCallback={clipboardSetCallback}
                 ></WebRTCControl>
             </App>
             <audio

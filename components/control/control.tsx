@@ -21,6 +21,7 @@ export const WebRTCControl = (input: {
         MouseMoveCallback: (x: number, y: number) => Promise<void>,
         MouseButtonCallback: (index: number,type: 'up' | 'down' ) => Promise<void>,
         keystuckCallback: () => Promise<void>, 
+        clipboardSetCallback: (val: string) => Promise<void>, 
 
         bitrate_callback: (bitrate: number) => Promise<void>, 
         toggle_mouse_touch_callback: (enable: boolean) => Promise<void>, 
@@ -28,9 +29,10 @@ export const WebRTCControl = (input: {
     const [enableVGamepad, setenableVGamepad] = useState<ButtonMode>("disable");
     const [enableVMouse, setenableVMouse] = useState<ButtonMode>("disable");
     const [actions,setactions] = useState<any[]>([]);
-    setInterval(async() => {
-        await input.toggle_mouse_touch_callback((enableVGamepad == 'disable'));
-    },500)
+
+    useEffect(()  => {
+        input.toggle_mouse_touch_callback((enableVGamepad == 'disable') && (enableVMouse == 'disable'));
+    },[enableVGamepad,enableVMouse])
 
     useEffect(()  => {
         console.log(`configuring menu on ${input.platform}`)
@@ -81,7 +83,7 @@ export const WebRTCControl = (input: {
                 name: "Write to clipboard",
                 action: async () => {
                     const text = await TurnOnClipboard()
-                    console.log(text)
+                    await input.clipboardSetCallback(text)
                 },
             } ])
         } else {
