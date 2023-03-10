@@ -1,4 +1,4 @@
-import { Fullscreen  } from "@mui/icons-material";
+import { Fullscreen, Key  } from "@mui/icons-material";
 import SportsEsportsOutlinedIcon from '@mui/icons-material/SportsEsportsOutlined';
 import MouseOutlinedIcon from '@mui/icons-material/MouseOutlined';
 import VideoSettingsOutlinedIcon from '@mui/icons-material/VideoSettingsOutlined';
@@ -8,7 +8,7 @@ import ListIcon from '@mui/icons-material/List';
 import React, { useEffect, useState } from "react"; // we need this to make JSX compile
 import { WebRTCClient } from "webrtc-streaming-core";
 import { getOS , Platform} from "webrtc-streaming-core/dist/utils/platform";
-import { AskSelectBitrate } from "../popup/popup";
+import { AskSelectBitrate, TurnOnClipboard } from "../popup/popup";
 import { VirtualGamepad } from "../virtGamepad/virtGamepad";
 import { VirtualMouse } from "../virtMouse/virtMouse";
 
@@ -21,6 +21,7 @@ export const WebRTCControl = (input: {
         MouseMoveCallback: (x: number, y: number) => Promise<void>,
         MouseButtonCallback: (index: number,type: 'up' | 'down' ) => Promise<void>,
         keystuckCallback: () => Promise<void>, 
+        clipboardSetCallback: (val: string) => Promise<void>, 
 
         bitrate_callback: (bitrate: number) => Promise<void>, 
         toggle_mouse_touch_callback: (enable: boolean) => Promise<void>, 
@@ -28,9 +29,10 @@ export const WebRTCControl = (input: {
     const [enableVGamepad, setenableVGamepad] = useState<ButtonMode>("disable");
     const [enableVMouse, setenableVMouse] = useState<ButtonMode>("disable");
     const [actions,setactions] = useState<any[]>([]);
-    setInterval(async() => {
-        await input.toggle_mouse_touch_callback((enableVGamepad == 'disable'));
-    },500)
+
+    useEffect(()  => {
+        input.toggle_mouse_touch_callback((enableVGamepad == 'disable') && (enableVMouse == 'disable'));
+    },[enableVGamepad,enableVMouse])
 
     useEffect(()  => {
         console.log(`configuring menu on ${input.platform}`)
@@ -76,6 +78,13 @@ export const WebRTCControl = (input: {
                             }
                     });
                 },
+            }, {
+                icon: <KeyboardIcon/>,
+                name: "Write to clipboard",
+                action: async () => {
+                    const text = await TurnOnClipboard()
+                    await input.clipboardSetCallback(text)
+                },
             } ])
         } else {
             setactions([{
@@ -113,15 +122,6 @@ export const WebRTCControl = (input: {
 
 
 
-    let filter = 0;
-	const MouseJTcallback = async (x: number, y: number) => { // translate cordinate
-        if (filter == 30) {
-            input.MouseMoveCallback(x*10,y*10);
-            filter = 0;
-        }
-        filter++;
-	}
-
 
 
     return (
@@ -150,7 +150,7 @@ export const WebRTCControl = (input: {
             </div>
 
             <VirtualMouse
-                MouseMoveCallback={MouseJTcallback} 
+                MouseMoveCallback={input.MouseMoveCallback} 
                 MouseButtonCallback={input.MouseButtonCallback} 
                 draggable={enableVMouse}/>
 

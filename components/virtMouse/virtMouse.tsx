@@ -13,22 +13,35 @@ export const JoyStick = (param: {
     moveCallback: (x: number, y: number) => Promise<void>;
 }) => {
     const [enableJT, setenableJT] = useState<boolean>(false);
+    const [position, setPosition] = useState<{ x: number; y: number }>({
+        x: 0,
+        y: 0,
+    });
+    // set interval to send position per 100ms
 
     const move = (event: IJoystickUpdateEvent) => {
         if (event.type == "move") {
             if (!enableJT) {
-                param.moveCallback(0, 0);
+                // param.moveCallback(0, 0);
+                setPosition({ x: 0, y: 0 });
                 return;
             }
-            param.moveCallback(event.x, -event.y);
+            // param.moveCallback(event.`x, -event.y);
+            setPosition({ x: event.x, y: -event.y });
         } else if (event.type == "stop") {
             setenableJT(false);
-            param.moveCallback(0, 0);
+            setPosition({ x: 0, y: 0 });
         } else if (event.type == "start") {
             setenableJT(true);
         }
     };
+    useEffect(() => {
+        const set = () => { param.moveCallback(position.x * 6, position.y * 6) }
 
+        set();
+        const intervalSendPos = setInterval(set, 5);
+        return () => { clearInterval(intervalSendPos); };
+    }, [position]);
     return (
         <Joystick
             start={move}
@@ -154,7 +167,7 @@ export const VirtualMouse = (param: {
     return (
         <div>
             {param.draggable == "static" || param.draggable == "draggable" ? (
-                <ContainerVirtMouse >
+                <ContainerVirtMouse>
                     <MouseGroup
                         AxisCallback={param.MouseMoveCallback}
                         ButtonCallback={param.MouseButtonCallback}

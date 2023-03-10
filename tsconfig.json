@@ -20,7 +20,8 @@
     "typeRoots": [
       "./node_modules/@webgpu/types",
       "./node_modules/@types"
-    ]
+    ],
+    "moduleResolution": "node"
   },
   "include": [
     "next-env.d.ts",

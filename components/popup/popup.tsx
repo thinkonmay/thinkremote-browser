@@ -41,6 +41,26 @@ export function TurnOffStatus(): void {
     Swal.close();
 }
 
+
+export async function TurnOnClipboard(): Promise<string | null> {
+    const { value: text } = await Swal.fire({
+        input: 'textarea',
+        inputLabel: 'Message',
+        inputPlaceholder: 'Type your message here...',
+        inputAttributes: {
+            'aria-label': 'Type your message here'
+        },
+        showCancelButton: false
+    })
+    Swal.close();
+
+    if (text) {
+        return text
+    } else {
+        return null
+    }
+}
+
 export async function AskSelectSoundcard(
     soundcards: Array<Soundcard>
 ): Promise<string> {

@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import Head from "next/head";
+import video from "../public/assets/videos/video_demo.mp4";
 import styled from "styled-components";
 import {
     AskSelectBitrate,
@@ -27,20 +28,20 @@ import { GoogleAnalytics } from "nextjs-google-analytics";
 import Button from "@mui/material/Button";
 import { WebRTCControl } from "../components/control/control";
 import { VirtualGamepad } from "../components/virtGamepad/virtGamepad";
-import { getPlatform, Platform } from "webrtc-streaming-core/dist/utils/platform";
-import { Analytics } from '@vercel/analytics/react';
-
+import {
+    getPlatform,
+    Platform,
+} from "webrtc-streaming-core/dist/utils/platform";
+import { Analytics } from "@vercel/analytics/react";
 
 type Props = { host: string | null };
 export const getServerSideProps: GetServerSideProps<Props> = async (
     context
 ) => ({ props: { host: context.req.headers.host || null } });
 
-
 const Home = ({ host }) => {
     const remoteVideo = useRef<HTMLVideoElement>(null);
     const remoteAudio = useRef<HTMLAudioElement>(null);
-
     const router = useRouter();
     const { signaling, token, fps, bitrate,platform } = router.query;
     const signalingURL = Buffer.from(
@@ -55,7 +56,7 @@ const Home = ({ host }) => {
     var defaultSoundcard = "Default Audio Render Device";
     var defaultPlatform: Platform = platform == 'mobile' ? 'mobile' : (platform == 'desktop' ? 'desktop' : null);
     const selectDevice = async (offer: DeviceSelection) => {
-        LogConnectionEvent( ConnectionEvent.WaitingAvailableDeviceSelection);
+        LogConnectionEvent(ConnectionEvent.WaitingAvailableDeviceSelection);
         let ret = new DeviceSelectionResult(
             offer.soundcards[0].DeviceID,
             offer.monitors[0].MonitorHandle.toString()
@@ -74,10 +75,9 @@ const Home = ({ host }) => {
             }
 
             if (!exist) {
-                ret.SoundcardDeviceID =
-                    await AskSelectSoundcard(
-                        offer.soundcards
-                    );
+                ret.SoundcardDeviceID = await AskSelectSoundcard(
+                    offer.soundcards
+                );
                 Log(
                     LogLevel.Infor,
                     `selected audio deviceid ${ret.SoundcardDeviceID}`
@@ -86,13 +86,8 @@ const Home = ({ host }) => {
         }
 
         if (offer.monitors.length > 1) {
-            ret.MonitorHandle = await AskSelectDisplay(
-                offer.monitors
-            );
-            Log(
-                LogLevel.Infor,
-                `selected monitor handle ${ret.MonitorHandle}`
-            );
+            ret.MonitorHandle = await AskSelectDisplay(offer.monitors);
+            Log(LogLevel.Infor, `selected monitor handle ${ret.MonitorHandle}`);
         }
 
         if (defaultBitrate == null) {
@@ -128,8 +123,8 @@ const Home = ({ host }) => {
     }, []);
         
     const toggle_mouse_touch_callback=async function(enable: boolean) { 
-        client?.hid?.disableTouch(!enable);
-        // TODO
+        client?.hid?.DisableTouch(!enable);
+        client?.hid?.DisableMouse(!enable);
     } 
     const bitrate_callback=async function (bitrate: number) { 
         client?.ChangeBitrate(bitrate);
@@ -147,14 +142,18 @@ const Home = ({ host }) => {
         type == 'down' ? client?.hid?.MouseButtonDown({button: index}) : client?.hid?.MouseButtonUp({button: index})
     } 
     const keystuckCallback= async function (): Promise<void> {
-        client?.hid?.ResetKeyStuck(null);
+        client?.hid?.ResetKeyStuck();
+    }
+    const clipboardSetCallback= async function (val: string): Promise<void> {
+        console.log(val)
+        client?.hid?.SetClipboard(val)
+        client?.hid?.PasteClipboard()
     }
 
     return (
-        <Body >
+        <Body>
             <GoogleAnalytics trackPageViews />
             <Analytics />
-
             <Head>
                 <title>WebRTC remote viewer</title>
                 <meta
@@ -170,18 +169,42 @@ const Home = ({ host }) => {
 
             <RemoteVideo
                 ref={remoteVideo}
+                src={video}
                 autoPlay
                 muted
                 playsInline
                 loop
             ></RemoteVideo>
-
-            <App 
-                onContextMenu= {(e) => e.preventDefault()}
-                onMouseUp=   {(e :MouseEvent)    => {e.preventDefault()}}
-                onMouseDown= {(e :MouseEvent)    => {e.preventDefault()}}
-                onKeyUp=     {(e :KeyboardEvent) => {e.preventDefault()}}
-                onKeyDown=   {(e :KeyboardEvent) => {e.preventDefault()}}
+            {/* <video
+                autoPlay
+                loop
+                playsInline
+                muted
+            >
+                <source src={video} />
+            </video> */}
+            {/* <iframe
+                width="420"
+                height="315"
+                src="https://www.youtube.com/embed/YXUUpCbEdpQ? 
+                            autoplay=1&mute=1"
+                title="YouTube video player"
+                frameborder="0"
+            ></iframe> */}
+            <App
+                onContextMenu={(e) => e.preventDefault()}
+                onMouseUp={(e: MouseEvent) => {
+                    e.preventDefault();
+                }}
+                onMouseDown={(e: MouseEvent) => {
+                    e.preventDefault();
+                }}
+                onKeyUp={(e: KeyboardEvent) => {
+                    e.preventDefault();
+                }}
+                onKeyDown={(e: KeyboardEvent) => {
+                    e.preventDefault();
+                }}
             >
                 <WebRTCControl platform={Platform} 
                 toggle_mouse_touch_callback={toggle_mouse_touch_callback}
@@ -191,6 +214,7 @@ const Home = ({ host }) => {
                 MouseMoveCallback={MouseMoveCallback}
                 MouseButtonCallback={MouseButtonCallback}
                 keystuckCallback={keystuckCallback}
+                clipboardSetCallback={clipboardSetCallback}
                 ></WebRTCControl>
             </App>
             <audio
@@ -222,12 +246,12 @@ const Body = styled.div`
     margin: 0;
     border: 0;
     overflow: hidden;
-    background-color: black; 
+    background-color: black;
 `;
 const App = styled.div`
     touch-action: none;
     position: relative;
-    width: 100vw;   
+    width: 100vw;
     height: 100vh;
 `;
 export default Home;
