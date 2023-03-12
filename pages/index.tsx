@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import Head from "next/head";
-import video from "../public/assets/videos/video_demo.mp4";
+import video_mobile from "../public/assets/videos/video_demo.mp4";
+import video_desktop from "../public/assets/videos/video_demo_desktop.mp4";
 import styled from "styled-components";
 import {
     AskSelectBitrate,
@@ -115,10 +116,15 @@ const Home = ({ host }) => {
         setclient(new WebRTCClient( signalingURL, remoteVideo.current, remoteAudio.current, signalingToken, selectDevice, newplatform)
         .Notifier((message: EventMessage) => {
             console.log(message);
+            if(message == 'WebSocketConnected' || 
+               message == 'ExchangingSignalingMessage' || 
+               message == 'WaitingAvailableDeviceSelection')  
+                return;
+            
             TurnOnStatus(message);
-            if(message == 'WebRTCConnectionClosed') {
+
+            if(message == 'WebRTCConnectionClosed') 
               location.reload();
-            }
         }))
     }, []);
         
@@ -169,7 +175,7 @@ const Home = ({ host }) => {
 
             <RemoteVideo
                 ref={remoteVideo}
-                src={video}
+                src={platform == 'desktop' ? video_desktop : video_desktop}
                 autoPlay
                 muted
                 playsInline
