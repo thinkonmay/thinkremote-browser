@@ -6,8 +6,8 @@ import KeyboardIcon from '@mui/icons-material/Keyboard';
 import { List, SpeedDial, SpeedDialAction } from "@mui/material";
 import ListIcon from '@mui/icons-material/List';
 import React, { useEffect, useState } from "react"; // we need this to make JSX compile
-import { WebRTCClient } from "webrtc-streaming-core";
-import { getOS , Platform} from "webrtc-streaming-core/dist/utils/platform";
+import { Platform } from "webrtc-streaming-core/dist/utils/platform";
+import { requestFullscreen } from "webrtc-streaming-core/dist/utils/screen";
 import { AskSelectBitrate, TurnOnClipboard } from "../popup/popup";
 import { VirtualGamepad } from "../virtGamepad/virtGamepad";
 import { VirtualMouse } from "../virtMouse/virtMouse";
@@ -101,7 +101,7 @@ export const WebRTCControl = (input: {
             }, {
                 icon: <Fullscreen />,
                 name: "Enter fullscreen",
-                action: () => { document.documentElement.requestFullscreen() }
+                action: () => { requestFullscreen() }
             }, {
                 icon: <KeyboardIcon />,
                 name: "If some of your key is stuck",
