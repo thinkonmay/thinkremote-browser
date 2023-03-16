@@ -36,7 +36,7 @@ export const WebRTCControl = (input: {
 		input.toggle_mouse_touch_callback((enableVGamepad == 'disable') && (enableVMouse == 'disable'));
 	}, [enableVGamepad, enableVMouse])
 
-	useLayoutEffect(() => {
+	useEffect(() => {
 		console.log(`configuring menu on ${input.platform}`)
 		if (input.platform == 'mobile') {
 			setactions([{
@@ -124,6 +124,7 @@ export const WebRTCControl = (input: {
 
 
 	const [posBtn, setPosBtn] = useState({ x: 0, y: 0 });
+	const [isControlDragable, setControlDragable] = useState(false)
 	useEffect(() => {
 		const heightContent = document.querySelector('.containerDrag')
 		console.log(heightContent);
@@ -159,7 +160,22 @@ export const WebRTCControl = (input: {
 		console.log(`set ${x} ${y} to storage`);
 	};
 
+	let touchTime: number = 0
+	const toggleControl = (e) => {
 
+		e.preventDefault
+		if (touchTime == 0) {
+			touchTime = new Date().getTime();
+		} else {
+			if (((new Date().getTime()) - touchTime) < 800) {
+				console.log("double clicked");
+				setControlDragable(prev => !prev)
+				touchTime = 0;
+			} else {
+				touchTime = new Date().getTime();
+			}
+		}
+	}
 
 	return (
 		<div>
@@ -167,8 +183,9 @@ export const WebRTCControl = (input: {
 				position={{ x: posBtn.x, y: posBtn.y }}
 				onStop={handleStop}
 				onDrag={handleDrag}
+				disabled={!isControlDragable}
 			>
-				<div className="containerDrag" style={{ maxWidth: 'max-content', maxHeight: 'max-content' }}>
+				<div onDoubleClick={()=>{setControlDragable(prev => !prev)}} onTouchEndCapture={toggleControl} className="containerDrag" style={{ maxWidth: 'max-content', maxHeight: 'max-content' }}>
 					<SpeedDial
 						ariaLabel="SpeedDial basic example"
 						sx={{
