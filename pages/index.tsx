@@ -181,22 +181,6 @@ const Home = ({ host }) => {
                 playsInline
                 loop
             ></RemoteVideo>
-            {/* <video
-                autoPlay
-                loop
-                playsInline
-                muted
-            >
-                <source src={video} />
-            </video> */}
-            {/* <iframe
-                width="420"
-                height="315"
-                src="https://www.youtube.com/embed/YXUUpCbEdpQ? 
-                            autoplay=1&mute=1"
-                title="YouTube video player"
-                frameborder="0"
-            ></iframe> */}
             <App
                 onContextMenu={(e) => e.preventDefault()}
                 onMouseUp={(e: MouseEvent) => {
