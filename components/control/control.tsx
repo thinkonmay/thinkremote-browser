@@ -128,7 +128,7 @@ export const WebRTCControl = (input: {
 		const heightContent = document.querySelector('.containerDrag')
 		console.log(heightContent);
 		const defaultX = window.innerWidth - (window.innerWidth * 10 / 100)
-		const defaultY = (window.innerHeight - heightContent.offsetHeight) - (window.innerHeight * 20 / 100)
+		const defaultY = (window.innerHeight - heightContent.clientHeight) - (window.innerHeight * 20 / 100)
 		let cache = localStorage.getItem(`control_pos`);
 		const { x, y } = JSON.parse(
 			cache != null ? cache : `{"x": ${defaultX}, "y" : ${defaultY}}`
