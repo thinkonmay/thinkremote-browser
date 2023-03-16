@@ -129,11 +129,9 @@ const Home = ({ host }) => {
         let interval : NodeJS.Timer | null = null
         if (pingUrl != null) {
             interval = setInterval(async () => {
-                try {
-                    await fetch(atob(pingUrl as string), {
-                        method: 'POST'
-                    })
-                } catch {}
+                await fetch(atob(pingUrl as string), {
+                    method: 'POST'
+                })
             },1000);
         }
 
