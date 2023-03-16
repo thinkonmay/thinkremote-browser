@@ -1,59 +1,67 @@
 {
-  "name": "oneplay-webrtc-client",
-  "version": "0.1.0",
-  "private": true,
-  "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
-    "lint": "next lint"
-  },
-  "browser": {
-    "fs": false,
-    "path": false,
-    "os": false
-  },
-  "dependencies": {
-    "@emotion/react": "^11.10.4",
-    "@emotion/styled": "^11.10.4",
-    "@mui/icons-material": "^5.10.3",
-    "@mui/material": "^5.10.4",
-    "@paypal/react-paypal-js": "^7.8.2",
-    "@supabase/auth-helpers-react": "^0.3.1",
-    "@supabase/supabase-js": "^2.10.0",
-    "@types/cors": "^2.8.12",
-    "@types/express": "^4.17.13",
-    "@types/ws": "^8.5.3",
-    "@vercel/analytics": "^0.1.10",
-    "axios": "^0.27.2",
-    "bufferutil": "^4.0.6",
-    "cors": "^2.8.5",
-    "express": "^4.18.1",
-    "fs": "^0.0.1-security",
-    "net": "^1.0.2",
-    "next": "^13.2.3",
-    "nextjs-google-analytics": "^2.3.0",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "react-draggable": "^4.4.5",
-    "react-joystick-component": "^6.0.0",
-    "sass": "^1.54.0",
-    "serve": "^14.0.1",
-    "styled-components": "^5.3.6",
-    "sweetalert2": "^11.4.32",
-    "tls": "^0.0.1",
-    "utf-8-validate": "^5.0.9",
-    "webrtc-streaming-core": "^1.1.35",
-    "ws": "^8.8.1"
-  },
-  "devDependencies": {
-    "@svgr/webpack": "^6.5.1",
-    "@types/node": "18.0.4",
-    "@types/react": "18.0.15",
-    "@types/react-dom": "18.0.6",
-    "babel-plugin-styled-components": "^2.0.7",
-    "eslint": "8.19.0",
-    "eslint-config-next": "^13.2.3",
-    "typescript": "4.7.4"
-  }
+	"name": "oneplay-webrtc-client",
+	"version": "0.1.0",
+	"private": true,
+	"scripts": {
+		"dev": "next dev",
+		"build": "next build",
+		"start": "next start",
+		"lint": "next lint"
+	},
+	"browser": {
+		"fs": false,
+		"path": false,
+		"os": false
+	},
+	"dependencies": {
+		"@emotion/react": "^11.10.4",
+		"@emotion/styled": "^11.10.4",
+		"@hookform/resolvers": "^2.9.11",
+		"@mui/icons-material": "^5.10.3",
+		"@mui/material": "^5.10.4",
+		"@paypal/react-paypal-js": "^7.8.2",
+		"@supabase/auth-helpers-react": "^0.3.1",
+		"@supabase/supabase-js": "^2.10.0",
+		"@types/cors": "^2.8.12",
+		"@types/express": "^4.17.13",
+		"@types/ws": "^8.5.3",
+		"@vercel/analytics": "^0.1.10",
+		"axios": "^0.27.2",
+		"bufferutil": "^4.0.6",
+		"cors": "^2.8.5",
+		"express": "^4.18.1",
+		"fs": "^0.0.1-security",
+		"net": "^1.0.2",
+		"next": "^13.2.3",
+		"nextjs-google-analytics": "^2.3.0",
+		"react": "^18.2.0",
+		"react-dom": "^18.2.0",
+		"react-draggable": "^4.4.5",
+		"react-hook-form": "^7.43.5",
+		"react-joystick-component": "^6.0.0",
+		"sass": "^1.54.0",
+		"serve": "^14.0.1",
+		"styled-components": "^5.3.6",
+		"sweetalert2": "^11.4.32",
+		"tls": "^0.0.1",
+		"utf-8-validate": "^5.0.9",
+		"webrtc-streaming-core": "^1.1.35",
+		"ws": "^8.8.1",
+		"yup": "^1.0.2"
+	},
+	"devDependencies": {
+		"@svgr/webpack": "^6.5.1",
+		"@types/node": "18.0.4",
+		"@types/react": "18.0.15",
+		"@types/react-dom": "18.0.6",
+		"babel-plugin-styled-components": "^2.0.7",
+		"eslint": "8.19.0",
+		"eslint-config-next": "^13.2.3",
+		"typescript": "4.7.4"
+	},
+	"overrides": {
+		"babel-plugin-lodash": {
+			"@babel/types": "~7.20.0"
+		}
+	}
 }
