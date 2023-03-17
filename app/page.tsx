@@ -41,7 +41,7 @@ import { Analytics } from "@vercel/analytics/react";
 //    context
 //) => ({ props: { host: context.req.headers.host || null } });
 
-export default function Home ({ host }) {
+export default function Home () {
     const remoteVideo = useRef<HTMLVideoElement>(null);
     const remoteAudio = useRef<HTMLAudioElement>(null);
     const searchParams = useSearchParams();
