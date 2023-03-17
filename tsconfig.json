@@ -21,13 +21,19 @@
       "./node_modules/@webgpu/types",
       "./node_modules/@types"
     ],
-    "moduleResolution": "node"
+    "moduleResolution": "node",
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ]
   },
   "include": [
     "next-env.d.ts",
     "**/*.ts",
     "**/*.tsx",
-    "custom.d.ts"
+    "custom.d.ts",
+    ".next/types/**/*.ts"
   ],
   "exclude": [
     "node_modules"

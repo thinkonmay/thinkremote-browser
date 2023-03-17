@@ -1,3 +1,5 @@
+"use client"
+
 import { Fullscreen, Key } from "@mui/icons-material";
 import SportsEsportsOutlinedIcon from '@mui/icons-material/SportsEsportsOutlined';
 import MouseOutlinedIcon from '@mui/icons-material/MouseOutlined';

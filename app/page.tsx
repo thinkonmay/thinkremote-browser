@@ -1,3 +1,5 @@
+"use client"
+
 import React, { useEffect, useRef, useState } from "react";
 import Head from "next/head";
 import video_mobile from "../public/assets/videos/video_demo.mp4";
@@ -12,7 +14,7 @@ import {
     TurnOnStatus,
 } from "../components/popup/popup";
 import { WebRTCClient } from "webrtc-streaming-core/dist/app";
-import { useRouter } from "next/router";
+import { useSearchParams  } from "next/navigation";
 import {
     DeviceSelection,
     DeviceSelectionResult,
@@ -26,7 +28,6 @@ import {
 } from "webrtc-streaming-core/dist/utils/log";
 import { GetServerSideProps } from "next";
 import { GoogleAnalytics } from "nextjs-google-analytics";
-import Button from "@mui/material/Button";
 import { WebRTCControl } from "../components/control/control";
 import { VirtualGamepad } from "../components/virtGamepad/virtGamepad";
 import {
@@ -35,16 +36,21 @@ import {
 } from "webrtc-streaming-core/dist/utils/platform";
 import { Analytics } from "@vercel/analytics/react";
 
-type Props = { host: string | null };
-export const getServerSideProps: GetServerSideProps<Props> = async (
-    context
-) => ({ props: { host: context.req.headers.host || null } });
+//type Props = { host: string | null };
+//export const getServerSideProps: GetServerSideProps<Props> = async (
+//    context
+//) => ({ props: { host: context.req.headers.host || null } });
 
-const Home = ({ host }) => {
+export default function Home ({ host }) {
     const remoteVideo = useRef<HTMLVideoElement>(null);
     const remoteAudio = useRef<HTMLAudioElement>(null);
-    const router = useRouter();
-    const { signaling, token, fps, bitrate,platform } = router.query;
+    const searchParams = useSearchParams();
+    //const { signaling, token, fps, bitrate,platform } = searchParams.getAll();
+	const signaling = searchParams.get('signaling'); 
+	const token = searchParams.get('token'); 
+	const fps = searchParams.get('fps'); 
+	const bitrate = searchParams.get('bitrate'); 
+	const platform = searchParams.get('platform'); 
     const signalingURL = Buffer.from(
         (signaling
             ? signaling
@@ -158,7 +164,7 @@ const Home = ({ host }) => {
 
     return (
         <Body>
-            <GoogleAnalytics trackPageViews />
+            {/*<GoogleAnalytics trackPageViews />
             <Analytics />
             <Head>
                 <title>WebRTC remote viewer</title>
@@ -171,7 +177,7 @@ const Home = ({ host }) => {
                     content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"
                 ></meta>
                 <link rel="icon" href="/favicon.ico" />
-            </Head>
+            </Head>*/}
 
             <RemoteVideo
                 ref={remoteVideo}
@@ -244,4 +250,4 @@ const App = styled.div`
     width: 100vw;
     height: 100vh;
 `;
-export default Home;
+//export default Home;?
