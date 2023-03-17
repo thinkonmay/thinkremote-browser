@@ -123,88 +123,35 @@ export const WebRTCControl = (input: {
 
 
 
-	const [posBtn, setPosBtn] = useState({ x: 0, y: 0 });
-	const [isControlDragable, setControlDragable] = useState(false)
-	useEffect(() => {
-		const heightContent = document.querySelector('.containerDrag')
-		console.log(heightContent);
-		const defaultX = window.innerWidth - (window.innerWidth * 10 / 100)
-		const defaultY = (window.innerHeight - heightContent.clientHeight) - (window.innerHeight * 20 / 100)
-		let cache = localStorage.getItem(`control_pos`);
-		const { x, y } = JSON.parse(
-			cache != null ? cache : `{"x": ${defaultX}, "y" : ${defaultY}}`
-		);
-		if (x == null || y == null) {
-			return;
-		}
 
-		console.log(`get ${x} ${y} from storage`);
-		setPosBtn({ x: x, y: y });
-	}, [actions]);
-	const handleDrag = (e: DraggableEvent, data: DraggableData) => {
-
-		//console.log(data, 'data');
-		setPosBtn({
-			x: data.x,
-			y: data.y,
-		});
-	};
-
-	const handleStop = (e: DraggableEvent, data: DraggableData) => {
-		const { x, y } = posBtn;
-		if (x == null || y == null) {
-			return;
-		}
-
-		localStorage.setItem(`control_pos`, JSON.stringify(posBtn));
-		console.log(`set ${x} ${y} to storage`);
-	};
-
-	let touchTime: number = 0
-	const toggleControl = (e) => {
-
-		e.preventDefault
-		if (touchTime == 0) {
-			touchTime = new Date().getTime();
-		} else {
-			if (((new Date().getTime()) - touchTime) < 800) {
-				console.log("double clicked");
-				setControlDragable(prev => !prev)
-				touchTime = 0;
-			} else {
-				touchTime = new Date().getTime();
-			}
-		}
-	}
 
 	return (
 		<div>
-			<Draggable
-				position={{ x: posBtn.x, y: posBtn.y }}
-				onStop={handleStop}
-				onDrag={handleDrag}
-				disabled={!isControlDragable}
+			<div
+				className="containerDrag"
+				style={{ maxWidth: 'max-content', maxHeight: 'max-content' }}
 			>
-				<div onDoubleClick={()=>{setControlDragable(prev => !prev)}} onTouchEndCapture={toggleControl} className="containerDrag" style={{ maxWidth: 'max-content', maxHeight: 'max-content' }}>
-					<SpeedDial
-						ariaLabel="SpeedDial basic example"
-						sx={{
-							opacity: 0.7,
-							'& .MuiFab-primary': { backgroundColor: 'white', color: 'white' }
-						}}
-						icon={<ListIcon sx={{ color: 'black' }} />}
-					>
-						{actions.map((action) => (
-							<SpeedDialAction
-								key={action.name}
-								icon={action.icon}
-								tooltipTitle={action.name}
-								onClick={action.action}
-							/>
-						))}
-					</SpeedDial>
-				</div>
-			</Draggable>
+				<SpeedDial
+					ariaLabel="SpeedDial basic example"
+					sx={{
+						opacity: 0.7,
+						position: 'absolute',
+						bottom: '25%',
+						right: '2%',
+						'& .MuiFab-primary': { backgroundColor: 'white', color: 'white' }
+					}}
+					icon={<ListIcon sx={{ color: 'black' }} />}
+				>
+					{actions.map((action) => (
+						<SpeedDialAction
+							key={action.name}
+							icon={action.icon}
+							tooltipTitle={action.name}
+							onClick={action.action}
+						/>
+					))}
+				</SpeedDial>
+			</div>
 
 			<VirtualMouse
 				MouseMoveCallback={input.MouseMoveCallback}
