@@ -44,7 +44,7 @@ const Home = ({ host }) => {
     const remoteVideo = useRef<HTMLVideoElement>(null);
     const remoteAudio = useRef<HTMLAudioElement>(null);
     const router = useRouter();
-    const { signaling, token, fps, bitrate,platform } = router.query;
+    const { signaling, token, fps, bitrate,platform, pingUrl } = router.query;
     const signalingURL = Buffer.from(
         (signaling
             ? signaling
@@ -126,6 +126,20 @@ const Home = ({ host }) => {
             if(message == 'WebRTCConnectionClosed') 
               location.reload();
         }))
+        let interval : NodeJS.Timer | null = null
+        if (pingUrl != null) {
+            interval = setInterval(async () => {
+                await fetch(atob(pingUrl as string), {
+                    method: 'POST'
+                })
+            },1000);
+        }
+
+        return () => {
+            if (interval != null) {
+                clearInterval(interval)
+            }
+        }
     }, []);
         
     const toggle_mouse_touch_callback=async function(enable: boolean) { 
