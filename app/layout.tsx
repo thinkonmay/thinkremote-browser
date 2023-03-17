@@ -3,7 +3,8 @@
 import { Analytics } from '@vercel/analytics/react';
 import { GoogleAnalytics } from 'nextjs-google-analytics';
 import * as React from 'react';
-
+import StyledComponentsRegistry from '../lib/registry';
+import "../styles/globals.css"
 
 function RootLayout({
 	children,
@@ -23,12 +24,17 @@ function RootLayout({
 					content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"
 				></meta>
 				<link rel="icon" href="/favicon.ico" />
+				{/*<style>
+					*
+				</style>*/}
 			</head>
 			<body>
-			<GoogleAnalytics trackPageViews />
-            <Analytics />
+				<GoogleAnalytics trackPageViews />
+				<Analytics />
 				<main>
-					{children}
+					<StyledComponentsRegistry>
+						{children}
+					</StyledComponentsRegistry>
 				</main>
 			</body>
 		</html>
