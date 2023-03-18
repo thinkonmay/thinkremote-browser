@@ -24,9 +24,6 @@ function RootLayout({
 					content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"
 				></meta>
 				<link rel="icon" href="/favicon.ico" />
-				{/*<style>
-					*
-				</style>*/}
 			</head>
 			<body>
 				<GoogleAnalytics trackPageViews />
@@ -34,7 +31,7 @@ function RootLayout({
 				<main>
 					<StyledComponentsRegistry>
 						{children}
-					</StyledComponentsRegistry>
+ 					</StyledComponentsRegistry>
 				</main>
 			</body>
 		</html>

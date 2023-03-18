@@ -14,7 +14,7 @@ import {
     TurnOnStatus,
 } from "../components/popup/popup";
 import { WebRTCClient } from "webrtc-streaming-core/dist/app";
-import { useSearchParams  } from "next/navigation";
+import { useRouter, useSearchParams  } from "next/navigation";
 import {
     DeviceSelection,
     DeviceSelectionResult,
@@ -45,6 +45,7 @@ export default function Home () {
     const remoteVideo = useRef<HTMLVideoElement>(null);
     const remoteAudio = useRef<HTMLAudioElement>(null);
     const searchParams = useSearchParams();
+	const router = useRouter()
     //const { signaling, token, fps, bitrate,platform } = searchParams.getAll();
 	const signaling = searchParams.get('signaling'); 
 	const token = searchParams.get('token'); 
@@ -119,18 +120,19 @@ export default function Home () {
             newplatform = getPlatform()
         }
         setPlatform(newplatform)
+		console.log(Platform);
         setclient(new WebRTCClient( signalingURL, remoteVideo.current, remoteAudio.current, signalingToken, selectDevice, newplatform)
         .Notifier((message: EventMessage) => {
             console.log(message);
-            if(message == 'WebSocketConnected' || 
-               message == 'ExchangingSignalingMessage' || 
-               message == 'WaitingAvailableDeviceSelection')  
-                return;
+            //if(message == 'WebSocketConnected' || 
+            //   message == 'ExchangingSignalingMessage' || 
+            //   message == 'WaitingAvailableDeviceSelection')  
+            //    return;
             
             TurnOnStatus(message);
 
             if(message == 'WebRTCConnectionClosed') 
-              location.reload();
+			router.refresh();
         }))
     }, []);
         
