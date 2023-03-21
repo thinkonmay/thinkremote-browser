@@ -52,6 +52,8 @@ export default function Home () {
 	const fps = searchParams.get('fps'); 
 	const bitrate = searchParams.get('bitrate'); 
 	const platform = searchParams.get('platform'); 
+	const pingUrl = searchParams.get('pingUrl'); 
+
     const signalingURL = Buffer.from(
         (signaling
             ? signaling
