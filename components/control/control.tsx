@@ -121,24 +121,6 @@ export const WebRTCControl = (input: {
 
 
 
-	const desktop_css = {
-		opacity: 0.3,
-		position: "absolute",
-		bottom: 16,
-		right: 16,
-		'& .MuiFab-primary': { backgroundColor: 'white', color: 'white' } 
-	}
-
-	const mobile_css = {
-		opacity: 0.3,
-		position: 'absolute',
-		bottom: '25%',
-		right: '2%',
-		'& .MuiFab-primary': { backgroundColor: 'white', color: 'white' }
-	}
-
-
-
 
 
 	return (
@@ -149,7 +131,13 @@ export const WebRTCControl = (input: {
 			>
 				<SpeedDial
 					ariaLabel="SpeedDial basic example"
-					sx={input.platform == 'desktop' ? desktop_css : mobile_css}
+					sx={{
+						opacity: 0.3,
+						position: 'absolute',
+						bottom: '2%',
+						right: '2%',
+						'& .MuiFab-primary': { backgroundColor: 'white', color: 'white' }
+					}}
 					icon={<ListIcon sx={{ color: 'black' }} />}
 				>
 					{actions.map((action) => (
