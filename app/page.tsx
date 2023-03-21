@@ -36,30 +36,19 @@ import {
 } from "webrtc-streaming-core/dist/utils/platform";
 import { Analytics } from "@vercel/analytics/react";
 
-//type Props = { host: string | null };
-//export const getServerSideProps: GetServerSideProps<Props> = async (
-//    context
-//) => ({ props: { host: context.req.headers.host || null } });
-
 export default function Home () {
     const remoteVideo = useRef<HTMLVideoElement>(null);
     const remoteAudio = useRef<HTMLAudioElement>(null);
     const searchParams = useSearchParams();
-	const router = useRouter()
-    //const { signaling, token, fps, bitrate,platform } = searchParams.getAll();
-	const signaling = searchParams.get('signaling'); 
-	const token = searchParams.get('token'); 
-	const fps = searchParams.get('fps'); 
-	const bitrate = searchParams.get('bitrate'); 
-	const platform = searchParams.get('platform'); 
-	const pingUrl = searchParams.get('pingUrl'); 
+    const router = useRouter()
+    const signaling = searchParams.get('signaling'); 
+    const token = searchParams.get('token'); 
+    const fps = searchParams.get('fps'); 
+    const bitrate = searchParams.get('bitrate'); 
+    const platform = searchParams.get('platform'); 
+    const pingUrl = searchParams.get('pingUrl'); 
 
-    const signalingURL = Buffer.from(
-        (signaling
-            ? signaling
-            : "d3NzOi8vc2VydmljZS50aGlua21heS5uZXQvaGFuZHNoYWtl") as string,
-        "base64"
-    ).toString();
+    const signalingURL = Buffer.from((signaling ? signaling : "d3NzOi8vc2VydmljZS50aGlua21heS5uZXQvaGFuZHNoYWtl") as string, "base64").toString();
     const signalingToken = (token ? token : "none") as string;
     var defaultBitrate = parseInt((bitrate ? bitrate : "6000") as string, 10);
     var defaultFramerate = parseInt((fps ? fps : "55") as string, 10);
