@@ -134,7 +134,7 @@ export default function Home () {
             TurnOnStatus(message);
 
             if(message == 'WebRTCConnectionClosed') 
-			router.refresh();
+		router.refresh();
         }))
         let interval : NodeJS.Timer | null = null
         if (pingUrl != null) {
