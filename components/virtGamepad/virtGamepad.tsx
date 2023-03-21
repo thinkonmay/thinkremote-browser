@@ -1,3 +1,6 @@
+"use client"
+
+
 import { Translate } from "@mui/icons-material";
 import { Button, Stack } from "@mui/material";
 import React, { useRef, useState, useEffect } from "react"; // we need this to make JSX compile
