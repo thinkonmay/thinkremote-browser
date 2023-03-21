@@ -111,7 +111,6 @@ export default function Home () {
             newplatform = getPlatform()
         }
         setPlatform(newplatform)
-		console.log(Platform);
         setclient(new WebRTCClient( signalingURL, remoteVideo.current, remoteAudio.current, signalingToken, selectDevice, newplatform)
         .Notifier((message: EventMessage) => {
             console.log(message);
