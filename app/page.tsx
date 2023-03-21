@@ -126,10 +126,10 @@ export default function Home () {
         setclient(new WebRTCClient( signalingURL, remoteVideo.current, remoteAudio.current, signalingToken, selectDevice, newplatform)
         .Notifier((message: EventMessage) => {
             console.log(message);
-            //if(message == 'WebSocketConnected' || 
-            //   message == 'ExchangingSignalingMessage' || 
-            //   message == 'WaitingAvailableDeviceSelection')  
-            //    return;
+            if(message == 'WebSocketConnected' || 
+               message == 'ExchangingSignalingMessage' || 
+               message == 'WaitingAvailableDeviceSelection')  
+                return;
             
             TurnOnStatus(message);
 
