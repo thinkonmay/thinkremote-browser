@@ -6,6 +6,25 @@ import * as React from 'react';
 import StyledComponentsRegistry from '../lib/registry';
 import "../styles/globals.css"
 
+import { ThemeProvider, createTheme } from '@mui/material/styles';
+
+const theme = createTheme({
+	typography:{
+		//fontSize: 12,
+	},
+	components: {
+	  // Name of the component
+	  MuiButton: {
+		styleOverrides: {
+		  // Name of the slot
+		  root: {
+			// Some CSS
+			fontSize: '1.2rem',
+		  },
+		},
+	  },
+	},
+  });
 function RootLayout({
 	children,
 }: {
@@ -28,11 +47,11 @@ function RootLayout({
 			<body>
 				<GoogleAnalytics trackPageViews />
 				<Analytics />
-				<main>
+				<ThemeProvider theme={theme}>
 					<StyledComponentsRegistry>
 						{children}
  					</StyledComponentsRegistry>
-				</main>
+				</ThemeProvider>
 			</body>
 		</html>
 	);
