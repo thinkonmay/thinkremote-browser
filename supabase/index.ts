@@ -1,6 +1,9 @@
 "use client"
 
 import { createClient, SupabaseClient, User } from "@supabase/supabase-js";
+import { Hardware } from "./hardware";
+import { MediaDevice } from "./media";
+import {Schema, WorkerProfile} from "./type"
 
 export default class VirtualOSBrowserCore {
 	private supabase: SupabaseClient;
@@ -33,16 +36,21 @@ export default class VirtualOSBrowserCore {
 		return (await this.supabase.auth.getSession()).data.session != null
 	}
 
-
-
 	public async getUserInfor(): Promise< User | Error > {
 		const resp = await this.supabase.auth.getUser();
 		return resp.error == null ? resp.data.user : resp.error;
 	}
 
 
-	public async FetchAuthorizedWorker(): Promise<{}[] | Error> {
-		const resp = await this.supabase.auth.getUser();
-		return []
+	public async FetchAuthorizedWorker(): Promise<WorkerProfile[] | Error> {
+		const {data,error} = await this.supabase
+			.from('worker_profile' as Schema)
+			.select("hardware,media_device,account_id,id")
+		if (error != null) 
+			return new Error(error.message)
+
+		return data
 	}
 }
+
+

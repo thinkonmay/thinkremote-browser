@@ -6,6 +6,9 @@ import { Box } from "@mui/system";
 import { useEffect, useState } from "react";
 import { useRouter , usePathname } from "next/navigation";
 import VirtualOSBrowserCore from "../../supabase";
+import { MediaDevice } from "../../supabase/media";
+import { Hardware } from "../../supabase/hardware";
+import { WorkerProfile } from "../../supabase/type";
 
 
 
@@ -13,7 +16,7 @@ import VirtualOSBrowserCore from "../../supabase";
 function DashBoard() {
 	const path = usePathname()
 	const route = useRouter()
-	const [devices,setdevices] = useState<WorkerProps[]>([])
+	const [devices,setdevices] = useState<WorkerProfile[]>([])
 
 	useEffect(() => {
 		const core = new VirtualOSBrowserCore()
@@ -22,6 +25,15 @@ function DashBoard() {
 				console.log(`redirect to http://localhost:3000${path}`)
 				localStorage.setItem("redirectTo",`http://localhost:3000${path}`)
 				await route.replace("/sign_in")
+			} else {
+				const result = await core.FetchAuthorizedWorker()
+				if (result instanceof Error) {
+					console.log(result.message)
+					return 
+				}
+
+				console.log(JSON.stringify(result))
+				setdevices(result)
 			}
 		});
 	},[])
@@ -43,7 +55,7 @@ function DashBoard() {
 				<Grid container spacing={2}>
 					{devices.map(item => (
 						<Grid key={item.id} item xl={3} md={4} sm={6} xs={12} >
-							<Worker id={item.id} isConnect={true} ></Worker>
+							<Worker id={item.id} profile={item} ></Worker>
 						</Grid>
 					))}
 				</Grid>
@@ -55,10 +67,14 @@ function DashBoard() {
 
 interface WorkerProps {
 	id : number
-	isConnect?: boolean
+	profile : {
+		media_device : MediaDevice
+		hardware : Hardware
+		account_id : string
+	}
 }
 const Worker = (props: WorkerProps) => {
-	const { isConnect } = props
+	const  isConnect  = false
 	const renderIsConnect = () => {
 		if (isConnect) {
 			return (
@@ -104,8 +120,8 @@ const Worker = (props: WorkerProps) => {
 						<MoreVertIcon />
 					</IconButton>
 				}
-				title="Worker 1"
-				subheader="I7 6650U RTX 2060TI"
+				subheader={`${props.profile.hardware.Hostname}`}
+				title={`${props.profile.hardware.PublicIP}`}
 			></CardHeader>
 			<CardContent sx={{
 				color: '#b4b5b6',
@@ -114,50 +130,28 @@ const Worker = (props: WorkerProps) => {
 					Devices Info:
 				</Typography>
 				<Typography>
-					CPU: Intel Core Processor (Broadwell, IBRS)
+					{`OS  : ${props.profile.hardware.Hostname}`}
 				</Typography>
 				<Typography>
-					RAM: 16383Mb
+					{`CPU : ${props.profile.hardware.CPU}`}
 				</Typography>
 				<Typography>
-					GPU: RTX 2060TI
+					{`RAM : ${props.profile.hardware.RAM}`}
+				</Typography>
+				<Typography>
+					{`GPU : ${props.profile.hardware.GPUs}`}
 				</Typography>
 
 				<Stack>
 					<Box>
-						<Typography variant="h6" sx={{ color: 'black' }}>Capture:</Typography>
+						<Typography variant="h6" sx={{ color: 'black' }}>Monitor:</Typography>
 						<Grid container spacing={1}>
 							<Grid item xs={12} lg={6}>
-								<Card
-									sx={{
-										height: '50px',
-										bgcolor: 'red',
-										position: 'relative'
-									}}
-								>
-									<Checkbox
-										sx={{
-											position: 'absolute',
-											top: '1px',
-											right: '1px',
-										}}></Checkbox>
-								</Card>
-							</Grid>
-							<Grid item xs={12} lg={6}>
-								<Card
-									sx={{
-										height: '50px',
-										bgcolor: 'red',
-										position: 'relative'
-									}}
-								>
-									<Checkbox
-										sx={{
-											position: 'absolute',
-											top: '1px',
-											right: '1px',
-										}}></Checkbox>
-								</Card>
+								<FormGroup>
+									{props.profile.media_device.monitors.map(item => (
+										<FormControlLabel control={<Checkbox  />} label={`${item.MonitorName}`} />
+									))}
+								</FormGroup>
 							</Grid>
 						</Grid>
 					</Box>
@@ -166,8 +160,9 @@ const Worker = (props: WorkerProps) => {
 						<Grid container spacing={1}>
 							<Grid item xs={12} lg={6}>
 								<FormGroup>
-									<FormControlLabel control={<Checkbox defaultChecked />} label="Audio 1" />
-									<FormControlLabel  control={<Checkbox />} label="Audio 2" />
+									{props.profile.media_device.soundcards.map(item => (
+										<FormControlLabel control={<Checkbox  />} label={`${item.Name}`} />
+									))}
 								</FormGroup>
 							</Grid>
 						</Grid>
