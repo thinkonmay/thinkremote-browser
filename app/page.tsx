@@ -13,19 +13,19 @@ import {
     TurnOnAlert,
     TurnOnStatus,
 } from "../components/popup/popup";
-import { WebRTCClient } from "webrtc-streaming-core/dist/app";
+import { WebRTCClient } from "../core/src/app";
 import { useRouter, useSearchParams  } from "next/navigation";
 import {
     DeviceSelection,
     DeviceSelectionResult,
-} from "webrtc-streaming-core/dist/models/devices.model";
+} from "../core/src/models/devices.model";
 import {
     ConnectionEvent,
     EventMessage,
     Log,
     LogConnectionEvent,
     LogLevel,
-} from "webrtc-streaming-core/dist/utils/log";
+} from "../core/src/utils/log";
 import { GetServerSideProps } from "next";
 import { GoogleAnalytics } from "nextjs-google-analytics";
 import { WebRTCControl } from "../components/control/control";
@@ -33,7 +33,7 @@ import { VirtualGamepad } from "../components/virtGamepad/virtGamepad";
 import {
     getPlatform,
     Platform,
-} from "webrtc-streaming-core/dist/utils/platform";
+} from "../core/src/utils/platform";
 import { Analytics } from "@vercel/analytics/react";
 
 export default function Home () {
