@@ -13,9 +13,15 @@ import SendIcon from '@mui/icons-material/Send';
 import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
 import StarBorder from '@mui/icons-material/StarBorder';
+import VirtualOSBrowserCore from '../../supabase';
 
-export default function NavBarDashBoard() {
+interface NavBarDashBoardProps {
+  core : VirtualOSBrowserCore
+}
+export default function NavBarDashBoard(props: NavBarDashBoardProps) {
   const [open, setOpen] = React.useState(true);
+  const core = new VirtualOSBrowserCore()
+
 
   const handleClick = () => {
     setOpen(!open);
@@ -52,7 +58,9 @@ export default function NavBarDashBoard() {
             <ListItemIcon>
               <StarBorder />
             </ListItemIcon>
-            <ListItemText primary="Starred" />
+            <ListItemText primary="Starred" 
+              onClick={() => {core.Logout()}}
+            />
           </ListItemButton>
         </List>
       </Collapse>

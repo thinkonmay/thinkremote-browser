@@ -3,13 +3,29 @@
 import { Avatar, Button, Card, CardContent, CardHeader, Checkbox, FormControlLabel, FormGroup, Grid, IconButton, Stack, Typography } from "@mui/material";
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { Box } from "@mui/system";
+import { useEffect, useState } from "react";
+import { useRouter , usePathname } from "next/navigation";
+import VirtualOSBrowserCore from "../../supabase";
 
 
 
 
-let arr = [1, 2, 3, 4, 5, 6]
-let arr2 = [1, 2, 3]
 function DashBoard() {
+	const path = usePathname()
+	const route = useRouter()
+	const [devices,setdevices] = useState<WorkerProps[]>([])
+
+	useEffect(() => {
+		const core = new VirtualOSBrowserCore()
+		core.Authenticated().then(async (authenticated) => {
+			if (!authenticated) {
+				console.log(`redirect to http://localhost:3000${path}`)
+				localStorage.setItem("redirectTo",`http://localhost:3000${path}`)
+				await route.replace("/sign_in")
+			}
+		});
+	},[])
+
 	return (
 		<>
 			<Box
@@ -25,29 +41,9 @@ function DashBoard() {
 					Your device
 				</Typography>
 				<Grid container spacing={2}>
-					{arr.map(item => (
-						<Grid key={item} item xl={3} md={4} sm={6} xs={12} >
-							<CardItem isConnect={true} ></CardItem>
-						</Grid>
-					))}
-				</Grid>
-			</Box>
-			<Box
-				sx={{
-					//bgcolor: 'white',
-					'border-radius': '8px',
-					padding: '30px',
-					boxShadow: '0px 0px 15px -6px rgba(0,0,0,0.49)',
-					mb: '20px'
-				}}
-			>
-				<Typography variant="h2">
-					Avaible device
-				</Typography>
-				<Grid container spacing={2}>
-					{arr2.map(item => (
-						<Grid key={item} item xl={3} md={4} sm={6} xs={12} >
-							<CardItem isConnect={false} ></CardItem>
+					{devices.map(item => (
+						<Grid key={item.id} item xl={3} md={4} sm={6} xs={12} >
+							<Worker id={item.id} isConnect={true} ></Worker>
 						</Grid>
 					))}
 				</Grid>
@@ -57,10 +53,11 @@ function DashBoard() {
 }
 
 
-interface CardItemProps {
+interface WorkerProps {
+	id : number
 	isConnect?: boolean
 }
-const CardItem = (props: CardItemProps) => {
+const Worker = (props: WorkerProps) => {
 	const { isConnect } = props
 	const renderIsConnect = () => {
 		if (isConnect) {

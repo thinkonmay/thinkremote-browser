@@ -43,16 +43,6 @@ export default function SignIn() {
 	//	}
 	//}, [user]);
 
-	const clientSupabase = new VirtualOSBrowserCore();
-	const handleSubmit = async (event) => {
-		event.preventDefault();
-		const dataForm = new FormData(event.currentTarget);
-		const { data, error } = await supabase.auth.signUp({
-			email: dataForm.get("email"),
-			password: dataForm.get("password"),
-		});
-		console.log(data);
-	};
 	return (
 		<ThemeProvider theme={theme}>
 			<Container component="main" maxWidth="xs">

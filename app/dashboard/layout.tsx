@@ -1,15 +1,23 @@
 "use client"
 import { Container, Grid } from "@mui/material";
 import { Box, Stack } from "@mui/system";
-import React from "react";
+import React, { useEffect, useState } from "react";
+import VirtualOSBrowserCore from "../../supabase";
 import HeaderDashBoard from "./header";
 import NavBarDashBoard from "./navbar";
 
 interface Props{
 	children: React.ReactNode
+	// core: VirtualOSBrowserCore
 }
 function LayoutDashBoard(props: Props) {
 	const {children} = props
+	const [core,setcore] = useState<VirtualOSBrowserCore>(new VirtualOSBrowserCore())
+	useEffect(() => {
+		setcore(new VirtualOSBrowserCore())
+	},[])
+
+
 	return (
 		<Box 
 			sx={{
@@ -31,7 +39,9 @@ function LayoutDashBoard(props: Props) {
 			<Container maxWidth={'xl'} sx={{mt: '120px'}}>
 				<Grid container spacing={3}>
 					<Grid item xs={2}>
-						<NavBarDashBoard/>
+						<NavBarDashBoard
+							core={core}
+						/>
 					</Grid>
 					<Grid item xs={10}>
 						{children}

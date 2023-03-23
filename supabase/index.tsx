@@ -2,29 +2,8 @@
 
 import { createClient, SupabaseClient, User } from "@supabase/supabase-js";
 
-export  const supabaseClient = createClient(
-	process.env.NEXT_PUBLIC_SUPABASE_URL,
-	process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
-	{
-		global: {
-			fetch: (...args) => fetch(...args),
-		},
-	}
-)
-
-export async function LoginWithGoogle() {
-	await supabaseClient.auth.signInWithOAuth({
-		provider: "google",
-		options: {
-			queryParams: {
-				access_type: "offline",
-				prompt: "consent",
-			},
-		},
-	});
-}
-
 export default class VirtualOSBrowserCore {
+	private supabase: SupabaseClient;
 	constructor() {
 		this.supabase = createClient(
 			process.env.NEXT_PUBLIC_SUPABASE_URL ?? "",
@@ -33,6 +12,8 @@ export default class VirtualOSBrowserCore {
 	}
 
 	public async LoginWithGoogle() {
+		const redirectTo = localStorage.getItem("redirectTo")
+		console.log(redirectTo)
 		await this.supabase.auth.signInWithOAuth({
 			provider: "google",
 			options: {
@@ -40,28 +21,28 @@ export default class VirtualOSBrowserCore {
 					access_type: "offline",
 					prompt: "consent",
 				},
+				redirectTo :  redirectTo
 			},
 		});
 	}
-	public Logout() {
-		this.supabase.auth.signOut();
+
+	public async Logout() : Promise<void> {
+		await this.supabase.auth.signOut();
 	}
-	public async getUserInfor(): Promise<{
-		user: User | null;
-		error: Error | null;
-	}> {
-		const resp = await this.supabase.auth.getUser();
-		if (resp.error != null) {
-			return {
-				error: resp.error,
-				user: null,
-			};
-		}
-		return {
-			user: resp.data.user,
-			error: null,
-		};
+	public async Authenticated(): Promise<boolean> {
+		return (await this.supabase.auth.getSession()).data.session != null
 	}
 
-	private supabase: SupabaseClient;
+
+
+	public async getUserInfor(): Promise< User | Error > {
+		const resp = await this.supabase.auth.getUser();
+		return resp.error == null ? resp.data.user : resp.error;
+	}
+
+
+	public async FetchAuthorizedWorker(): Promise<{}[] | Error> {
+		const resp = await this.supabase.auth.getUser();
+		return []
+	}
 }

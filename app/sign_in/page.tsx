@@ -2,11 +2,7 @@
 
 import * as React from "react";
 import Avatar from "@mui/material/Avatar";
-import Button from "@mui/material/Button";
 import CssBaseline from "@mui/material/CssBaseline";
-import TextField from "@mui/material/TextField";
-import FormControlLabel from "@mui/material/FormControlLabel";
-import Checkbox from "@mui/material/Checkbox";
 import Link from "@mui/material/Link";
 import Grid from "@mui/material/Grid";
 import Box from "@mui/material/Box";
@@ -14,13 +10,9 @@ import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
-import { default as NextLink } from "next/link";
-import { AppRoutes } from "../../constants/appRoutes"; 
 import GoogleIcon from "@mui/icons-material/Google";
-import { IconButton, Stack } from "@mui/material";
-import VirtualOSBrowserCore, { LoginWithGoogle, supabaseClient }  from "../../supabase/index"
-import { useAuth } from "../../context/authContext"; 
-import { redirect } from "next/navigation";
+import { IconButton } from "@mui/material";
+import VirtualOSBrowserCore  from "../../supabase/index"
 import { useRouter } from "next/navigation";
 
 export function Copyright(props) {
@@ -56,15 +48,6 @@ export default function SignIn() {
 	//}, [user]);
 
 	const clientSupabase = new VirtualOSBrowserCore();
-	const handleSubmit = async (event) => {
-		event.preventDefault();
-		const dataForm = new FormData(event.currentTarget);
-		const { data, error } = await supabase.auth.signUp({
-			email: dataForm.get("email"),
-			password: dataForm.get("password"),
-		});
-		console.log(data);
-	};
 	return (
 		<ThemeProvider theme={theme}>
 			<Container component="main" maxWidth="xs">
@@ -91,7 +74,7 @@ export default function SignIn() {
 						<Grid item xs={"auto"}>
 							<IconButton
 								onClick={async () => {
-									await LoginWithGoogle()
+									await clientSupabase.LoginWithGoogle()
 								}}
 							>
 								<GoogleIcon
