@@ -18,7 +18,7 @@ import { default as NextLink } from "next/link";
 import { AppRoutes } from "../../constants/appRoutes"; 
 import GoogleIcon from "@mui/icons-material/Google";
 import { IconButton, Stack } from "@mui/material";
-import { supabase, VirtualOSBrowserCore }  from "../../supabase/index"
+import VirtualOSBrowserCore, { LoginWithGoogle, supabaseClient }  from "../../supabase/index"
 import { useAuth } from "../../context/authContext"; 
 import { redirect } from "next/navigation";
 import { useRouter } from "next/navigation";
@@ -154,7 +154,7 @@ export default function SignIn() {
 							<Grid item xs={"auto"}>
 								<IconButton
 									onClick={async () => {
-										await clientSupabase.LoginWithGoogle();
+										await LoginWithGoogle();
 									}}
 								>
 									<GoogleIcon
