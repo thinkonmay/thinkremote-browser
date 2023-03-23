@@ -1,27 +1,15 @@
 "use client"
 
 import * as React from "react";
-import Avatar from "@mui/material/Avatar";
-import Button from "@mui/material/Button";
 import CssBaseline from "@mui/material/CssBaseline";
-import TextField from "@mui/material/TextField";
-import FormControlLabel from "@mui/material/FormControlLabel";
-import Checkbox from "@mui/material/Checkbox";
 import Link from "@mui/material/Link";
-import Grid from "@mui/material/Grid";
 import Box from "@mui/material/Box";
-import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
-import { default as NextLink } from "next/link";
-import { AppRoutes } from "../../constants/appRoutes"; 
-import GoogleIcon from "@mui/icons-material/Google";
-import { IconButton, Stack } from "@mui/material";
-import VirtualOSBrowserCore, { LoginWithGoogle, supabaseClient }  from "../../supabase/index"
-import { useAuth } from "../../context/authContext"; 
-import { redirect } from "next/navigation";
+import VirtualOSBrowserCore, {  }  from "../../supabase/index"
 import { useRouter } from "next/navigation";
+import { PayPalButtons, PayPalScriptProvider } from "@paypal/react-paypal-js";
 
 export function Copyright(props) {
 	return (
@@ -77,30 +65,29 @@ export default function SignIn() {
 						alignItems: "center",
 					}}
 				>
-					<Avatar sx={{ m: 1, bgcolor: "secondary.main" }}>
-						<LockOutlinedIcon />
-					</Avatar>
-					<Typography component="h1" variant="h5">
-						Sign in
-					</Typography>
-					<Grid
-						container
-						justifyContent={"center"}
-						alignItems="center"
-					>
-						<Grid item xs={"auto"}>
-							<IconButton
-								onClick={async () => {
-									await LoginWithGoogle()
+						<PayPalScriptProvider options={{
+							"client-id": "AdxCRX7LxtFK0cPQMNwaK7k_0f3zo9ss582ggaFZyuWrsvxzf-KZ5EZMeJKnEcKNMj6pmi2TU_Oa5N5M",
+							// "data-client-token": "EJPWK-KL1eYYndvnq_3p4vby028oN8ICwWmWd-UvNyFq35_oZR257bUgaHGC8MVtzrUWd1gM4d_H2BsI",
+						}}>
+							<PayPalButtons
+								createOrder={(data, actions) => {
+									return actions.order.create({
+										purchase_units: [
+											{
+												amount: {
+													value: "0.99",
+												}
+											}
+										]
+									});
 								}}
-							>
-								<GoogleIcon
-									sx={{ fontSize: 30 }}
-									color="primary"
-								/>
-							</IconButton>
-						</Grid>
-					</Grid>
+								onApprove={(data, actions) => {
+									return actions.order.capture().then(function (details){
+										alert("Transaction completed by" + details.payer.name.given_name)
+									});
+								}}
+							/>
+					</PayPalScriptProvider>
 				</Box>
 				<Copyright sx={{ mt: 8, mb: 4 }} />
 			</Container>
