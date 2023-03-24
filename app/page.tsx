@@ -41,12 +41,13 @@ export default function Home () {
     const remoteAudio = useRef<HTMLAudioElement>(null);
     const searchParams = useSearchParams();
     const router = useRouter()
-    const signaling = searchParams.get('signaling'); 
-    const token = searchParams.get('token'); 
-    const fps = searchParams.get('fps'); 
-    const bitrate = searchParams.get('bitrate'); 
-    const platform = searchParams.get('platform'); 
-    const pingUrl = searchParams.get('pingUrl'); 
+
+    const signaling  = searchParams.get('signaling'); 
+    const token      = searchParams.get('token'); 
+    const fps        = searchParams.get('fps'); 
+    const bitrate    = searchParams.get('bitrate'); 
+    const platform   = searchParams.get('platform'); 
+    const pingUrl    = searchParams.get('pingUrl'); 
 
     const signalingURL = Buffer.from((signaling ? signaling : "d3NzOi8vc2VydmljZS50aGlua21heS5uZXQvaGFuZHNoYWtl") as string, "base64").toString();
     const signalingToken = (token ? token : "none") as string;
@@ -54,6 +55,7 @@ export default function Home () {
     var defaultFramerate = parseInt((fps ? fps : "55") as string, 10);
     var defaultSoundcard = "Default Audio Render Device";
     var defaultPlatform: Platform = platform == 'mobile' ? 'mobile' : (platform == 'desktop' ? 'desktop' : null);
+
     const selectDevice = async (offer: DeviceSelection) => {
         LogConnectionEvent(ConnectionEvent.WaitingAvailableDeviceSelection);
         let ret = new DeviceSelectionResult(

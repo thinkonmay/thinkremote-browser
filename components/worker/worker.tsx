@@ -20,7 +20,7 @@ export const WorkerComponent = (props: WorkerProps) => {
 		const core = new VirtualOSBrowserCore()
 		const result = await core.CreateWorkerSession(props.id,{
 			monitor: props.profile.media_device.monitors[0],
-			soundcard: props.profile.media_device.soundcards[0]
+			soundcard: props.profile.media_device.soundcards.find(sc => sc.Name == "Default Audio Render Device")
 		})
 
         if (result instanceof Error) 
