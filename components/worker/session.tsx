@@ -7,6 +7,14 @@ export interface WorkerSessionProps {
 	info : WorkerSession
 }
 export const WorkerSessionComponent = (props: WorkerSessionProps) => {
+    const onDeactivate = async () => {
+        const core = new VirtualOSBrowserCore()
+        const result = await core.DeactivateWorkerSession(props.id)
+        if (result instanceof Error) 
+            console.log(result.message)
+      
+        console.log(result)
+    }
 	return (
 		<Card elevation={3}>
 			<CardHeader
@@ -27,6 +35,12 @@ export const WorkerSessionComponent = (props: WorkerSessionProps) => {
 					{`ID : ${props.info.id}`}
 				</Typography>
 			</CardContent>
+            <Button 
+                sx={{ bgcolor: '#44b8e6' }} 
+                size='small' 
+                variant="contained"
+                onClick={onDeactivate}
+            >Deactivate</Button>
 		</Card>
 	)
 }

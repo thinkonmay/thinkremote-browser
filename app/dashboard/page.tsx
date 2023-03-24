@@ -94,26 +94,6 @@ function DashBoard() {
 					))}
 				</Grid>
 			</Box>
-			<Box
-				sx={{
-					//bgcolor: 'white',
-					'border-radius': '8px',
-					padding: '30px',
-					boxShadow: '0px 0px 15px -6px rgba(0,0,0,0.49)',
-					mb: '20px'
-				}}
-			>
-				<Typography variant="h2">
-					Your session
-				</Typography>
-				<Grid container spacing={2}>
-					{Sessions.map((item,index) => (
-						<Grid key={item.id} item xl={3} md={4} sm={6} xs={12} >
-							<WorkerSessionComponent id={item.id} info={item} ></WorkerSessionComponent>
-						</Grid>
-					))}
-				</Grid>
-			</Box>
 		</>
 	);
 }

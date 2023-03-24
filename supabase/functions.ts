@@ -13,4 +13,8 @@ export class MediaFilter {
 	soudcard_name  : string = ""
 }
 
+export class WorkerSessionDeactivateBody{
+  	worker_session_id : number = 0
+}
+
 export type WorkerSessionCreateBody = ( IPFilter | IDFilter ) & MediaFilter

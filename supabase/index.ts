@@ -1,7 +1,7 @@
 "use client"
 
 import { createClient, SupabaseClient, User } from "@supabase/supabase-js";
-import { WorkerSessionCreateBody } from "./functions";
+import { WorkerSessionCreateBody, WorkerSessionDeactivateBody } from "./functions";
 import { Hardware } from "./hardware";
 import { MediaDevice, MediaDevices } from "./media";
 import {Schema, WorkerProfile, WorkerSession} from "./type"
@@ -67,7 +67,26 @@ export default class VirtualOSBrowserCore {
 
 
 
-	public async GenWorkerURL(worker_profile_id: number, media: MediaDevice): Promise<string | Error> {
+	public async DeactivateWorkerSession(worker_session_id: number): Promise<string | Error> {
+		const session = await this.supabase.auth.getSession()
+		if (session.error != null) 
+			return new Error(session.error.message)
+
+		const body = JSON.stringify({
+			worker_session_id: worker_session_id
+		} as WorkerSessionDeactivateBody)
+
+		const {data,error} = await this.supabase.functions.invoke<string>("worker_session_deactivate",{
+			headers: { "access_token": session.data.session.access_token },
+			body: body,
+			method: 'POST',
+		})
+
+
+		return error == null ? data : new Error(error +":"+ data)
+	}
+
+	public async CreateWorkerSession(worker_profile_id: number, media: MediaDevice): Promise<string | Error> {
 		const session = await this.supabase.auth.getSession()
 		if (session.error != null) 
 			return new Error(session.error.message)
@@ -77,18 +96,15 @@ export default class VirtualOSBrowserCore {
 			soudcard_name: media.soundcard.Name,
 			monitor_name: media.monitor.MonitorName
 		} as WorkerSessionCreateBody)
-		console.log(body)
 
 		const {data,error} = await this.supabase.functions.invoke<string>("worker_session_create",{
+			headers: { "access_token": session.data.session.access_token },
 			body: body,
 			method: 'POST',
-			headers: {
-				"access_token": session.data.session.access_token
-
-			}
 		})
 
-		return error == null ? data : new Error(error)
+
+		return error == null ? data : new Error(error +":"+ data)
 	}
 }
 
