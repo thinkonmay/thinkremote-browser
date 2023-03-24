@@ -1,5 +1,5 @@
 import { Hardware } from "./hardware"
-import { MediaDevice } from "./media"
+import { MediaDevices } from "./media"
 
 export interface Database {
     public: {
@@ -296,9 +296,34 @@ export type Schema  =
     "worker_session"         |
     "user_session"           
 
-export interface WorkerProfile {
-    media_device : MediaDevice
+export class WorkerProfile {
+    inserted_at : any
+    last_check  : any
+    media_device : MediaDevices
     hardware : Hardware
     account_id : string
+    id : number
+}
+
+
+export interface RTCConfiguration {
+    bundlePolicy?: RTCBundlePolicy;
+    iceCandidatePoolSize?: number;
+    iceServers?: RTCIceServer[];
+    iceTransportPolicy?: RTCIceTransportPolicy;
+    rtcpMuxPolicy?: RTCRtcpMuxPolicy;
+}
+export interface WorkerSession {
+    signaling_config : {
+        HostName: string ,
+        WebsocketURL : string,
+        SignalingPort: string
+    }
+    media_config : MediaDevices
+    webrtc_config : RTCConfiguration
+    manifest : any
+    session_log: any[]
+
+    worker_profile_id: any
     id : number
 }

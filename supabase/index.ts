@@ -1,9 +1,10 @@
 "use client"
 
 import { createClient, SupabaseClient, User } from "@supabase/supabase-js";
+import { WorkerSessionCreateBody } from "./functions";
 import { Hardware } from "./hardware";
-import { MediaDevice } from "./media";
-import {Schema, WorkerProfile} from "./type"
+import { MediaDevice, MediaDevices } from "./media";
+import {Schema, WorkerProfile, WorkerSession} from "./type"
 
 export default class VirtualOSBrowserCore {
 	private supabase: SupabaseClient;
@@ -42,14 +43,52 @@ export default class VirtualOSBrowserCore {
 	}
 
 
-	public async FetchAuthorizedWorker(): Promise<WorkerProfile[] | Error> {
+	public async FetchAuthorizedWorkers(): Promise<WorkerProfile[] | Error> {
 		const {data,error} = await this.supabase
 			.from('worker_profile' as Schema)
-			.select("hardware,media_device,account_id,id")
+			.select("hardware,media_device,account_id,id,inserted_at,last_check")
 		if (error != null) 
 			return new Error(error.message)
 
 		return data
+	}
+
+
+	public async FetchAuthorizedWorkerSessions(): Promise<WorkerSession[] | Error> {
+		const {data,error} = await this.supabase
+			.from('worker_session' as Schema)
+			.select("id,signaling_config,media_config,webrtc_config,manifest,session_log,worker_profile_id:metadata->worker_profile_id")
+
+		if (error != null) 
+			return new Error(error.message)
+
+		return data 
+	}
+
+
+
+	public async GenWorkerURL(worker_profile_id: number, media: MediaDevice): Promise<string | Error> {
+		const session = await this.supabase.auth.getSession()
+		if (session.error != null) 
+			return new Error(session.error.message)
+
+		const body = JSON.stringify({
+			worker_id: worker_profile_id,
+			soudcard_name: media.soundcard.Name,
+			monitor_name: media.monitor.MonitorName
+		} as WorkerSessionCreateBody)
+		console.log(body)
+
+		const {data,error} = await this.supabase.functions.invoke<string>("worker_session_create",{
+			body: body,
+			method: 'POST',
+			headers: {
+				"access_token": session.data.session.access_token
+
+			}
+		})
+
+		return error == null ? data : new Error(error)
 	}
 }
 

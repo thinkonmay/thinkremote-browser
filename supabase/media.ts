@@ -17,7 +17,12 @@ export interface Soundcard {
 	IsLoopback: boolean  
 }
 
-export interface MediaDevice {
+export interface MediaDevices {
 	monitors: Monitor[]
 	soundcards: Soundcard[]
+}
+
+export interface MediaDevice {
+	monitor: Monitor
+	soundcard: Soundcard
 }
