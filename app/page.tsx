@@ -13,19 +13,19 @@ import {
     TurnOnAlert,
     TurnOnStatus,
 } from "../components/popup/popup";
-import { WebRTCClient } from "webrtc-streaming-core/dist/app";
+import { WebRTCClient } from "../core/src/app";
 import { useRouter, useSearchParams  } from "next/navigation";
 import {
     DeviceSelection,
     DeviceSelectionResult,
-} from "webrtc-streaming-core/dist/models/devices.model";
+} from "../core/src/models/devices.model";
 import {
     ConnectionEvent,
     EventMessage,
     Log,
     LogConnectionEvent,
     LogLevel,
-} from "webrtc-streaming-core/dist/utils/log";
+} from "../core/src/utils/log";
 import { GetServerSideProps } from "next";
 import { GoogleAnalytics } from "nextjs-google-analytics";
 import { WebRTCControl } from "../components/control/control";
@@ -33,7 +33,7 @@ import { VirtualGamepad } from "../components/virtGamepad/virtGamepad";
 import {
     getPlatform,
     Platform,
-} from "webrtc-streaming-core/dist/utils/platform";
+} from "../core/src/utils/platform";
 import { Analytics } from "@vercel/analytics/react";
 
 export default function Home () {
@@ -47,6 +47,7 @@ export default function Home () {
     const bitrate = searchParams.get('bitrate'); 
     const platform = searchParams.get('platform'); 
     const pingUrl = searchParams.get('pingUrl'); 
+    const loggingClientUrl = searchParams.get('loggingInforUrl');
 
     const signalingURL = Buffer.from((signaling ? signaling : "d3NzOi8vc2VydmljZS50aGlua21heS5uZXQvaGFuZHNoYWtl") as string, "base64").toString();
     const signalingToken = (token ? token : "none") as string;
@@ -102,6 +103,7 @@ export default function Home () {
 
         return ret;
     }
+    let intervalRemoteTime : NodeJS.Timer | null = null
 
     const [Platform,setPlatform] = useState<Platform>(null);
     const [client,setclient] = useState<WebRTCClient>(null); //always useState for WebRTCClient, trust me
@@ -114,6 +116,28 @@ export default function Home () {
         setclient(new WebRTCClient( signalingURL, remoteVideo.current, remoteAudio.current, signalingToken, selectDevice, newplatform)
         .Notifier((message: EventMessage) => {
             console.log(message);
+            if(message == 'WebRTCConnectionDoneChecking' ||
+            message == 'WebSocketDisconnected' || 
+            message == 'ReceivedVideoStream'){
+                 fetch(atob(loggingClientUrl as string) + `?message=${message}`, {
+                    method: 'POST'
+                }).then(() => {})
+            }
+            let countTimeUse = 60000;
+            let countTimeStep = [1, 2, 5, 10, 15, 30, 60];
+            let indexOfCountTime = 1;
+            if(message == 'ReceivedVideoStream'){
+               
+                intervalRemoteTime = setInterval(async () => {
+                    await fetch(atob(loggingClientUrl as string) + `?message=RemoteTime: ${countTimeStep[indexOfCountTime]}`, {
+                        method: 'POST'
+                    });
+                    if (indexOfCountTime < countTimeStep.length){
+                        indexOfCountTime++;
+                    }
+                }, countTimeStep[indexOfCountTime] * countTimeUse);
+            }
+
             if(message == 'WebSocketConnected' || 
                message == 'ExchangingSignalingMessage' || 
                message == 'WaitingAvailableDeviceSelection')  
@@ -124,9 +148,9 @@ export default function Home () {
             if(message == 'WebRTCConnectionClosed') 
 		router.refresh();
         }))
-        let interval : NodeJS.Timer | null = null
+        let intervalPing : NodeJS.Timer | null = null
         if (pingUrl != null) {
-            interval = setInterval(async () => {
+            intervalPing = setInterval(async () => {
                 await fetch(atob(pingUrl as string), {
                     method: 'POST'
                 })
@@ -134,8 +158,11 @@ export default function Home () {
         }
 
         return () => {
-            if (interval != null) {
-                clearInterval(interval)
+            if (intervalPing != null) {
+                clearInterval(intervalPing)
+            }
+            if (intervalRemoteTime != null) {
+                clearInterval(intervalRemoteTime)
             }
         }
     }, []);
