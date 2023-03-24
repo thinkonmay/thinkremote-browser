@@ -13,14 +13,14 @@ import SendIcon from '@mui/icons-material/Send';
 import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
 import StarBorder from '@mui/icons-material/StarBorder';
-import VirtualOSBrowserCore from '../../supabase';
+import SbCore from '../../supabase';
 
 interface NavBarDashBoardProps {
-  core : VirtualOSBrowserCore
+  core : SbCore
 }
 export default function NavBarDashBoard(props: NavBarDashBoardProps) {
   const [open, setOpen] = React.useState(true);
-  const core = new VirtualOSBrowserCore()
+  const core = new SbCore()
 
 
   const handleClick = () => {

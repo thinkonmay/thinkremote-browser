@@ -1,5 +1,5 @@
 import { Avatar, Box, Button, Card, CardContent, CardHeader, Checkbox, FormControlLabel, FormGroup, Grid, IconButton, Stack, Typography } from "@mui/material"
-import VirtualOSBrowserCore from "../../supabase"
+import SbCore from "../../supabase"
 import { WorkerSession } from "../../supabase/type"
 
 export interface WorkerSessionProps {
@@ -8,7 +8,7 @@ export interface WorkerSessionProps {
 }
 export const WorkerSessionComponent = (props: WorkerSessionProps) => {
     const onDeactivate = async () => {
-        const core = new VirtualOSBrowserCore()
+        const core = new SbCore()
         const result = await core.DeactivateWorkerSession(props.id)
         if (result instanceof Error) 
             console.log(result.message)

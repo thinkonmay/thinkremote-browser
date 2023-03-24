@@ -6,7 +6,7 @@ import { Hardware } from "./hardware";
 import { MediaDevice, MediaDevices } from "./media";
 import {Schema, WorkerProfile, WorkerSession} from "./type"
 
-export default class VirtualOSBrowserCore {
+export default class SbCore {
 	private supabase: SupabaseClient;
 	constructor() {
 		this.supabase = createClient(
@@ -42,6 +42,15 @@ export default class VirtualOSBrowserCore {
 		return resp.error == null ? resp.data.user : resp.error;
 	}
 
+
+	public async AuthenticateSession(): Promise<{
+		token: string
+		SignalingURL : string
+		WebRTCConfig : RTCConfiguration
+		PingCallback : () => (void)
+	} | Error> {
+		return new Error()
+	}
 
 	public async FetchAuthorizedWorkers(): Promise<WorkerProfile[] | Error> {
 		const {data,error} = await this.supabase

@@ -12,7 +12,7 @@ import Container from "@mui/material/Container";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import GoogleIcon from "@mui/icons-material/Google";
 import { IconButton } from "@mui/material";
-import VirtualOSBrowserCore  from "../../supabase/index"
+import SbCore  from "../../supabase/index"
 import { useRouter } from "next/navigation";
 
 export function Copyright(props) {
@@ -47,7 +47,7 @@ export default function SignIn() {
 	//	}
 	//}, [user]);
 
-	const clientSupabase = new VirtualOSBrowserCore();
+	const clientSupabase = new SbCore();
 	return (
 		<ThemeProvider theme={theme}>
 			<Container component="main" maxWidth="xs">

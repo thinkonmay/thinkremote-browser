@@ -5,7 +5,7 @@ import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { Box } from "@mui/system";
 import { useEffect, useState } from "react";
 import { useRouter , usePathname } from "next/navigation";
-import VirtualOSBrowserCore from "../../supabase";
+import SbCore from "../../supabase";
 import { MediaDevices } from "../../supabase/media";
 import { Hardware } from "../../supabase/hardware";
 import { WorkerProfile, WorkerSession } from "../../supabase/type";
@@ -24,7 +24,7 @@ function DashBoard() {
 	useEffect(() => { matchSessions() },[Sessions])
 
 	const fetchDevices = async() => {
-		const core = new VirtualOSBrowserCore()
+		const core = new SbCore()
 		const result = await core.FetchAuthorizedWorkers()
 		if (result instanceof Error) {
 			console.log(result.message)
@@ -37,7 +37,7 @@ function DashBoard() {
 	}
 
 	const fetchSessions = async() => {
-		const core = new VirtualOSBrowserCore()
+		const core = new SbCore()
 		const result = await core.FetchAuthorizedWorkerSessions()
 		if (result instanceof Error) {
 			console.log(result.message)
@@ -58,7 +58,7 @@ function DashBoard() {
 
 
 	useEffect(() => {
-		const core = new VirtualOSBrowserCore()
+		const core = new SbCore()
 		core.Authenticated().then(async (authenticated) => {
 			if (!authenticated) {
 				console.log(`redirect to http://localhost:3000${path}`)

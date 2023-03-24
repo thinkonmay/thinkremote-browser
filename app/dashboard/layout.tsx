@@ -2,7 +2,7 @@
 import { Container, Grid } from "@mui/material";
 import { Box, Stack } from "@mui/system";
 import React, { useEffect, useState } from "react";
-import VirtualOSBrowserCore from "../../supabase";
+import SbCore from "../../supabase";
 import HeaderDashBoard from "./header";
 import NavBarDashBoard from "./navbar";
 
@@ -12,9 +12,9 @@ interface Props{
 }
 function LayoutDashBoard(props: Props) {
 	const {children} = props
-	const [core,setcore] = useState<VirtualOSBrowserCore>(new VirtualOSBrowserCore())
+	const [core,setcore] = useState<SbCore>(new SbCore())
 	useEffect(() => {
-		setcore(new VirtualOSBrowserCore())
+		setcore(new SbCore())
 	},[])
 
 

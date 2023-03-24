@@ -1,8 +1,6 @@
 "use client"
 
 import React, { useEffect, useRef, useState } from "react";
-import Head from "next/head";
-import video_mobile from "../public/assets/videos/video_demo.mp4";
 import video_desktop from "../public/assets/videos/video_demo_desktop.mp4";
 import styled from "styled-components";
 import {
@@ -10,136 +8,76 @@ import {
     AskSelectDisplay,
     AskSelectFramerate,
     AskSelectSoundcard,
-    TurnOnAlert,
     TurnOnStatus,
 } from "../components/popup/popup";
-import { WebRTCClient } from "webrtc-streaming-core/dist/app";
+import { WebRTCClient } from "../core/src/app";
 import { useRouter, useSearchParams  } from "next/navigation";
 import {
     DeviceSelection,
     DeviceSelectionResult,
-} from "webrtc-streaming-core/dist/models/devices.model";
+} from "../core/src/models/devices.model";
 import {
+    AddNotifier,
     ConnectionEvent,
     EventMessage,
     Log,
     LogConnectionEvent,
     LogLevel,
-} from "webrtc-streaming-core/dist/utils/log";
-import { GetServerSideProps } from "next";
-import { GoogleAnalytics } from "nextjs-google-analytics";
+} from "../core/src/utils/log";
 import { WebRTCControl } from "../components/control/control";
-import { VirtualGamepad } from "../components/virtGamepad/virtGamepad";
 import {
     getPlatform,
     Platform,
-} from "webrtc-streaming-core/dist/utils/platform";
-import { Analytics } from "@vercel/analytics/react";
+} from "../core/src/utils/platform";
+import SbCore from "../supabase";
 
 export default function Home () {
     const remoteVideo = useRef<HTMLVideoElement>(null);
     const remoteAudio = useRef<HTMLAudioElement>(null);
     const searchParams = useSearchParams();
     const router = useRouter()
+    AddNotifier((message: EventMessage) => {
+        if(message == 'WebSocketConnected' || 
+            message == 'ExchangingSignalingMessage' || 
+            message == 'WaitingAvailableDeviceSelection')  
+            return;
+        
+        TurnOnStatus(message);
 
-    const signaling  = searchParams.get('signaling'); 
-    const token      = searchParams.get('token'); 
-    const fps        = searchParams.get('fps'); 
-    const bitrate    = searchParams.get('bitrate'); 
+        if(message == 'WebRTCConnectionClosed') 
+            router.refresh();
+    })
+
+    const ref        = searchParams.get('ref'); 
+
     const platform   = searchParams.get('platform'); 
-    const pingUrl    = searchParams.get('pingUrl'); 
 
-    const signalingURL = Buffer.from((signaling ? signaling : "d3NzOi8vc2VydmljZS50aGlua21heS5uZXQvaGFuZHNoYWtl") as string, "base64").toString();
-    const signalingToken = (token ? token : "none") as string;
-    var defaultBitrate = parseInt((bitrate ? bitrate : "6000") as string, 10);
-    var defaultFramerate = parseInt((fps ? fps : "55") as string, 10);
-    var defaultSoundcard = "Default Audio Render Device";
-    var defaultPlatform: Platform = platform == 'mobile' ? 'mobile' : (platform == 'desktop' ? 'desktop' : null);
+    const [Platform,setPlatform] = useState<Platform>(platform == 'mobile' ? 'mobile' : (platform == 'desktop' ? 'desktop' : null));
+    const [client,setclient] = useState<WebRTCClient>(null); //always useState for WebRTCClient, trust me
 
-    const selectDevice = async (offer: DeviceSelection) => {
-        LogConnectionEvent(ConnectionEvent.WaitingAvailableDeviceSelection);
-        let ret = new DeviceSelectionResult(
-            offer.soundcards[0].DeviceID,
-            offer.monitors[0].MonitorHandle.toString()
-        );
 
-        if (offer.soundcards.length > 1) {
-            let exist = false;
-            if (defaultSoundcard != null) {
-                offer.soundcards.forEach((x) => {
-                    if (x.Name == defaultSoundcard) {
-                        exist = true;
-                        ret.SoundcardDeviceID = x.DeviceID;
-                        defaultSoundcard = null;
-                    }
-                });
-            }
-
-            if (!exist) {
-                ret.SoundcardDeviceID = await AskSelectSoundcard(
-                    offer.soundcards
-                );
-                Log(
-                    LogLevel.Infor,
-                    `selected audio deviceid ${ret.SoundcardDeviceID}`
-                );
-            }
-        }
-
-        if (offer.monitors.length > 1) {
-            ret.MonitorHandle = await AskSelectDisplay(offer.monitors);
-            Log(LogLevel.Infor, `selected monitor handle ${ret.MonitorHandle}`);
-        }
-
-        if (defaultBitrate == null) {
-            ret.bitrate = await AskSelectBitrate();
-        } else {
-            ret.bitrate = defaultBitrate;
-        }
-        if (defaultFramerate == null) {
-            ret.framerate = await AskSelectFramerate();
-        } else {
-            ret.framerate = defaultFramerate;
-        }
-
-        return ret;
+    const SetupConnection = async() => {
+        const core = new SbCore()
+        const result  = await core.AuthenticateSession()
+        if (result instanceof Error) 
+            return
+        
+        const {token,SignalingURL,WebRTCConfig,PingCallback} = result
+        setInterval(PingCallback,1000)
+            
+        setclient(new WebRTCClient(
+            SignalingURL,token, WebRTCConfig,
+            remoteVideo.current, 
+            remoteAudio.current,  
+            Platform))
     }
 
-    const [Platform,setPlatform] = useState<Platform>(null);
-    const [client,setclient] = useState<WebRTCClient>(null); //always useState for WebRTCClient, trust me
     useEffect(() => {
-        let newplatform = defaultPlatform;
-        if (defaultPlatform == null) {
-            newplatform = getPlatform()
-        }
-        setPlatform(newplatform)
-        setclient(new WebRTCClient( signalingURL, remoteVideo.current, remoteAudio.current, signalingToken, selectDevice, newplatform)
-        .Notifier((message: EventMessage) => {
-            console.log(message);
-            if(message == 'WebSocketConnected' || 
-               message == 'ExchangingSignalingMessage' || 
-               message == 'WaitingAvailableDeviceSelection')  
-                return;
-            
-            TurnOnStatus(message);
-
-            if(message == 'WebRTCConnectionClosed') 
-		router.refresh();
-        }))
-        let interval : NodeJS.Timer | null = null
-        if (pingUrl != null) {
-            interval = setInterval(async () => {
-                await fetch(atob(pingUrl as string), {
-                    method: 'POST'
-                })
-            },1000);
-        }
-
-        return () => {
-            if (interval != null) {
-                clearInterval(interval)
-            }
-        }
+        setPlatform(old => { 
+            if (old == null) 
+                return getPlatform()
+        })
+        SetupConnection()
     }, []);
         
     const toggle_mouse_touch_callback=async function(enable: boolean) { 
