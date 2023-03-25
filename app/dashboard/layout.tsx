@@ -17,7 +17,7 @@ function LayoutDashBoard(props: Props) {
 		setcore(new VirtualOSBrowserCore())
 	},[])
 
-
+	
 	return (
 		<Box 
 			sx={{

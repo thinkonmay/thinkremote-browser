@@ -1,99 +1,129 @@
-"use client"
+import 'server-only'
 
-import { Avatar, Button, Card, CardContent, CardHeader, Checkbox, FormControlLabel, FormGroup, Grid, IconButton, Stack, Typography } from "@mui/material";
-import MoreVertIcon from '@mui/icons-material/MoreVert';
-import { Box } from "@mui/system";
-import { useEffect, useState } from "react";
-import { useRouter , usePathname } from "next/navigation";
+//import { useEffect, useState } from "react";
+//import { useRouter, usePathname } from "next/navigation";
 import VirtualOSBrowserCore from "../../supabase";
-import { MediaDevices } from "../../supabase/media";
-import { Hardware } from "../../supabase/hardware";
+//import { MediaDevices } from "../../supabase/media";
+//import { Hardware } from "../../supabase/hardware";
 import { WorkerProfile, WorkerSession } from "../../supabase/type";
 import { WorkerComponent, WorkerProfileWithSession } from "../../components/worker/worker";
 import { WorkerSessionComponent } from "../../components/worker/session";
+import RenderWorkers from "./renderWorkers";
+import { createServerClient } from "../../supabase/supabase-server";
+import { FetchAuthorizedWorkers, FetchAuthorizedWorkerSessions } from "../../supabase/supabase-queries";
+import { redirect } from 'next/navigation';
 
 
-
-
-function DashBoard() {
-	const path = usePathname()
-	const route = useRouter()
-	const [Workers,setWorkers] = useState<WorkerProfileWithSession[]>([])
-	const [Sessions,setSessions] = useState<WorkerSession[]>([])
-	useEffect(() => { fetchSessions() },[Workers])
-	useEffect(() => { matchSessions() },[Sessions])
-
-	const fetchDevices = async() => {
-		const core = new VirtualOSBrowserCore()
-		const result = await core.FetchAuthorizedWorkers()
-		if (result instanceof Error) {
-			console.log(result.message)
-			return 
-		}
-
-		const wfws : WorkerProfileWithSession[] = []
-		result.forEach(item => { wfws.push({...item,worker_sessions:[]}) })
-		setWorkers(wfws)
-	}
-
-	const fetchSessions = async() => {
-		const core = new VirtualOSBrowserCore()
-		const result = await core.FetchAuthorizedWorkerSessions()
-		if (result instanceof Error) {
-			console.log(result.message)
-			return 
-		}
-		setSessions(result)
-	}
-
-	const matchSessions = async() => {
-		setWorkers(old => {
-			old.forEach((worker) => {
-				worker.worker_sessions = Sessions.filter(x => x.worker_profile_id == worker.id)
-			})
-			return old
+const matchSessions =  (workers = [], sessions) => {
+	if(workers.length > 0) {
+		workers.forEach(worker => {
+			worker.worker_sessions = sessions.filter(x => x.worker_profile_id == worker.id)
 		})
 	}
+	return workers
+}
+
+const fetchWokersAndSessions = async () => {
+	//const core = new VirtualOSBrowserCore()
+	
+	//const workers = await core.FetchAuthorizedWorkers()
+	const supabase = createServerClient()
+	const workers = await FetchAuthorizedWorkers(supabase)
+	console.log(workers, '0000000000000');
+	if (workers instanceof Error) {
+		console.log(workers.message)
+		return 	
+	}
+	let wfws: WorkerProfileWithSession[]
+	workers.forEach(item => { wfws.push({ ...item, worker_sessions: [] }) })
+
+
+	//const sessions = await core.FetchAuthorizedWorkerSessions()
+	const sessions = await FetchAuthorizedWorkerSessions(supabase)
+	if (sessions instanceof Error) {
+		console.log(sessions.message)
+		return
+	}
+
+	console.log(workers, sessions);
+
+	return matchSessions(wfws, sessions)
+
+}
+async function DashBoard() {
+	//const path = usePathname()
+	//const route = useRouter()
+	//const [Workers, setWorkers] = useState<WorkerProfileWithSession[]>([])
+	//const [Sessions, setSessions] = useState<WorkerSession[]>([])
+	//useEffect(() => { fetchSessions() }, [Workers])
+	//useEffect(() => { matchSessions() }, [Sessions])
+
+	//const fetchDevices = async () => {
+	//	const core = new VirtualOSBrowserCore()
+	//	const result = await core.FetchAuthorizedWorkers()
+	//	if (result instanceof Error) {
+	//		console.log(result.message)
+	//		return
+	//	}
+
+	//	const wfws: WorkerProfileWithSession[] = []
+	//	result.forEach(item => { wfws.push({ ...item, worker_sessions: [] }) })
+	//	setWorkers(wfws)
+	//}
+
+	//const fetchSessions = async () => {
+	//	const core = new VirtualOSBrowserCore()
+	//	const result = await core.FetchAuthorizedWorkerSessions()
+	//	if (result instanceof Error) {
+	//		console.log(result.message)
+	//		return
+	//	}
+	//	setSessions(result)
+	//}
+
+	//const matchSessions = async () => {
+	//	setWorkers(old => {
+	//		old.forEach((worker) => {
+	//			worker.worker_sessions = Sessions.filter(x => x.worker_profile_id == worker.id)
+	//		})
+	//		return old
+	//	})
+	//}
 
 
 
-	useEffect(() => {
-		const core = new VirtualOSBrowserCore()
-		core.Authenticated().then(async (authenticated) => {
-			if (!authenticated) {
-				console.log(`redirect to http://localhost:3000${path}`)
-				localStorage.setItem("redirectTo",`http://localhost:3000${path}`)
-				await route.replace("/sign_in")
-				return
-			}
+	//useEffect(() => {
+	//	const core = new VirtualOSBrowserCore()
+	//	core.Authenticated().then(async (authenticated) => {
+	//		if (!authenticated) {
+	//			console.log(`redirect to http://localhost:3000${path}`)
+	//			localStorage.setItem("redirectTo", `http://localhost:3000${path}`)
+	//			await route.replace("/sign_in")
+	//			return
+	//		}
 
-			fetchDevices()
-			fetchSessions()
-		});
-	},[])
+	//		fetchDevices()
+	//		fetchSessions()
+	//	});
+	//}, [])
 
+	const data = await fetchWokersAndSessions()
 	return (
 		<>
-			<Box
-				sx={{
+			<div
+				style={{
 					//bgcolor: 'white',
-					'border-radius': '8px',
+					borderRadius: '8px',
 					padding: '30px',
 					boxShadow: '0px 0px 15px -6px rgba(0,0,0,0.49)',
-					mb: '20px'
+					marginBottom: '20px'
 				}}
 			>
-				<Typography variant="h2">
+				<h2>
 					Your device
-				</Typography>
-				<Grid container spacing={2}>
-					{Workers.map(item => (
-						<Grid key={item.id} item xl={3} md={4} sm={6} xs={12} >
-							<WorkerComponent id={item.id} profile={item} ></WorkerComponent>
-						</Grid>
-					))}
-				</Grid>
-			</Box>
+				</h2>
+				<RenderWorkers data={data}/>
+			</div>
 		</>
 	);
 }

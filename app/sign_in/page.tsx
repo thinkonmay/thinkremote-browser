@@ -14,6 +14,8 @@ import GoogleIcon from "@mui/icons-material/Google";
 import { IconButton } from "@mui/material";
 import VirtualOSBrowserCore  from "../../supabase/index"
 import { useRouter } from "next/navigation";
+import { useSupabase } from "../../context/authContext";
+import { redirect } from 'next/navigation';
 
 export function Copyright(props) {
 	return (
@@ -36,18 +38,12 @@ export function Copyright(props) {
 const theme = createTheme();
 
 export default function SignIn() {
-	//const { isUserAuthenticated, user } = useAuth();
-	const router = useRouter();
-
-	//React.useEffect(() => {
-	//	if (isUserAuthenticated()) {
-	//		// router.push('/')
-	//		// router.replace(`/`);
-	//		console.log("chang roue");
-	//	}
-	//}, [user]);
-
 	const clientSupabase = new VirtualOSBrowserCore();
+	const {session} = useSupabase()
+	console.log(session)
+	if(session){
+		redirect('/dashboard')
+	}
 	return (
 		<ThemeProvider theme={theme}>
 			<Container component="main" maxWidth="xs">
@@ -88,6 +84,6 @@ export default function SignIn() {
 				<Copyright sx={{ mt: 8, mb: 4 }} />
 			</Container>
 		</ThemeProvider>
-	);
+	)
 }
 

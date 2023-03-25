@@ -1,35 +1,24 @@
-"use client"
+import "server-only"
 
-import { Analytics } from '@vercel/analytics/react';
-import { GoogleAnalytics } from 'nextjs-google-analytics';
 import * as React from 'react';
+import Provider from '../context/provider';
 import StyledComponentsRegistry from '../lib/registry';
 import "../styles/globals.css"
+import { createServerClient } from '../supabase/supabase-server';
 
-import { ThemeProvider, createTheme } from '@mui/material/styles';
 
-const theme = createTheme({
-	typography:{
-		//fontSize: 12,
-	},
-	components: {
-	  // Name of the component
-	  MuiButton: {
-		styleOverrides: {
-		  // Name of the slot
-		  root: {
-			// Some CSS
-			fontSize: '1.2rem',
-		  },
-		},
-	  },
-	},
-  });
-function RootLayout({
+async function RootLayout({
 	children,
 }: {
 	children: React.ReactNode
 }) {
+	const supabase = createServerClient();
+
+	const {
+		data: { session }
+	} = await supabase.auth.getSession();
+
+	
 	return (
 		<html>
 			<head>
@@ -45,13 +34,12 @@ function RootLayout({
 				<link rel="icon" href="/favicon.ico" />
 			</head>
 			<body>
-				<GoogleAnalytics trackPageViews />
-				<Analytics />
-				<ThemeProvider theme={theme}>
-					<StyledComponentsRegistry>
+
+				<StyledComponentsRegistry>
+					<Provider session={session}>
 						{children}
- 					</StyledComponentsRegistry>
-				</ThemeProvider>
+					</Provider>
+				</StyledComponentsRegistry>
 			</body>
 		</html>
 	);
