@@ -49,7 +49,6 @@ export default function Home () {
     })
 
     const ref        = searchParams.get('ref'); 
-
     const platform   = searchParams.get('platform'); 
 
     const [Platform,setPlatform] = useState<Platform>(platform == 'mobile' ? 'mobile' : (platform == 'desktop' ? 'desktop' : null));
@@ -58,7 +57,7 @@ export default function Home () {
 
     const SetupConnection = async() => {
         const core = new SbCore()
-        const result  = await core.AuthenticateSession()
+        const result  = await core.AuthenticateSession(ref)
         if (result instanceof Error) 
             return
         

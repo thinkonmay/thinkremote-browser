@@ -1,6 +1,7 @@
 "use client"
 
 import { createClient, SupabaseClient, User } from "@supabase/supabase-js";
+import { AuthSessionResp } from "./authenticate";
 import { WorkerSessionCreateBody, WorkerSessionDeactivateBody } from "./functions";
 import { Hardware } from "./hardware";
 import { MediaDevice, MediaDevices } from "./media";
@@ -43,13 +44,34 @@ export default class SbCore {
 	}
 
 
-	public async AuthenticateSession(): Promise<{
+	public async AuthenticateSession(ref : string): Promise<{
 		token: string
 		SignalingURL : string
 		WebRTCConfig : RTCConfiguration
 		PingCallback : () => (void)
 	} | Error> {
-		return new Error()
+		const session = await this.supabase.auth.getSession()
+		if (session.error != null) 
+			return new Error(session.error.message)
+
+		const body = JSON.stringify({ reference: ref })
+		const {data,error} = await this.supabase.functions.invoke<AuthSessionResp>("session_authenticate",{
+			headers: { "access_token": session.data.session.access_token },
+			body: body,
+			method: 'POST',
+		})
+
+		if(error != null)
+			return new Error(error)
+
+		return  {
+			token : data.token,
+			SignalingURL : data.signaling.WebsocketURL,
+			WebRTCConfig : data.webrtc,
+			PingCallback: ()=>{
+				const user_session_id = data.id
+			}
+		}
 	}
 
 	public async FetchAuthorizedWorkers(): Promise<WorkerProfile[] | Error> {
