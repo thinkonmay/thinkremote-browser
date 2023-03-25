@@ -12,7 +12,7 @@ import Container from "@mui/material/Container";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import GoogleIcon from "@mui/icons-material/Google";
 import { IconButton } from "@mui/material";
-import VirtualOSBrowserCore  from "../../supabase/index"
+import SbCore  from "../../supabase/index"
 import { useRouter } from "next/navigation";
 import { useSupabase } from "../../context/authContext";
 import { redirect } from 'next/navigation';
@@ -38,12 +38,6 @@ export function Copyright(props) {
 const theme = createTheme();
 
 export default function SignIn() {
-	const clientSupabase = new VirtualOSBrowserCore();
-	const {session} = useSupabase()
-	console.log(session)
-	if(session){
-		redirect('/dashboard')
-	}
 	return (
 		<ThemeProvider theme={theme}>
 			<Container component="main" maxWidth="xs">

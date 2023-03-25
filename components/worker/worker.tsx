@@ -1,5 +1,5 @@
 import { Avatar, Box, Button, Card, CardContent, CardHeader, Checkbox, FormControlLabel, FormGroup, Grid, IconButton, Stack, Typography } from "@mui/material"
-import VirtualOSBrowserCore from "../../supabase"
+import SbCore from "../../supabase"
 import { WorkerProfile, WorkerSession } from "../../supabase/type"
 import { WorkerSessionComponent } from "./session"
 
@@ -17,10 +17,10 @@ export type WorkerProfileWithSession = (WorkerProfile & {
 
 export const WorkerComponent = (props: WorkerProps) => {
 	const onConnect = async() => {
-		const core = new VirtualOSBrowserCore()
+		const core = new SbCore()
 		const result = await core.CreateWorkerSession(props.id,{
 			monitor: props.profile.media_device.monitors[0],
-			soundcard: props.profile.media_device.soundcards[0]
+			soundcard: props.profile.media_device.soundcards.find(sc => sc.Name == "Default Audio Render Device")
 		})
 
         if (result instanceof Error) 

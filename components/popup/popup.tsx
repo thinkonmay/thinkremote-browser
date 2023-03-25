@@ -1,9 +1,5 @@
 import Swal from "sweetalert2";
-import { WebRTCClient } from "webrtc-streaming-core/dist/app";
-import {
-    Soundcard,
-    Monitor,
-} from "webrtc-streaming-core/dist/models/devices.model";
+import { Soundcard, Monitor, } from "../../core/src/models/devices.model";
 
 let have_swal = false;
 export async function TurnOnAlert(error: string): Promise<void> {

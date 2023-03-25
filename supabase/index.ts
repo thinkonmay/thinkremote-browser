@@ -1,12 +1,13 @@
 "use client"
 
 import { createClient, SupabaseClient, User } from "@supabase/supabase-js";
+import { AuthSessionResp } from "./authenticate";
 import { WorkerSessionCreateBody, WorkerSessionDeactivateBody } from "./functions";
 import { Hardware } from "./hardware";
 import { MediaDevice, MediaDevices } from "./media";
 import {Schema, WorkerProfile, WorkerSession} from "./type"
 
-export default class VirtualOSBrowserCore {
+export default class SbCore {
 	private supabase: SupabaseClient;
 	constructor() {
 		this.supabase = createClient(
@@ -42,6 +43,36 @@ export default class VirtualOSBrowserCore {
 		return resp.error == null ? resp.data.user : resp.error;
 	}
 
+
+	public async AuthenticateSession(ref : string): Promise<{
+		token: string
+		SignalingURL : string
+		WebRTCConfig : RTCConfiguration
+		PingCallback : () => (void)
+	} | Error> {
+		const session = await this.supabase.auth.getSession()
+		if (session.error != null) 
+			return new Error(session.error.message)
+
+		const body = JSON.stringify({ reference: ref })
+		const {data,error} = await this.supabase.functions.invoke<AuthSessionResp>("session_authenticate",{
+			headers: { "access_token": session.data.session.access_token },
+			body: body,
+			method: 'POST',
+		})
+
+		if(error != null)
+			return new Error(error)
+
+		return  {
+			token : data.token,
+			SignalingURL : data.signaling.WebsocketURL,
+			WebRTCConfig : data.webrtc,
+			PingCallback: ()=>{
+				const user_session_id = data.id
+			}
+		}
+	}
 
 	public async FetchAuthorizedWorkers(): Promise<WorkerProfile[] | Error> {
 		const {data,error} = await this.supabase
