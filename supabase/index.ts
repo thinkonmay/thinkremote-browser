@@ -1,19 +1,22 @@
 "use client"
 
-import { createClient, SupabaseClient, User } from "@supabase/supabase-js";
+import { SupabaseClient, User } from "@supabase/supabase-js";
 import { AuthSessionResp } from "./authenticate";
 import { WorkerSessionCreateBody, WorkerSessionDeactivateBody } from "./functions";
 import { Hardware } from "./hardware";
 import { MediaDevice, MediaDevices } from "./media";
 import {Schema, WorkerProfile, WorkerSession} from "./type"
+import { createBrowserClient } from "./supabase-browser";
 
 export default class SbCore {
 	private supabase: SupabaseClient;
 	constructor() {
-		this.supabase = createClient(
-			process.env.NEXT_PUBLIC_SUPABASE_URL ?? "",
-			process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? ""
-		);
+		// this.supabase = createClient(
+		// 	process.env.NEXT_PUBLIC_SUPABASE_URL ?? "",
+		// 	process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? ""
+		// );
+		this.supabase = createBrowserClient()
+
 	}
 
 	public async LoginWithGoogle() {
@@ -107,6 +110,7 @@ export default class SbCore {
 			worker_session_id: worker_session_id
 		} as WorkerSessionDeactivateBody)
 
+		console.log(session)
 		const {data,error} = await this.supabase.functions.invoke<string>("worker_session_deactivate",{
 			headers: { "access_token": session.data.session.access_token },
 			body: body,

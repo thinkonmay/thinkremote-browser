@@ -34,7 +34,7 @@ const fetchWokersAndSessions = async () => {
 		console.log(workers.message)
 		return 	
 	}
-	let wfws: WorkerProfileWithSession[]
+	let wfws: WorkerProfileWithSession[] = []
 	workers.forEach(item => { wfws.push({ ...item, worker_sessions: [] }) })
 
 

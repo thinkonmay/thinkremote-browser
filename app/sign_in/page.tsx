@@ -64,7 +64,7 @@ export default function SignIn() {
 						<Grid item xs={"auto"}>
 							<IconButton
 								onClick={async () => {
-									await clientSupabase.LoginWithGoogle()
+									await (new SbCore()).LoginWithGoogle()
 								}}
 							>
 								<GoogleIcon
