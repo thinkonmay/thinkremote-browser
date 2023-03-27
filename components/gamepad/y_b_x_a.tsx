@@ -31,6 +31,7 @@ const ButtonY = styled(DefaultButton)`
 
     transform: translate(50%, -100%);
 `;
+
 const ButtonB = styled(DefaultButton)`
     bottom: 0;
     right: 50%;
@@ -87,22 +88,36 @@ export function YBXA(props: Props) {
     );
 }
 
+const MouseRight = styled(DefaultButton)`
+    top: 0;
+    right: 50%;
+    transform: translate(50%, -100%);
+	color: white;
+    border: 2px solid currentColor;
+`;
+const MouseLeft = styled(DefaultButton)`
+    bottom: 0;
+    right: 50%;
+    transform: translate(50%, 100%);
+	color: white;
+    border: 2px solid currentColor;
+`;
 export function LR(props: Props) {
     const { onTouch, size } = props;
     return (
         <Container size={size}>
-            <ButtonY
+            <MouseRight
                 onTouchStart={(e: React.TouchEvent) => onTouch(e, "down", 2)}
                 onTouchEnd={(e: React.TouchEvent) => onTouch(e, "up", 2)}
             >
                 Right
-            </ButtonY>
-            <ButtonB
+            </MouseRight>
+            <MouseLeft
                 onTouchStart={(e: React.TouchEvent) => onTouch(e, "down", 0)}
                 onTouchEnd={(e: React.TouchEvent) => onTouch(e, "up", 0)}
             >
                 Left
-            </ButtonB>
+            </MouseLeft>
         </Container>
     );
 }

@@ -3,7 +3,7 @@
 
 import { Translate } from "@mui/icons-material";
 import { Button, Stack } from "@mui/material";
-import React, { useRef, useState, useEffect } from "react"; // we need this to make JSX compile
+import React, { useRef, useState, useEffect, useLayoutEffect } from "react"; // we need this to make JSX compile
 import Draggable, { DraggableData, DraggableEvent } from "react-draggable";
 import styled from "styled-components";
 import {
@@ -60,8 +60,8 @@ interface ButtonGroupProps {
     ButtonCallback: (index: number, type: "up" | "down") => Promise<void>;
 }
 export const ButtonGroupRight = (param: ButtonGroupProps) => {
-    const [posBtn, setPosBtn] = useState({ x: 0, y: 0 });
-    useEffect(() => {
+    const [posBtn, setPosBtn] = useState<{x: number, y: number}>({x:null, y: null});
+    useLayoutEffect(() => {
         let cache = localStorage.getItem(`right_group_pos`);
         const { x, y } = JSON.parse(
             cache != null ? cache : `{"x": 0, "y" : 0}`
@@ -75,7 +75,6 @@ export const ButtonGroupRight = (param: ButtonGroupProps) => {
     }, []);
 
     const handleDrag = (e: DraggableEvent, data: DraggableData) => {
-        const { x, y } = posBtn;
         setPosBtn({
             x: data.x,
             y: data.y,
@@ -123,7 +122,7 @@ export const ButtonGroupRight = (param: ButtonGroupProps) => {
 };
 export const ButtonGroupLeft = (param: ButtonGroupProps) => {
     const [posBtn, setPosBtn] = useState({ x: 0, y: 0 });
-    useEffect(() => {
+    useLayoutEffect(() => {
         let cache = localStorage.getItem(`left_group_pos`);
         const { x, y } = JSON.parse(
             cache != null ? cache : `{"x": 0, "y" : 0}`
