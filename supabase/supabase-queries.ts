@@ -1,4 +1,6 @@
+import 'server-only'
 import { WorkerSession } from "./type"
+export const revalidate = 0; 
 
 
 export const FetchAuthorizedWorkers = async (supabase) => {
