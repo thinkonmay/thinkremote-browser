@@ -103,12 +103,15 @@ export default function Home () {
 
         return ret;
     }
-    let intervalRemoteTime : NodeJS.Timer | null = null
+    let countTimeStep = 300000;
+    let indexOfCountTime = 1;
+
 
     const [Platform,setPlatform] = useState<Platform>(null);
     const [client,setclient] = useState<WebRTCClient>(null); //always useState for WebRTCClient, trust me
     useEffect(() => {
         let newplatform = defaultPlatform;
+        let intervalRemoteTime : NodeJS.Timer | null = null
         if (defaultPlatform == null) {
             newplatform = getPlatform()
         }
@@ -123,19 +126,13 @@ export default function Home () {
                     method: 'POST'
                 }).then(() => {})
             }
-            let countTimeUse = 60000;
-            let countTimeStep = [1, 2, 5, 10, 15, 30, 60];
-            let indexOfCountTime = 1;
             if(message == 'ReceivedVideoStream'){
-               
                 intervalRemoteTime = setInterval(async () => {
-                    await fetch(atob(loggingClientUrl as string) + `?message=RemoteTime: ${countTimeStep[indexOfCountTime]}`, {
+                    await fetch(atob(loggingClientUrl as string) + `?message=RemoteTime: ${countTimeStep * indexOfCountTime / 60000}`, {
                         method: 'POST'
                     });
-                    if (indexOfCountTime < countTimeStep.length){
                         indexOfCountTime++;
-                    }
-                }, countTimeStep[indexOfCountTime] * countTimeUse);
+                }, countTimeStep);
             }
 
             if(message == 'WebSocketConnected' || 
