@@ -39,8 +39,9 @@ export default function Home () {
     AddNotifier((message: EventMessage) => {
         if(message == 'WebSocketConnected' || 
             message == 'ExchangingSignalingMessage' || 
-            message == 'WaitingAvailableDeviceSelection')  
+            message == 'WaitingAvailableDeviceSelection')  {
             return;
+        }
         
         TurnOnStatus(message);
 
@@ -60,7 +61,6 @@ export default function Home () {
         const result  = await core.AuthenticateSession(ref)
         if (result instanceof Error) 
             return
-        
         const {token,SignalingURL,WebRTCConfig,PingCallback} = result
         setInterval(PingCallback,1000)
             

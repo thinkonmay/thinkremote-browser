@@ -24,7 +24,6 @@ const theme = createTheme({
 	},
 });
 function Provider({ children, session }) {
-	console.log(session);
 	return (
 		<SupabaseProvider session={session}>
 			<GoogleAnalytics trackPageViews />

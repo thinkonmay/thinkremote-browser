@@ -21,7 +21,6 @@ export default class SbCore {
 
 	public async LoginWithGoogle() {
 		const redirectTo = localStorage.getItem("redirectTo")
-		console.log(redirectTo)
 		await this.supabase.auth.signInWithOAuth({
 			provider: "google",
 			options: {
@@ -110,7 +109,6 @@ export default class SbCore {
 			worker_session_id: worker_session_id
 		} as WorkerSessionDeactivateBody)
 
-		console.log(session)
 		const {data,error} = await this.supabase.functions.invoke<string>("worker_session_deactivate",{
 			headers: { "access_token": session.data.session.access_token },
 			body: body,

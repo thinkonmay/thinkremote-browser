@@ -30,7 +30,6 @@ const fetchWokersAndSessions = async () => {
 	//const workers = await core.FetchAuthorizedWorkers()
 	const supabase = createServerClient()
 	const workers = await FetchAuthorizedWorkers(supabase)
-	console.log(workers, '0000000000000');
 	if (workers instanceof Error) {
 		console.log(workers.message)
 		return 	
@@ -41,12 +40,11 @@ const fetchWokersAndSessions = async () => {
 
 	//const sessions = await core.FetchAuthorizedWorkerSessions()
 	const sessions = await FetchAuthorizedWorkerSessions(supabase)
+	
 	if (sessions instanceof Error) {
 		console.log(sessions.message)
 		return
 	}
-
-	console.log(workers, sessions);
 
 	return matchSessions(wfws, sessions)
 

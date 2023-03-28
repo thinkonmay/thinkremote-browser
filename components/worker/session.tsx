@@ -10,7 +10,6 @@ export interface WorkerSessionProps {
 export const WorkerSessionComponent = (props: WorkerSessionProps) => {
     const onDeactivate = async () => {
         const core = new SbCore()
-		console.log(await core.Authenticated())
         const result = await core.DeactivateWorkerSession(props.id)
         if (result instanceof Error) 
             console.log(result.message)

@@ -70,7 +70,6 @@ export const ButtonGroupRight = (param: ButtonGroupProps) => {
             return;
         }
 
-        console.log(`get ${x} ${y} from storage`);
         setPosBtn({ x: x, y: y });
     }, []);
 
@@ -89,7 +88,6 @@ export const ButtonGroupRight = (param: ButtonGroupProps) => {
         }
 
         localStorage.setItem(`right_group_pos`, JSON.stringify(posBtn));
-        console.log(`set ${x} ${y} to storage`);
     };
 
     return (

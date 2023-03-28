@@ -16,6 +16,7 @@ export type WorkerProfileWithSession = (WorkerProfile & {
 
 
 export const WorkerComponent = (props: WorkerProps) => {
+	// console.log(JSON.stringify(props.profile.worker_sessions))
 	const onConnect = async() => {
 		const core = new SbCore()
 		const result = await core.CreateWorkerSession(props.id,{
@@ -88,7 +89,7 @@ export const WorkerComponent = (props: WorkerProps) => {
 						<Grid container spacing={1}>
 							<Grid item xs={12} lg={6}>
 								<FormGroup>
-									{props.profile.media_device.monitors.map((item, index) => (
+									{props.profile?.media_device?.monitors?.map((item, index) => (
 										<FormControlLabel key={index} control={<Checkbox  />} label={`${item.MonitorName}`} />
 									))}
 								</FormGroup>
@@ -100,7 +101,7 @@ export const WorkerComponent = (props: WorkerProps) => {
 						<Grid container spacing={1}>
 							<Grid item xs={12} lg={6}>
 								<FormGroup>
-									{props.profile.media_device.soundcards.map((item,index) => (
+									{props.profile?.media_device?.soundcards?.map((item,index) => (
 										<FormControlLabel key={index} control={<Checkbox  />} label={`${item.Name}`} />
 									))}
 								</FormGroup>

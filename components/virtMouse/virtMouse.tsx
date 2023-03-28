@@ -73,7 +73,6 @@ const MouseGroup = (param: ButtonGroupProps) => {
             return;
         }
 
-        console.log(`get ${x} ${y} from storage`);
         setPosBtn({ x: x, y: y });
     }, []);
 
@@ -91,7 +90,6 @@ const MouseGroup = (param: ButtonGroupProps) => {
         }
 
         localStorage.setItem(`mouse_group_pos`, JSON.stringify(posBtn));
-        console.log(`set ${x} ${y} to storage`);
     };
 
     return (
@@ -124,7 +122,6 @@ const JoyStickBtn = (param: ButtonGroupProps) => {
             return;
         }
 
-        console.log(`get ${x} ${y} from storage`);
         setPosBtn({ x: x, y: y });
     }, []);
 
@@ -143,7 +140,6 @@ const JoyStickBtn = (param: ButtonGroupProps) => {
         }
 
         localStorage.setItem(`joystick_btn_pos`, JSON.stringify(posBtn));
-        console.log(`set ${x} ${y} to storage`);
     };
 
     return (
