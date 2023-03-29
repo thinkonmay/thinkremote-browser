@@ -140,27 +140,24 @@ export default function Home() {
             }
 
 	//Check horizontal or vertical
-	const checkHorizontal = (width: number, height: number) =>{
-		if (width < height) {
-			setModalOpen(true)
-		}
-		else {
-			setModalOpen(false)
-		}
-	}
 	const [isModalOpen, setModalOpen] = useState(false)
 
 	useEffect(() => {
-		const width = window.innerWidth
-		const height = window.innerHeight
-		checkHorizontal(width, height)
+        const checkHorizontal = () =>{
+            const width = this.innerWidth
+            const height = this.innerHeight
+            if (width < height) {
+                setModalOpen(true)
+            }
+            else {
+                setModalOpen(false)
+            }
+        }
 		
-		window.addEventListener('resize', (e: UIEvent) => {
-			checkHorizontal(window.innerWidth, window.innerHeight)
-		})
-
+		checkHorizontal()
+		window.addEventListener('resize', checkHorizontal.bind(window) )
 		return () => {
-			window.removeEventListener('resize', checkHorizontal)
+			window.removeEventListener('resize',checkHorizontal.bind(window) )
 		}
 	}, [])
 
