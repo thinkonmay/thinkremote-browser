@@ -18,3 +18,6 @@ export class WorkerSessionDeactivateBody{
 }
 
 export type WorkerSessionCreateBody = ( IPFilter | IDFilter ) & MediaFilter
+
+
+export type SbFunction = 'worker_session_create' | 'worker_session_deactivate' | 'worker_profile_fetch' | 'session_authenticate' 

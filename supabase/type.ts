@@ -303,6 +303,8 @@ export class WorkerProfile {
     hardware : Hardware
     account_id : string
     id : number
+
+    match_sessions?: WorkerSession[]
 }
 
 
@@ -322,8 +324,6 @@ export interface WorkerSession {
     media_config : MediaDevices
     webrtc_config : RTCConfiguration
     manifest : any
-    session_log: any[]
 
-    worker_profile_id: any
     id : number
 }

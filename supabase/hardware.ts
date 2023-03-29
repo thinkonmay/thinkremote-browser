@@ -1,3 +1,5 @@
+import { WorkerProfile } from "./type"
+
 export interface Hardware {
 	Hostname    : string  
 	CPU         : string  
@@ -10,4 +12,10 @@ export interface Hardware {
 	GPUs        : string[]
 	Disks       : string[]
 	NICs        : string[]
+}
+
+
+export interface FetchResponse {
+	active: WorkerProfile[]
+	unactive: WorkerProfile[]
 }

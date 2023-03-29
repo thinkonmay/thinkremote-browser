@@ -2,8 +2,8 @@
 
 import { SupabaseClient, User } from "@supabase/supabase-js";
 import { AuthSessionResp } from "./authenticate";
-import { WorkerSessionCreateBody, WorkerSessionDeactivateBody } from "./functions";
-import { Hardware } from "./hardware";
+import { SbFunction, WorkerSessionCreateBody, WorkerSessionDeactivateBody } from "./functions";
+import { FetchResponse, Hardware } from "./hardware";
 import { MediaDevice, MediaDevices } from "./media";
 import {Schema, WorkerProfile, WorkerSession} from "./type"
 import { createBrowserClient } from "./supabase-browser";
@@ -57,7 +57,7 @@ export default class SbCore {
 			return new Error(session.error.message)
 
 		const body = JSON.stringify({ reference: ref })
-		const {data,error} = await this.supabase.functions.invoke<AuthSessionResp>("session_authenticate",{
+		const {data,error} = await this.supabase.functions.invoke<AuthSessionResp>("session_authenticate" as SbFunction,{
 			headers: { "access_token": session.data.session.access_token },
 			body: body,
 			method: 'POST',
@@ -76,28 +76,20 @@ export default class SbCore {
 		}
 	}
 
-	public async FetchAuthorizedWorkers(): Promise<WorkerProfile[] | Error> {
-		const {data,error} = await this.supabase
-			.from('worker_profile' as Schema)
-			.select("hardware,media_device,account_id,id,inserted_at,last_check")
-		if (error != null) 
-			return new Error(error.message)
+	public async FetchAuthorizedWorkers(): Promise<FetchResponse | Error> {
+		const session = await this.supabase.auth.getSession()
+		if (session.error != null) 
+			return new Error(session.error.message)
 
-		return data
+		const body = JSON.stringify({})
+		const {data,error} = await this.supabase.functions.invoke<FetchResponse>("worker_profile_fetch" as SbFunction,{
+			headers: { "access_token": session.data.session.access_token },
+			body: body,
+			method: 'POST',
+		})
+
+		return error == null ?  data : new Error(error +":"+ data)
 	}
-
-
-	public async FetchAuthorizedWorkerSessions(): Promise<WorkerSession[] | Error> {
-		const {data,error} = await this.supabase
-			.from('worker_session' as Schema)
-			.select("id,signaling_config,media_config,webrtc_config,manifest,session_log,worker_profile_id:metadata->worker_profile_id")
-
-		if (error != null) 
-			return new Error(error.message)
-
-		return data 
-	}
-
 
 
 	public async DeactivateWorkerSession(worker_session_id: number): Promise<string | Error> {
@@ -109,7 +101,7 @@ export default class SbCore {
 			worker_session_id: worker_session_id
 		} as WorkerSessionDeactivateBody)
 
-		const {data,error} = await this.supabase.functions.invoke<string>("worker_session_deactivate",{
+		const {data,error} = await this.supabase.functions.invoke<string>("worker_session_deactivate" as SbFunction,{
 			headers: { "access_token": session.data.session.access_token },
 			body: body,
 			method: 'POST',
@@ -130,7 +122,7 @@ export default class SbCore {
 			monitor_name: media.monitor.MonitorName
 		} as WorkerSessionCreateBody)
 
-		const {data,error} = await this.supabase.functions.invoke<string>("worker_session_create",{
+		const {data,error} = await this.supabase.functions.invoke<string>("worker_session_create" as SbFunction,{
 			headers: { "access_token": session.data.session.access_token },
 			body: body,
 			method: 'POST',
