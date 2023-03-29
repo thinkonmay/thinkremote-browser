@@ -1,7 +1,7 @@
 "use client"
 
 
-import React, { useState, useEffect } from "react"; // we need this to make JSX compile
+import React, { useState, useEffect, useLayoutEffect } from "react"; // we need this to make JSX compile
 import Draggable, { DraggableData, DraggableEvent } from "react-draggable";
 import styled from "styled-components";
 import {
@@ -64,7 +64,7 @@ interface ButtonGroupProps {
 
 const MouseGroup = (param: ButtonGroupProps) => {
     const [posBtn, setPosBtn] = useState({ x: 0, y: 0 });
-    useEffect(() => {
+    useLayoutEffect(() => {
         let cache = localStorage.getItem(`mouse_group_pos`);
         const { x, y } = JSON.parse(
             cache != null ? cache : `{"x": 25, "y" : 140}`
@@ -103,7 +103,7 @@ const MouseGroup = (param: ButtonGroupProps) => {
         >
             <WrapperDrag>
                 <LR
-                    size={120}
+                    size={90}
                     onTouch={(e: React.TouchEvent, type, index) => {
                         param.ButtonCallback(index, type);
                     }}
@@ -115,7 +115,7 @@ const MouseGroup = (param: ButtonGroupProps) => {
 };
 const JoyStickBtn = (param: ButtonGroupProps) => {
     const [posBtn, setPosBtn] = useState({ x: 0, y: 0 });
-    useEffect(() => {
+    useLayoutEffect(() => {
         let cache = localStorage.getItem(`joystick_btn_pos`);
         const { x, y } = JSON.parse(
             cache != null ? cache : `{"x": 160, "y" : 25}`

@@ -57,6 +57,8 @@ export const WebRTCControl = (input: {
 				icon: <SportsEsportsOutlinedIcon />,
 				name: "Edit VGamepad",
 				action: async () => {
+
+					setenableVMouse('disable')
 					setenableVGamepad((prev) => {
 						switch (prev) {
 							case "disable":
@@ -72,6 +74,7 @@ export const WebRTCControl = (input: {
 				icon: <MouseOutlinedIcon />,
 				name: "Enable VMouse",
 				action: () => {
+					setenableVGamepad('disable')
 					setenableVMouse((prev) => {
 						switch (prev) {
 							case "disable":
@@ -82,6 +85,7 @@ export const WebRTCControl = (input: {
 								return "disable";
 						}
 					});
+
 				},
 			}, {
 				icon: <KeyboardIcon />,
