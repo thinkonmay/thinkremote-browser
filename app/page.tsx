@@ -107,37 +107,6 @@ export default function Home() {
 		return ret;
 	}
 
-    let countTimeStep = 300000;
-    let indexOfCountTime = 1;
-
-
-    const [Platform,setPlatform] = useState<Platform>(null);
-    const [client,setclient] = useState<WebRTCClient>(null); //always useState for WebRTCClient, trust me
-    useEffect(() => {
-        let newplatform = defaultPlatform;
-        let intervalRemoteTime : NodeJS.Timer | null = null
-        if (defaultPlatform == null) {
-            newplatform = getPlatform()
-        }
-        setPlatform(newplatform)
-        setclient(new WebRTCClient( signalingURL, remoteVideo.current, remoteAudio.current, signalingToken, selectDevice, newplatform)
-        .Notifier((message: EventMessage) => {
-            console.log(message);
-            if(message == 'WebRTCConnectionDoneChecking' ||
-            message == 'WebSocketDisconnected' || 
-            message == 'ReceivedVideoStream'){
-                 fetch(atob(loggingClientUrl as string) + `?message=${message}`, {
-                    method: 'POST'
-                }).then(() => {})
-            }
-            if(message == 'ReceivedVideoStream'){
-                intervalRemoteTime = setInterval(async () => {
-                    await fetch(atob(loggingClientUrl as string) + `?message=RemoteTime: ${countTimeStep * indexOfCountTime / 60000}`, {
-                        method: 'POST'
-                    });
-                        indexOfCountTime++;
-                }, countTimeStep);
-            }
 
 	//Check horizontal or vertical
 	const checkHorizontal = (width: number, height: number) => {
@@ -172,6 +141,7 @@ export default function Home() {
 	const [client, setclient] = useState<WebRTCClient>(null); //always useState for WebRTCClient, trust me
 	useEffect(() => {
 		let newplatform = defaultPlatform;
+		let intervalRemoteTime
 		if (defaultPlatform == null) {
 			newplatform = getPlatform()
 		}
@@ -311,9 +281,8 @@ export default function Home() {
 				</ContentModal>
 			</Modal>
 		</Body>
-	);
-};
-
+	)
+}
 const RemoteVideo = styled.video`
     position: absolute;
     top: 0px;
