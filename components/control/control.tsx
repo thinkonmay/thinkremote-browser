@@ -122,7 +122,27 @@ export const WebRTCControl = (input: {
 
 
 
+	let sxSpeedDial
 
+	if (input.platform === 'mobile') {
+		sxSpeedDial =
+		{
+			opacity: 0.3,
+			position: 'absolute',
+			bottom: '17%',
+			right: '2%',
+			'& .MuiFab-primary': { backgroundColor: 'white', color: 'white' }
+		}
+	}
+	else if (input.platform === 'desktop') {
+		sxSpeedDial = {
+			opacity: 0.3,
+			position: 'absolute',
+			bottom: '2%',
+			right: '2%',
+			'& .MuiFab-primary': { backgroundColor: 'white', color: 'white' }
+		}
+	}
 	return (
 		<div>
 			<div
@@ -131,13 +151,7 @@ export const WebRTCControl = (input: {
 			>
 				<SpeedDial
 					ariaLabel="SpeedDial basic example"
-					sx={{
-						opacity: 0.3,
-						position: 'absolute',
-						bottom: '2%',
-						right: '2%',
-						'& .MuiFab-primary': { backgroundColor: 'white', color: 'white' }
-					}}
+					sx={sxSpeedDial}
 					icon={<ListIcon sx={{ color: 'black' }} />}
 				>
 					{actions.map((action) => (
