@@ -88,7 +88,7 @@ export default function Home () {
         client?.hid?.DisableTouch(!enable);
         client?.hid?.DisableMouse(!enable);
     } 
-    const bitrate_callback= function (bitrate: number) { 
+    const bitrate_callback= async function (bitrate: number) { 
         client?.ChangeBitrate(bitrate);
         client?.ChangeFramerate(55);
     } 
