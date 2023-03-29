@@ -110,7 +110,7 @@ export default function Home() {
 
 
 	//Check horizontal or vertical
-	const checkHorizontal = (width: number, height: number) =>{
+	const checkHorizontal = (width: number, height: number) => {
 		if (width < height) {
 			setModalOpen(true)
 		}
@@ -124,13 +124,15 @@ export default function Home() {
 		const width = window.innerWidth
 		const height = window.innerHeight
 		checkHorizontal(width, height)
-		
+
 		window.addEventListener('resize', (e: UIEvent) => {
 			checkHorizontal(window.innerWidth, window.innerHeight)
 		})
 
 		return () => {
-			window.removeEventListener('resize', checkHorizontal)
+			window.removeEventListener('resize', (e: UIEvent) => {
+				checkHorizontal(window.innerWidth, window.innerHeight)
+			})
 		}
 	}, [])
 
