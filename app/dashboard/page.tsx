@@ -50,61 +50,6 @@ const fetchWokersAndSessions = async () => {
 
 }
 async function DashBoard() {
-	//const path = usePathname()
-	//const route = useRouter()
-	//const [Workers, setWorkers] = useState<WorkerProfileWithSession[]>([])
-	//const [Sessions, setSessions] = useState<WorkerSession[]>([])
-	//useEffect(() => { fetchSessions() }, [Workers])
-	//useEffect(() => { matchSessions() }, [Sessions])
-
-	//const fetchDevices = async () => {
-	//	const core = new VirtualOSBrowserCore()
-	//	const result = await core.FetchAuthorizedWorkers()
-	//	if (result instanceof Error) {
-	//		console.log(result.message)
-	//		return
-	//	}
-
-	//	const wfws: WorkerProfileWithSession[] = []
-	//	result.forEach(item => { wfws.push({ ...item, worker_sessions: [] }) })
-	//	setWorkers(wfws)
-	//}
-
-	//const fetchSessions = async () => {
-	//	const core = new VirtualOSBrowserCore()
-	//	const result = await core.FetchAuthorizedWorkerSessions()
-	//	if (result instanceof Error) {
-	//		console.log(result.message)
-	//		return
-	//	}
-	//	setSessions(result)
-	//}
-
-	//const matchSessions = async () => {
-	//	setWorkers(old => {
-	//		old.forEach((worker) => {
-	//			worker.worker_sessions = Sessions.filter(x => x.worker_profile_id == worker.id)
-	//		})
-	//		return old
-	//	})
-	//}
-
-
-
-	//useEffect(() => {
-	//	const core = new VirtualOSBrowserCore()
-	//	core.Authenticated().then(async (authenticated) => {
-	//		if (!authenticated) {
-	//			console.log(`redirect to http://localhost:3000${path}`)
-	//			localStorage.setItem("redirectTo", `http://localhost:3000${path}`)
-	//			await route.replace("/sign_in")
-	//			return
-	//		}
-
-	//		fetchDevices()
-	//		fetchSessions()
-	//	});
-	//}, [])
 
 	const data = await fetchWokersAndSessions()
 	return (
