@@ -31,6 +31,8 @@ import {
 } from "../core/src/utils/platform";
 import SbCore from "../supabase";
 
+let client : WebRTCClient = null
+
 export default function Home () {
     const remoteVideo = useRef<HTMLVideoElement>(null);
     const remoteAudio = useRef<HTMLAudioElement>(null);
@@ -52,39 +54,43 @@ export default function Home () {
     const ref        = searchParams.get('ref'); 
     const platform   = searchParams.get('platform'); 
 
-    const [Platform,setPlatform] = useState<Platform>(platform == 'mobile' ? 'mobile' : (platform == 'desktop' ? 'desktop' : null));
-    const [client,setclient] = useState<WebRTCClient>(null); //always useState for WebRTCClient, trust me
+    const [Platform,setPlatform] = useState<Platform>(null);
 
 
-    const SetupConnection = async() => {
+
+
+
+    const SetupConnection = async () => {
         const core = new SbCore()
-        const result  = await core.AuthenticateSession(ref)
+        const result = await core.AuthenticateSession(ref)
         if (result instanceof Error) 
             return
+
         const {token,SignalingURL,WebRTCConfig,PingCallback} = result
         setInterval(PingCallback,1000)
-            
-        setclient(new WebRTCClient(
+        client = new WebRTCClient(
             SignalingURL,token, WebRTCConfig,
             remoteVideo.current, 
             remoteAudio.current,  
-            Platform))
+            Platform)
     }
 
+    
     useEffect(() => {
-        setPlatform(old => { 
-            if (old == null) 
-                return getPlatform()
-        })
-        SetupConnection()
+        SetupConnection()            
+        setPlatform(old => { if (old == null) return getPlatform() })
     }, []);
-        
+
+
+
+
     const toggle_mouse_touch_callback=async function(enable: boolean) { 
         client?.hid?.DisableTouch(!enable);
         client?.hid?.DisableMouse(!enable);
     } 
-    const bitrate_callback=async function (bitrate: number) { 
+    const bitrate_callback= function (bitrate: number) { 
         client?.ChangeBitrate(bitrate);
+        client?.ChangeFramerate(55);
     } 
     const GamepadACallback=async function(x: number, y: number, type: "left" | "right"): Promise<void> {
         client?.hid?.VirtualGamepadAxis(x,y,type);
