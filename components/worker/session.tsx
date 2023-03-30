@@ -14,8 +14,14 @@ export const WorkerSessionComponent = (props: WorkerSessionProps) => {
 	const router = useRouter()
 
 	const onDeactivate = async () => {
+		Swal.fire({
+			title: "Deactivate",
+			text: 'Please wait a second!',
+			icon: "info",
+		});
 		const core = new SbCore()
 		const result = await core.DeactivateWorkerSession(props.id)
+		Swal.close()
 		if (result instanceof Error){
 			console.log(result.message)
 			return
