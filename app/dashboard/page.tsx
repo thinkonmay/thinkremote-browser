@@ -1,6 +1,6 @@
 import 'server-only'
 
-export const revalidate = 0; 
+export const revalidate = 0;
 //import { useEffect, useState } from "react";
 //import { useRouter, usePathname } from "next/navigation";
 import VirtualOSBrowserCore from "../../supabase";
@@ -11,62 +11,49 @@ import { WorkerComponent, WorkerProfileWithSession } from "../../components/work
 import { WorkerSessionComponent } from "../../components/worker/session";
 import RenderWorkers from "./renderWorkers";
 import { createServerClient } from "../../supabase/supabase-server";
-import { FetchAuthorizedWorkers, FetchAuthorizedWorkerSessions } from "../../supabase/supabase-queries";
+import { FetchAuthorizedWorkers } from "../../supabase/supabase-queries";
 import { redirect } from 'next/navigation';
+import { FetchResponse } from '../../supabase/hardware';
+import { Suspense } from 'react';
 
 
-const matchSessions =  (workers = [], sessions) => {
-	if(workers.length > 0) {
-		workers.forEach(worker => {
-			worker.worker_sessions = sessions.filter(x => x.worker_profile_id == worker.id)
-		})
-	}
-	return workers
-}
-
-const fetchWokersAndSessions = async () => {
-	//const core = new VirtualOSBrowserCore()
-	
-	//const workers = await core.FetchAuthorizedWorkers()
-	const supabase = createServerClient()
-	const workers = await FetchAuthorizedWorkers(supabase)
-	if (workers instanceof Error) {
-		console.log(workers.message)
-		return 	
-	}
-	let wfws: WorkerProfileWithSession[] = []
-	workers.forEach(item => { wfws.push({ ...item, worker_sessions: [] }) })
 
 
-	//const sessions = await core.FetchAuthorizedWorkerSessions()
-	const sessions = await FetchAuthorizedWorkerSessions(supabase)
-	
-	if (sessions instanceof Error) {
-		console.log(sessions.message)
-		return
-	}
-
-	return matchSessions(wfws, sessions)
-
-}
-async function DashBoard() {
-
-	const data = await fetchWokersAndSessions()
+function DashBoard() {
 	return (
 		<>
 			<div
-				style={{
-					//bgcolor: 'white',
-					borderRadius: '8px',
-					padding: '30px',
-					boxShadow: '0px 0px 15px -6px rgba(0,0,0,0.49)',
-					marginBottom: '20px'
-				}}
 			>
-				<h2>
-					Your device
-				</h2>
-				<RenderWorkers data={data}/>
+				<div
+					style={{
+						borderRadius: '8px',
+						padding: '30px',
+						boxShadow: '0px 0px 15px -6px rgba(0,0,0,0.49)',
+						marginBottom: '20px'
+					}}
+				>
+					<h2>Your devices</h2>
+					<Suspense fallback={<h1>Loadingg..</h1>}>
+						{/* @ts-expect-error Async Server Component */}
+						<RenderWorkers isRenderWorkersActive={true} />
+					</Suspense>
+				</div>
+				<div
+					style={{
+						borderRadius: '8px',
+						padding: '30px',
+						boxShadow: '0px 0px 15px -6px rgba(0,0,0,0.49)',
+						marginBottom: '20px'
+					}}
+				>
+					<h2>Available devices</h2>
+
+					<Suspense fallback={<h2>Loading...</h2>}>
+						{/* @ts-expect-error Async Server Component */}
+						<RenderWorkers isRenderWorkersActive={false} />
+					</Suspense>
+				</div>
+
 			</div>
 		</>
 	);

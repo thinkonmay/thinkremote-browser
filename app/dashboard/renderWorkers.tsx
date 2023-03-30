@@ -1,16 +1,34 @@
-"use client"
-import { Grid } from "@mui/material";
-import { WorkerComponent } from "../../components/worker/worker";
+//"use client"
 
-function RenderWorkers({data = []}) {
+import ContainerWorkers from "../../components/worker/containerWorkes"
+import { FetchResponse } from "../../supabase/hardware"
+import { FetchAuthorizedWorkers } from "../../supabase/supabase-queries"
+import { createServerClient } from "../../supabase/supabase-server"
+import {WorkerProfile} from "../../supabase/type"
+interface Props {
+	isRenderWorkersActive : boolean
+}
+const fetchWokers = async (isWorkersActive): Promise<WorkerProfile[]> => {
+
+
+	const supabase = createServerClient()
+	const workers = await FetchAuthorizedWorkers(supabase)
+	if (workers instanceof Error) {
+		console.log(workers.message)
+		return
+	}
+	if(isWorkersActive){
+		return workers.active
+	}
+	return workers.unactive
+
+}
+async function RenderWorkers(props: Props) {
+	const {isRenderWorkersActive} = props
+	const data = await fetchWokers(isRenderWorkersActive)
+	console.log(data);
 	return (
-		<Grid container spacing={2}>
-			{data.map(item => (
-				<Grid key={item.id} item xl={3} md={4} sm={6} xs={12} >
-					<WorkerComponent id={item.id} profile={item} ></WorkerComponent>
-				</Grid>
-			))}
-		</Grid>
+		<ContainerWorkers data={data} ></ContainerWorkers>
 	);
 }
 
