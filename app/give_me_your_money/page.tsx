@@ -35,13 +35,6 @@ export default function SignIn() {
 	//const { isUserAuthenticated, user } = useAuth();
 	const router = useRouter();
 
-	//React.useEffect(() => {
-	//	if (isUserAuthenticated()) {
-	//		// router.push('/')
-	//		// router.replace(`/`);
-	//		console.log("chang roue");
-	//	}
-	//}, [user]);
 
 	return (
 		<ThemeProvider theme={theme}>
