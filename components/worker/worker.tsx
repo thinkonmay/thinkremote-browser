@@ -8,7 +8,7 @@ import { WorkerSessionComponent } from "./session"
 
 export interface WorkerProps {
 	id: number
-	profile: WorkerProfileWithSession
+	profile: WorkerProfile
 }
 export type WorkerProfileWithSession = (WorkerProfile & {
 	worker_sessions: WorkerSession[]
@@ -16,18 +16,21 @@ export type WorkerProfileWithSession = (WorkerProfile & {
 
 
 
-
-
 export const WorkerComponent = (props: WorkerProps) => {
-	// console.log(JSON.stringify(props.profile.worker_sessions))
+	const { profile } = props
 	const router = useRouter()
 	const onConnect = async () => {
+		Swal.fire({
+			title: 'Connecting',
+			text:'Please wait a seconds',
+			icon: 'info',
+		})
 		const core = new SbCore()
 		const result = await core.CreateWorkerSession(props.id, {
 			monitor: props.profile.media_device.monitors[0],
 			soundcard: props.profile.media_device.soundcards.find(sc => sc.Name == "Default Audio Render Device")
 		})
-
+		Swal.close()
 		if (result instanceof Error) {
 			console.log(result.message)
 			return
@@ -40,7 +43,6 @@ export const WorkerComponent = (props: WorkerProps) => {
 			confirmButtonText: 'Copy',
 			denyButtonText: `Don't save`,
 		}).then(async (confirm) => {
-			/* Read more about isConfirmed, isDenied below */
 			if (confirm.isConfirmed) {
 				await navigator.clipboard.writeText(result)
 				Swal.fire('Saved!', '', 'success')
@@ -76,8 +78,8 @@ export const WorkerComponent = (props: WorkerProps) => {
 						{/* <MoreVertIcon /> */}
 					</IconButton>
 				}
-				subheader={`${props.profile.hardware.Hostname}`}
-				title={`${props.profile.hardware.PublicIP}`}
+				subheader={`${profile.hardware.Hostname}`}
+				title={`${profile.hardware.PublicIP}`}
 			></CardHeader>
 			<CardContent sx={{
 				color: '#b4b5b6',
@@ -86,22 +88,22 @@ export const WorkerComponent = (props: WorkerProps) => {
 					Devices Info:
 				</Typography>
 				<Typography>
-					{`OS  : ${props.profile.hardware.Hostname}`}
+					{`OS  : ${profile.hardware.Hostname}`}
 				</Typography>
 				<Typography>
-					{`CPU : ${props.profile.hardware.CPU}`}
+					{`CPU : ${profile.hardware.CPU}`}
 				</Typography>
 				<Typography>
-					{`RAM : ${props.profile.hardware.RAM}`}
+					{`RAM : ${profile.hardware.RAM}`}
 				</Typography>
 				<Typography>
-					{`GPU : ${props.profile.hardware.GPUs}`}
+					{`GPU : ${profile.hardware.GPUs}`}
 				</Typography>
 				<Typography>
-					{`Created at : ${props.profile.inserted_at}`}
+					{`Created at : ${profile.inserted_at}`}
 				</Typography>
 				<Typography>
-					{`Lastcheck : ${props.profile.last_check}`}
+					{`Lastcheck : ${profile.last_check}`}
 				</Typography>
 
 				<Stack>
@@ -110,7 +112,7 @@ export const WorkerComponent = (props: WorkerProps) => {
 						<Grid container spacing={1}>
 							<Grid item xs={12} lg={6}>
 								<FormGroup>
-									{props.profile?.media_device?.monitors?.map((item, index) => (
+									{profile?.media_device?.monitors?.map((item, index) => (
 										<FormControlLabel key={index} control={<Checkbox />} label={`${item.MonitorName}`} />
 									))}
 								</FormGroup>
@@ -122,7 +124,7 @@ export const WorkerComponent = (props: WorkerProps) => {
 						<Grid container spacing={1}>
 							<Grid item xs={12} lg={6}>
 								<FormGroup>
-									{props.profile?.media_device?.soundcards?.map((item, index) => (
+									{profile?.media_device?.soundcards?.map((item, index) => (
 										<FormControlLabel key={index} control={<Checkbox />} label={`${item.Name}`} />
 									))}
 								</FormGroup>
@@ -134,7 +136,7 @@ export const WorkerComponent = (props: WorkerProps) => {
 					<Grid item xs={12} lg={6}>
 						<Suspense fallback={<p>Loading...</p>}>
 							<FormGroup>
-								{props.profile.worker_sessions.map((item, index) => (
+								{profile?.match_sessions?.map((item, index) => (
 									<WorkerSessionComponent key={index} id={item.id} info={item}></WorkerSessionComponent>
 								))}
 							</FormGroup>
