@@ -1,32 +1,21 @@
 import 'server-only'
 import { Schema, WorkerSession } from "./type"
 import { SupabaseClient } from '@supabase/supabase-js';
+import { FetchResponse } from './hardware';
+import { SbFunction } from './functions';
 //export const revalidate = 0;
 
+export const FetchAuthorizedWorkers = async (supabase: SupabaseClient): Promise<FetchResponse | Error> => {
+	const session = await supabase.auth.getSession()
+	if (session.error != null)
+		return new Error(session.error.message)
 
-export const FetchAuthorizedWorkers = async (supabase: SupabaseClient) => {
-	const { data, error } = await supabase
-		.from('worker_profile')
-		.select("hardware,media_device,account_id,id,inserted_at,last_check")
-	if (error != null)
-		return new Error(error.message)
+	const body = JSON.stringify({})
+	const { data, error } = await supabase.functions.invoke<FetchResponse>("worker_profile_fetch" as SbFunction, {
+		headers: { "access_token": session.data.session.access_token },
+		body: body,
+		method: 'POST',
+	})
 
-	//return data.filter(x => {
-	//	const time = -(Date.parse(x.last_check) - Date.now())
-	//	console.log(`worker ${x.id} last ping ${x.last_check} - ${time/1000} seconds from now`)
-	//	return  time < 10 * 1000
-	//})
-	return data
-}
-
-export const FetchAuthorizedWorkerSessions = async (supabase: SupabaseClient): Promise<WorkerSession[] | Error> => {
-	const { data, error } = await supabase
-		.from('worker_session' as Schema)
-		.select("id,signaling_config,media_config,webrtc_config,manifest,session_log,worker_profile_id:metadata->worker_profile_id")
-
-	if (error != null)
-		return new Error(error.message)
-	console.log(data);
-
-	return data
+	return error == null ? data : new Error(error + ":" + data)
 }
