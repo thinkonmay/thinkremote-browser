@@ -22,7 +22,7 @@ export function SupabaseProvider({
   session: MaybeSession;
 }) {
   const [supabase] = useState(() => createBrowserClient());
-
+	
   return (
     <Context.Provider value={{ supabase, session }}>
       <>{children}</>

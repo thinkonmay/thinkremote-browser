@@ -14,19 +14,22 @@ import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
 import StarBorder from '@mui/icons-material/StarBorder';
 import SbCore from '../../supabase';
+import { useSupabase } from '../../context/authContext';
+import { useRouter } from 'next/navigation';
 
-interface NavBarDashBoardProps {
-  core : SbCore
-}
-export default function NavBarDashBoard(props: NavBarDashBoardProps) {
+export default function NavBarDashBoard() {
   const [open, setOpen] = React.useState(true);
-  const core = new SbCore()
-
+//  const core = new SbCore()
+	const {supabase} = useSupabase()
+	const router = useRouter()
 
   const handleClick = () => {
     setOpen(!open);
   };
-
+  const handleLogout = async () =>{
+	await supabase.auth.signOut()
+	router.push('/sign_in')
+  }
   return (
     <List
       sx={{ width: '100%', maxWidth: 360, bgcolor: 'background.paper', padding: '0' }}
@@ -58,8 +61,8 @@ export default function NavBarDashBoard(props: NavBarDashBoardProps) {
             <ListItemIcon>
               <StarBorder />
             </ListItemIcon>
-            <ListItemText primary="Starred" 
-              onClick={() => {core.Logout()}}
+            <ListItemText primary="Logout" 
+              onClick={handleLogout}
             />
           </ListItemButton>
         </List>
