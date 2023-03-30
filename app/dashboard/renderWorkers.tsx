@@ -26,7 +26,6 @@ const fetchWokers = async (isWorkersActive): Promise<WorkerProfile[]> => {
 async function RenderWorkers(props: Props) {
 	const {isRenderWorkersActive} = props
 	const data = await fetchWokers(isRenderWorkersActive)
-	console.log(data);
 	return (
 		<ContainerWorkers data={data} ></ContainerWorkers>
 	);
