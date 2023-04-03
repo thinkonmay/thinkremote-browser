@@ -1,10 +1,8 @@
 import "server-only"
 
 import * as React from 'react';
-import Provider from '../context/provider';
 import StyledComponentsRegistry from '../lib/registry';
 import "../styles/globals.css"
-import { createServerClient } from '../supabase/supabase-server';
 
 
 async function RootLayout({
@@ -12,13 +10,6 @@ async function RootLayout({
 }: {
 	children: React.ReactNode
 }) {
-	const supabase = createServerClient();
-
-	const {
-		data: { session }
-	} = await supabase.auth.getSession();
-
-	
 	return (
 		<html>
 			<head>
@@ -36,9 +27,7 @@ async function RootLayout({
 			<body>
 
 				<StyledComponentsRegistry>
-					<Provider session={session}>
-						{children}
-					</Provider>
+					{children}
 				</StyledComponentsRegistry>
 			</body>
 		</html>

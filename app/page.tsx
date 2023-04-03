@@ -4,25 +4,13 @@ import React, { useEffect, useRef, useState } from "react";
 import video_desktop from "../public/assets/videos/video_demo_desktop.mp4";
 import styled from "styled-components";
 import {
-    AskSelectBitrate,
-    AskSelectDisplay,
-    AskSelectFramerate,
-    AskSelectSoundcard,
     TurnOnStatus,
 } from "../components/popup/popup";
 import { WebRTCClient } from "../core/src/app";
 import { useRouter, useSearchParams  } from "next/navigation";
 import {
-    DeviceSelection,
-    DeviceSelectionResult,
-} from "../core/src/models/devices.model";
-import {
     AddNotifier,
-    ConnectionEvent,
     EventMessage,
-    Log,
-    LogConnectionEvent,
-    LogLevel,
 } from "../core/src/utils/log";
 import { WebRTCControl } from "../components/control/control";
 import {
@@ -62,6 +50,18 @@ export default function Home () {
 
     const SetupConnection = async () => {
         const core = new SbCore()
+        if (!await core.Authenticated()) 
+			await core.LoginWithGoogle()
+        
+        const info = await core.getUserInfor()
+        if(info instanceof Error) 
+            return
+
+        TurnOnStatus(`welcome ${info.email.split("@").at(0)}`);
+        
+        if(ref == null) 
+            return
+
         const result = await core.AuthenticateSession(ref)
         if (result instanceof Error) 
             return
