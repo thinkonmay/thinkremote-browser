@@ -39,7 +39,7 @@ export default function Home () {
             router.refresh();
     })
 
-    const ref        = searchParams.get('ref') != "" ? ; 
+    const ref        = searchParams.get('ref') != "" ? searchParams.get('ref') : localStorage.getItem("reference"); 
     const platform   = searchParams.get('platform'); 
 
     const [Platform,setPlatform] = useState<Platform>(null);
@@ -66,6 +66,7 @@ export default function Home () {
         if (result instanceof Error) 
             return
 
+        localStorage.setItem("reference",ref)
         const {token,SignalingURL,WebRTCConfig,PingCallback} = result
         setInterval(PingCallback,1000)
         client = new WebRTCClient(
