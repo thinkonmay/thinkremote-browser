@@ -22,7 +22,6 @@ export default class SbCore {
 	}
 
 	public async LoginWithGoogle() {
-		const redirectTo = localStorage.getItem("redirectTo")
 		await this.supabase.auth.signInWithOAuth({
 			provider: "google",
 			options: {
@@ -30,7 +29,6 @@ export default class SbCore {
 					access_type: "offline",
 					prompt: "consent",
 				},
-				redirectTo :  redirectTo
 			},
 		});
 	}
