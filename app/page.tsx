@@ -39,7 +39,7 @@ export default function Home () {
             router.refresh();
     })
 
-    const ref        = searchParams.get('ref'); 
+    const ref        = searchParams.get('ref') != "" ? ; 
     const platform   = searchParams.get('platform'); 
 
     const [Platform,setPlatform] = useState<Platform>(null);
@@ -51,7 +51,7 @@ export default function Home () {
     const SetupConnection = async () => {
         const core = new SbCore()
         if (!await core.Authenticated()) 
-			await core.LoginWithGoogle(`/?ref=${ref}`)
+			await core.LoginWithGoogle()
         
         const info = await core.getUserInfor()
         if(info instanceof Error) 
