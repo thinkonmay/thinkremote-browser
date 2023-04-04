@@ -44,10 +44,6 @@ export default function Home () {
 
     const [Platform,setPlatform] = useState<Platform>(null);
 
-
-
-
-
     const SetupConnection = async () => {
         const core = new SbCore()
         if (!await core.Authenticated()) 
