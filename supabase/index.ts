@@ -21,7 +21,7 @@ export default class SbCore {
 		this.supabase = createBrowserClient()
 	}
 
-	public async LoginWithGoogle() {
+	public async LoginWithGoogle(redirectTo : string) {
 		await this.supabase.auth.signInWithOAuth({
 			provider: "google",
 			options: {
@@ -29,6 +29,7 @@ export default class SbCore {
 					access_type: "offline",
 					prompt: "consent",
 				},
+				redirectTo :  redirectTo
 			},
 		});
 	}

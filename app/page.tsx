@@ -51,7 +51,7 @@ export default function Home () {
     const SetupConnection = async () => {
         const core = new SbCore()
         if (!await core.Authenticated()) 
-			await core.LoginWithGoogle()
+			await core.LoginWithGoogle(`/?ref=${ref}`)
         
         const info = await core.getUserInfor()
         if(info instanceof Error) 
