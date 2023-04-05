@@ -39,7 +39,7 @@ export default function Home () {
             router.refresh();
     })
 
-    const ref        = searchParams.get('ref') != "" ? searchParams.get('ref') : localStorage.getItem("reference"); 
+    const ref        = searchParams.get('ref') ?? localStorage.getItem("reference"); 
     const platform   = searchParams.get('platform'); 
 
     const [Platform,setPlatform] = useState<Platform>(null);
@@ -50,8 +50,10 @@ export default function Home () {
 			await core.LoginWithGoogle()
         
         const info = await core.getUserInfor()
-        if(info instanceof Error) 
+        if(info instanceof Error)  {
+            TurnOnStatus("invalid reference key")
             return
+        }
 
         TurnOnStatus(`welcome ${info.email.split("@").at(0)}`);
         
