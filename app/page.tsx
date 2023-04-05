@@ -45,6 +45,7 @@ export default function Home () {
     const [Platform,setPlatform] = useState<Platform>(null);
 
     const SetupConnection = async () => {
+        localStorage.setItem("reference",ref)
         const core = new SbCore()
         if (!await core.Authenticated()) 
 			await core.LoginWithGoogle()
@@ -64,7 +65,6 @@ export default function Home () {
         if (result instanceof Error) 
             return
 
-        localStorage.setItem("reference",ref)
         const {token,SignalingURL,WebRTCConfig,PingCallback} = result
         setInterval(PingCallback,1000)
         client = new WebRTCClient(
