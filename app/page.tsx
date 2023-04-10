@@ -150,8 +150,11 @@ export default function Home () {
             </App>
             <audio
                 ref={remoteAudio}
-                autoPlay
-                controls
+                autoPlay={true}
+                playsInline={true}
+                controls={false}
+                muted={false}
+                loop={true}
                 style={{ zIndex: -5, opacity: 0 }}
             ></audio>
         </Body>
