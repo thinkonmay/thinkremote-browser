@@ -6,7 +6,7 @@ import { createBrowserSupabaseClient } from '@supabase/auth-helpers-nextjs'
 export type SbFunction = 'worker_session_create' | 'worker_session_deactivate' | 'worker_profile_fetch' | 'session_authenticate' 
 export const createBrowserClient = () => createBrowserSupabaseClient()
 export type AuthSessionResp = {
-	id : number
+	id 	  : string
 	token : string
 	webrtc : RTCConfiguration
 	signaling : {
@@ -51,7 +51,7 @@ export default class SbCore {
 		token: string
 		SignalingURL : string
 		WebRTCConfig : RTCConfiguration
-		PingCallback : () => (void)
+		PingCallback : () => Promise<void>
 	} | Error> {
 		const session = await this.supabase.auth.getSession()
 		if (session.error != null) 
@@ -71,8 +71,14 @@ export default class SbCore {
 			token : data.token,
 			SignalingURL : data.signaling.WebsocketURL,
 			WebRTCConfig : data.webrtc,
-			PingCallback: ()=>{
-				const user_session_id = data.id
+			PingCallback: async () => {
+				const { error } = await this.supabase.rpc(`ping_session`, { 
+					session_id: data.id 
+				})
+
+				if (error != null ) {
+					throw `unable to ping ${error.message}`	
+				}
 			}
 		}
 	}
