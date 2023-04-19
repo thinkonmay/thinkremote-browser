@@ -1,12 +1,12 @@
-"use client"
+import "server-only"
 
-import { Analytics } from '@vercel/analytics/react';
-import { GoogleAnalytics } from 'nextjs-google-analytics';
 import * as React from 'react';
 import StyledComponentsRegistry from '../lib/registry';
 import "../styles/globals.css"
+import { GoogleAnalytics } from "nextjs-google-analytics";
 
-function RootLayout({
+
+async function RootLayout({
 	children,
 }: {
 	children: React.ReactNode
@@ -26,13 +26,11 @@ function RootLayout({
 				<link rel="icon" href="/favicon.ico" />
 			</head>
 			<body>
-				<GoogleAnalytics trackPageViews />
-				<Analytics />
-				<main>
-					<StyledComponentsRegistry>
-						{children}
- 					</StyledComponentsRegistry>
-				</main>
+
+				<GoogleAnalytics trackPageViews></GoogleAnalytics>
+				<StyledComponentsRegistry>
+					{children}
+				</StyledComponentsRegistry>
 			</body>
 		</html>
 	);
