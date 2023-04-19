@@ -41,12 +41,20 @@ export default function Home () {
             router.refresh();
     })
 
-    const ref        = searchParams.get('ref') ?? localStorage.getItem("reference"); 
+    let ref_local        = ''
+    if (typeof window !== 'undefined') {
+        ref_local        = localStorage.getItem("reference")
+    }
+    const user_ref   = searchParams.get('uref') 
+    const ref        = searchParams.get('ref')  ?? ref_local 
     const platform   = searchParams.get('platform'); 
 
     const [Platform,setPlatform] = useState<Platform>(null);
 
     const SetupConnection = async () => {
+        if (typeof window !== 'undefined') 
+            return
+        
         localStorage.setItem("reference",ref)
         const core = new SbCore()
         if (!await core.Authenticated()) 

@@ -1,10 +1,7 @@
-import "server-only"
-
 import * as React from 'react';
 import StyledComponentsRegistry from '../lib/registry';
 import "../styles/globals.css"
-import { GoogleAnalytics } from "nextjs-google-analytics";
-
+import GoogleAnalytics  from './googleAnalytics';
 
 async function RootLayout({
 	children,
