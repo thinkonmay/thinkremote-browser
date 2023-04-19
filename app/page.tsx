@@ -52,10 +52,8 @@ export default function Home () {
     const [Platform,setPlatform] = useState<Platform>(null);
 
     const SetupConnection = async () => {
-        if (typeof window !== 'undefined') 
-            return
-        
         localStorage.setItem("reference",ref)
+        
         const core = new SbCore()
         if (!await core.Authenticated()) 
 			await core.LoginWithGoogle()
