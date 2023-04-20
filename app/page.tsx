@@ -89,16 +89,21 @@ export default function Home () {
     }, []);
 
 	const [isModalOpen, setModalOpen] = useState(false)
-	const checkHorizontal = () => {
-		const width = window.innerWidth
-		const height = window.innerHeight
+	const checkHorizontal = (width: number,height:number) => {
         setModalOpen((width < height) && Platform == 'mobile')
 	}
 
 	useEffect(() => {
-		checkHorizontal()
-		window.addEventListener('resize', checkHorizontal)
-		return () => { window.removeEventListener('resize', checkHorizontal ) }
+		checkHorizontal(window.innerWidth,window.innerHeight)
+        window.addEventListener('resize', (e: UIEvent) => {
+			checkHorizontal(window.innerWidth, window.innerHeight)
+		})
+
+		return () => { 
+            window.removeEventListener('resize', (e: UIEvent) => { 
+                checkHorizontal(window.innerWidth, window.innerHeight)
+			})
+		}
 	}, [])
 
 
