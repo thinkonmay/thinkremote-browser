@@ -83,17 +83,18 @@ export default function Home () {
     }
 
     
+	const [isModalOpen, setModalOpen] = useState(false)
+	const checkHorizontal = (width: number,height:number) => {
+        setModalOpen(width < height)
+	}
+
     useEffect(() => {
         SetupConnection()            
         setPlatform(old => { if (old == null) return getPlatform() })
-    }, []);
 
-	const [isModalOpen, setModalOpen] = useState(false)
-	const checkHorizontal = (width: number,height:number) => {
-        setModalOpen((width < height) && Platform == 'mobile')
-	}
-
-	useEffect(() => {
+        if(getPlatform() != 'mobile')
+            return
+        
 		checkHorizontal(window.innerWidth,window.innerHeight)
         window.addEventListener('resize', (e: UIEvent) => {
 			checkHorizontal(window.innerWidth, window.innerHeight)
@@ -104,7 +105,7 @@ export default function Home () {
                 checkHorizontal(window.innerWidth, window.innerHeight)
 			})
 		}
-	}, [])
+    }, []);
 
 
     const toggle_mouse_touch_callback=async function(enable: boolean) { 
