@@ -48,19 +48,23 @@ export default class SbCore {
 	}
 
 
-	public async AuthenticateSession(ref : string): Promise<{
+	public async AuthenticateSession(ref : string, uref?: string): Promise<{
 		token: string
 		SignalingURL : string
 		WebRTCConfig : RTCConfiguration
 		PingCallback : () => Promise<void>
 	} | Error> {
 		const session = await this.supabase.auth.getSession()
-		if (session.error != null) 
+		if (session.error != null && uref == undefined) 
 			return new Error(session.error.message)
+
+		const headers = uref == undefined ?
+			{ "access_token": session.data?.session?.access_token }  :
+			{ "uref": uref }  
 
 		const body = JSON.stringify({ reference: ref })
 		const {data,error} = await this.supabase.functions.invoke<AuthSessionResp>("session_authenticate" as SbFunction,{
-			headers: { "access_token": session.data.session.access_token },
+			headers: headers,
 			body: body,
 			method: 'POST',
 		})

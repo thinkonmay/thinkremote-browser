@@ -45,7 +45,7 @@ export default function Home () {
     if (typeof window !== 'undefined') {
         ref_local        = localStorage.getItem("reference")
     }
-    const user_ref   = searchParams.get('uref') 
+    const user_ref   = searchParams.get('uref') ?? undefined
     const ref        = searchParams.get('ref')  ?? ref_local 
     const platform   = searchParams.get('platform'); 
 
@@ -55,26 +55,18 @@ export default function Home () {
         localStorage.setItem("reference",ref)
         
         const core = new SbCore()
-        if (!await core.Authenticated()) 
+        if (!await core.Authenticated() && user_ref == undefined) 
 			await core.LoginWithGoogle()
-        
-        const info = await core.getUserInfor()
-        if(info instanceof Error)  {
-            TurnOnStatus("invalid reference key")
-            return
-        }
-
-        TurnOnStatus(`welcome ${info.email.split("@").at(0)}`);
         
         if(ref == null) 
             return
 
-        const result = await core.AuthenticateSession(ref)
+        const result = await core.AuthenticateSession(ref,user_ref)
         if (result instanceof Error) 
             return
 
         const {token,SignalingURL,WebRTCConfig,PingCallback} = result
-        setInterval(PingCallback,3000)
+        setInterval(PingCallback,5000)
         client = new WebRTCClient(
             SignalingURL,token, WebRTCConfig,
             remoteVideo.current, 
