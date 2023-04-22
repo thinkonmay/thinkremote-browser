@@ -66,7 +66,7 @@ export default function Home () {
             return
 
         const {token,SignalingURL,WebRTCConfig,PingCallback} = result
-        setInterval(PingCallback,5000)
+        setInterval(PingCallback,20000)
         client = new WebRTCClient(
             SignalingURL,token, WebRTCConfig,
             remoteVideo.current, 
