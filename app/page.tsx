@@ -65,7 +65,7 @@ export default function Home () {
         if (result instanceof Error) 
             return
 
-        const {token,SignalingURL,WebRTCConfig,PingCallback} = result
+        const {token,email,SignalingURL,WebRTCConfig,PingCallback} = result
         setInterval(PingCallback,20000)
         client = new WebRTCClient(
             SignalingURL,token, WebRTCConfig,

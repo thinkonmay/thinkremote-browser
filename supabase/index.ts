@@ -7,6 +7,7 @@ export type SbFunction = 'worker_session_create' | 'worker_session_deactivate' |
 export const createBrowserClient = () => createBrowserSupabaseClient()
 export type AuthSessionResp = {
 	id 	  : string
+	email : string
 	token : string
 	webrtc : RTCConfiguration
 	signaling : {
@@ -50,6 +51,7 @@ export default class SbCore {
 
 	public async AuthenticateSession(ref : string, uref?: string): Promise<{
 		token: string
+		email: string
 		SignalingURL : string
 		WebRTCConfig : RTCConfiguration
 		PingCallback : () => Promise<void>
@@ -74,6 +76,7 @@ export default class SbCore {
 
 		return  {
 			token : data.token,
+			email : data.email,
 			SignalingURL : data.signaling.WebsocketURL,
 			WebRTCConfig : data.webrtc,
 			PingCallback: async () => {
