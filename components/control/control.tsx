@@ -119,6 +119,10 @@ export const WebRTCControl = (input: {
 				name: "Enter fullscreen",
 				action: () => { requestFullscreen() }
 			}, {
+				icon: <VolumeUp />,
+				name: "If your audio is muted",
+				action: () => { input.audioCallback() },
+			}, {
 				icon: <KeyboardIcon />,
 				name: "If some of your key is stuck",
 				action: () => { input.keystuckCallback() },
@@ -138,7 +142,7 @@ export const WebRTCControl = (input: {
 		{
 			opacity: 0.3,
 			position: 'absolute',
-			bottom: '17%',
+			bottom: '10%',
 			right: '2%',
 			'& .MuiFab-primary': { backgroundColor: 'white', color: 'white' }
 		}
