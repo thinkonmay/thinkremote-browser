@@ -137,9 +137,16 @@ export default function Home () {
                 muted
                 playsInline
                 loop
+                onclick={async() => {
+                    try { await remoteAudio.current.play() } catch (e) {
+                        console.log(`error play audio ${e}`)
+                    }
+                }}
             ></RemoteVideo>
             <App
-                onContextMenu={(e) => e.preventDefault()}
+                onContextMenu={(e) => {
+                    e.preventDefault()
+                }}
                 onMouseUp={(e: MouseEvent) => {
                     e.preventDefault();
                 }}
