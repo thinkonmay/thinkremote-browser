@@ -128,6 +128,11 @@ export default function Home () {
         client?.hid?.SetClipboard(val)
         client?.hid?.PasteClipboard()
     }
+    const audioCallback = async() => {
+        try { await remoteAudio.current.play() } catch (e) {
+            console.log(`error play audio ${JSON.stringify(e)}`)
+        }
+    }
     return (
         <Body>
             <RemoteVideo
@@ -137,11 +142,6 @@ export default function Home () {
                 muted
                 playsInline
                 loop
-                onclick={async() => {
-                    try { await remoteAudio.current.play() } catch (e) {
-                        console.log(`error play audio ${e}`)
-                    }
-                }}
             ></RemoteVideo>
             <App
                 onContextMenu={(e) => {
@@ -168,6 +168,7 @@ export default function Home () {
                 MouseMoveCallback={MouseMoveCallback}
                 MouseButtonCallback={MouseButtonCallback}
                 keystuckCallback={keystuckCallback}
+                audioCallback={audioCallback}
                 clipboardSetCallback={clipboardSetCallback}
                 ></WebRTCControl>
             </App>

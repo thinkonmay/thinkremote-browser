@@ -1,6 +1,6 @@
 "use client"
 
-import { Fullscreen, Key } from "@mui/icons-material";
+import { Fullscreen, Key, VolumeUp } from "@mui/icons-material";
 import SportsEsportsOutlinedIcon from '@mui/icons-material/SportsEsportsOutlined';
 import MouseOutlinedIcon from '@mui/icons-material/MouseOutlined';
 import VideoSettingsOutlinedIcon from '@mui/icons-material/VideoSettingsOutlined';
@@ -24,6 +24,7 @@ export const WebRTCControl = (input: {
 	MouseMoveCallback: (x: number, y: number) => Promise<void>,
 	MouseButtonCallback: (index: number, type: 'up' | 'down') => Promise<void>,
 	keystuckCallback: () => Promise<void>,
+	audioCallback: () => Promise<void>,
 	clipboardSetCallback: (val: string) => Promise<void>,
 
 	bitrate_callback: (bitrate: number) => Promise<void>,
@@ -87,6 +88,10 @@ export const WebRTCControl = (input: {
 					});
 
 				},
+			}, {
+				icon: <VolumeUp />,
+				name: "If your audio is muted",
+				action: () => { input.audioCallback() },
 			}, {
 				icon: <KeyboardIcon />,
 				name: "Write to clipboard",
