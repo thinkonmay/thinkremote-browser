@@ -129,7 +129,10 @@ export default function Home () {
         client?.hid?.PasteClipboard()
     }
     const audioCallback = async() => {
-        try { await remoteAudio.current.play() } catch (e) {
+        try { 
+            await remoteAudio.current.play() 
+            await remoteVideo.current.play() 
+        } catch (e) {
             console.log(`error play audio ${JSON.stringify(e)}`)
         }
     }
