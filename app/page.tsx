@@ -130,6 +130,7 @@ export default function Home () {
     }
     const audioCallback = async() => {
         try { 
+            client?.ResetAudio()
             await remoteAudio.current.play() 
             await remoteVideo.current.play() 
         } catch (e) {
