@@ -81,7 +81,10 @@ export default function Home () {
 	}
 
     useEffect(() => {
-        SetupConnection()            
+        SetupConnection().catch(error => {
+            TurnOnStatus(error);
+        })
+
         setPlatform(old => { if (old == null) return getPlatform() })
 
         if(getPlatform() != 'mobile')
