@@ -25,6 +25,7 @@ let client : WebRTCClient = null
 
 export default function Home () {
     const remoteVideo = useRef<HTMLVideoElement>(null);
+    remoteVideo.current.controls
     const remoteAudio = useRef<HTMLAudioElement>(null);
     const searchParams = useSearchParams();
     const router = useRouter()
@@ -145,7 +146,8 @@ export default function Home () {
             <RemoteVideo
                 ref={remoteVideo}
                 src={platform == 'desktop' ? video_desktop : video_desktop}
-                autoPlay
+                controls={true}
+                autoPlay={false}
                 muted
                 playsInline
                 loop
