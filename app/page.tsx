@@ -215,6 +215,7 @@ const RemoteVideo = styled.video`
     height: 100%;
     max-height: 100%;
     max-width: 100%;
+    opacity: 1;
 `;
 const Body = styled.div`
     width: 100vw;
