@@ -204,6 +204,8 @@ export default function Home () {
 
 const RemoteVideo = styled.video`
     position: absolute;
+    z-index: 1;
+    -webkit-transform-style: preserve-3d;
     top: 0px;
     right: 0px;
     bottom: 0px;
