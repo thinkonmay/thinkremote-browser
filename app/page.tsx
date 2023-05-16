@@ -144,7 +144,7 @@ export default function Home () {
         <Body>
             <RemoteVideo
                 ref={remoteVideo}
-                src={platform == 'desktop' ? video_desktop : video_desktop}
+                // src={platform == 'desktop' ? video_desktop : video_desktop}
                 autoPlay
                 muted
                 playsInline
