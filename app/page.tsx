@@ -144,7 +144,7 @@ export default function Home () {
         <Body>
             <RemoteVideo
                 ref={remoteVideo}
-                // src={platform == 'desktop' ? video_desktop : video_desktop}
+                src={platform == 'desktop' ? video_desktop : video_desktop}
                 autoPlay
                 muted
                 playsInline
@@ -221,7 +221,7 @@ const Body = styled.div`
     margin: 0;
     border: 0;
     overflow: hidden;
-    background-color: black;
+    background-color: gray;
 `;
 const App = styled.div`
     touch-action: none;
