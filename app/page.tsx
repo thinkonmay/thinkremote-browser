@@ -31,25 +31,6 @@ export default function Home () {
     const remoteAudio = useRef<HTMLAudioElement>(null);
     const searchParams = useSearchParams();
     const router = useRouter()
-    AddNotifier(async (message: EventMessage) => {
-        if(message == 'WebSocketConnected' || 
-            message == 'ExchangingSignalingMessage' || 
-            message == 'WaitingAvailableDeviceSelection')  {
-            return;
-        }
-
-        if (message == 'ApplicationStarted' ||
-            message == "ReceivedVideoStream" ||
-            message == 'ReceivedAudioStream' ) {
-            await TurnOnConfirm(message)
-            return
-        }
-        
-        TurnOnStatus(message);
-
-        if(message == 'WebRTCConnectionClosed') 
-            router.refresh();
-    })
 
     let ref_local        = ''
     if (typeof window !== 'undefined') {
@@ -93,6 +74,26 @@ export default function Home () {
 	}
 
     useEffect(() => {
+        AddNotifier(async (message: EventMessage) => {
+            if(message == 'WebSocketConnected' || 
+                message == 'ExchangingSignalingMessage' || 
+                message == 'WaitingAvailableDeviceSelection')  {
+                return;
+            }
+
+            if (message == 'ApplicationStarted' ||
+                message == "ReceivedVideoStream" ||
+                message == 'ReceivedAudioStream' ) {
+                await TurnOnConfirm(message)
+                return
+            }
+            
+            TurnOnStatus(message);
+
+            if(message == 'WebRTCConnectionClosed') 
+                router.refresh();
+        })
+
         SetupConnection().catch(error => {
             TurnOnStatus(error);
         })
