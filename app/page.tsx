@@ -4,13 +4,16 @@ import React, { useEffect, useRef, useState } from "react";
 import video_desktop from "../public/assets/videos/video_demo_desktop.mp4";
 import styled from "styled-components";
 import {
+    TurnOnConfirm,
     TurnOnStatus,
 } from "../components/popup/popup";
 import { WebRTCClient } from "../core/src/app";
 import { useRouter, useSearchParams } from "next/navigation";
 import {
     AddNotifier,
+    ConnectionEvent,
     EventMessage,
+    LogConnectionEvent,
 } from "../core/src/utils/log";
 import { WebRTCControl } from "../components/control/control";
 import {
@@ -28,11 +31,18 @@ export default function Home () {
     const remoteAudio = useRef<HTMLAudioElement>(null);
     const searchParams = useSearchParams();
     const router = useRouter()
-    AddNotifier((message: EventMessage) => {
+    AddNotifier(async (message: EventMessage) => {
         if(message == 'WebSocketConnected' || 
             message == 'ExchangingSignalingMessage' || 
             message == 'WaitingAvailableDeviceSelection')  {
             return;
+        }
+
+        if (message == 'ApplicationStarted' ||
+            message == "ReceivedVideoStream" ||
+            message == 'ReceivedAudioStream' ) {
+            await TurnOnConfirm(message)
+            return
         }
         
         TurnOnStatus(message);
@@ -67,6 +77,8 @@ export default function Home () {
 
         const {token,email,SignalingURL,WebRTCConfig,PingCallback} = result
         setInterval(PingCallback,14000)
+
+        await LogConnectionEvent(ConnectionEvent.ApplicationStarted)
         client = new WebRTCClient(
             SignalingURL,token, WebRTCConfig,
             remoteVideo.current, 

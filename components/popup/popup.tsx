@@ -17,6 +17,17 @@ export async function TurnOnAlert(error: string): Promise<void> {
     have_swal = true;
 }
 
+export async function TurnOnConfirm(status: string): Promise<void> {
+    if (have_swal) {
+        TurnOffStatus();
+    }
+
+    await Swal.fire({
+        title: `Application status: ${status}`,
+        text: "Please wait while the client is getting ready...",
+        showConfirmButton: true,
+    });
+}
 export function TurnOnStatus(status: string): void {
     if (have_swal) {
         TurnOffStatus();
