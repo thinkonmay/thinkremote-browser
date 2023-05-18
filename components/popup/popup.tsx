@@ -24,7 +24,7 @@ export async function TurnOnAlert(error: string): Promise<void> {
     });
 }
 
-export async function TurnOnConfirm(status: string): Promise<void> {
+export async function TurnOnConfirm(status: string, text?: string): Promise<void> {
     while (have_swal == 'confirm') {
 		await new Promise(r => setTimeout(r, 300));
     }
@@ -37,13 +37,13 @@ export async function TurnOnConfirm(status: string): Promise<void> {
 
     have_swal = 'confirm'
     await Swal.fire({
-        title: `Application status: ${status}`,
-        text: "Please wait while the client is getting ready...",
+        title: `${status}`,
+        text: text ?? "Please wait while the client is getting ready...",
         showConfirmButton: true,
     });
     have_swal = 'none'
 }
-export function TurnOnStatus(status: string): void {
+export function TurnOnStatus(status: string, text?: string): void {
     if (have_swal == 'popup') {
         TurnOffStatus();
     } 
@@ -54,8 +54,8 @@ export function TurnOnStatus(status: string): void {
 
     have_swal = 'popup';
     Swal.fire({
-        title: `Application status: ${status}`,
-        text: "Please wait while the client is getting ready...",
+        title: `${status}`,
+        text: text ?? "Please wait while the client is getting ready...",
         showConfirmButton: false,
         timer: 7000,
         willOpen: () => Swal.showLoading(null),

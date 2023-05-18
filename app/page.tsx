@@ -12,7 +12,6 @@ import { useRouter, useSearchParams } from "next/navigation";
 import {
     AddNotifier,
     ConnectionEvent,
-    EventMessage,
     LogConnectionEvent,
 } from "../core/src/utils/log";
 import { WebRTCControl } from "../components/control/control";
@@ -74,23 +73,23 @@ export default function Home () {
 	}
 
     useEffect(() => {
-        AddNotifier(async (message: EventMessage) => {
-            if(message == 'WebSocketConnected' || 
-                message == 'ExchangingSignalingMessage' || 
-                message == 'WaitingAvailableDeviceSelection')  {
+        AddNotifier(async (message: ConnectionEvent, text?: string) => {
+            if(message == ConnectionEvent.WebSocketConnected || 
+                message == ConnectionEvent.ExchangingSignalingMessage || 
+                message == ConnectionEvent.WaitingAvailableDeviceSelection)  {
                 return;
             }
 
-            if (message == 'ApplicationStarted' ||
-                message == "ReceivedVideoStream" ||
-                message == 'ReceivedAudioStream' ) {
-                await TurnOnConfirm(message)
+            if (message == ConnectionEvent.ApplicationStarted ||
+                message == ConnectionEvent.ReceivedVideoStream ||
+                message == ConnectionEvent.ReceivedAudioStream ) {
+                await TurnOnConfirm(message,text)
                 return
             }
             
-            TurnOnStatus(message);
+            TurnOnStatus(message,text);
 
-            if(message == 'WebRTCConnectionClosed') 
+            if(message == ConnectionEvent.WebRTCConnectionClosed) 
                 router.refresh();
         })
 
@@ -237,7 +236,7 @@ const Body = styled.div`
     margin: 0;
     border: 0;
     overflow: hidden;
-    background-color: gray;
+    background-color: black;
 `;
 const App = styled.div`
     touch-action: none;
