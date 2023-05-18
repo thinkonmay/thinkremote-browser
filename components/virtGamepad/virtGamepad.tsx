@@ -58,6 +58,8 @@ interface ButtonGroupProps {
         type: "left" | "right"
     ) => Promise<void>;
     ButtonCallback: (index: number, type: "up" | "down") => Promise<void>;
+    SelectBtnCallback?: () => void;
+    StartBtnCallback?: () => void
 }
 export const ButtonGroupRight = (param: ButtonGroupProps) => {
     const [posBtn, setPosBtn] = useState<{x: number, y: number}>({x:null, y: null});
@@ -106,7 +108,7 @@ export const ButtonGroupRight = (param: ButtonGroupProps) => {
                         param.ButtonCallback(index, type)
                     }
                 />
-                <StartBtn />
+                <StartBtn onClick={param.StartBtnCallback}/>
                 <JoyStickRight
                     moveCallback={(x: number, y: number) =>
                         param.AxisCallback(x, y, "right")
@@ -165,7 +167,7 @@ export const ButtonGroupLeft = (param: ButtonGroupProps) => {
                         param.ButtonCallback(index, type);
                     }}
                 />
-
+                <SelectBtn onClick={param.SelectBtnCallback}/>
                 <JoyStickLeft
                     moveCallback={async (x: number, y: number) => {
                         param.AxisCallback(x, y, "left");
@@ -187,6 +189,7 @@ export const VirtualGamepad = (param: {
         type: "left" | "right"
     ) => Promise<void>;
     ButtonCallback: (index: number, type: "up" | "down") => Promise<void>;
+    
 }) => {
     return (
         <div>
@@ -196,12 +199,15 @@ export const VirtualGamepad = (param: {
                         AxisCallback={param.AxisCallback}
                         ButtonCallback={param.ButtonCallback}
                         draggable={param.draggable}
+                        SelectBtnCallback={() =>{console.log('click select btn');}}
                     />
                     
                     <ButtonGroupRight
                         AxisCallback={param.AxisCallback}
                         ButtonCallback={param.ButtonCallback}
                         draggable={param.draggable}
+                        StartBtnCallback={() =>{console.log('click start btn');}}
+
                     />
                 </ContainerVirGamepad>
             ) : null}
