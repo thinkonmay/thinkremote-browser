@@ -7,7 +7,7 @@ import {
     TurnOnConfirm,
     TurnOnStatus,
 } from "../components/popup/popup";
-import { WebRTCClient } from "../core/src/app";
+import { RemoteDesktopClient } from "../core/src/app";
 import { useRouter, useSearchParams } from "next/navigation";
 import {
     AddNotifier,
@@ -23,7 +23,7 @@ import SbCore from "../supabase";
 import { Modal } from "@mui/material";
 import { IconHorizontalPhone } from "../public/assets/svg/svg_cpn";
 
-let client : WebRTCClient = null
+let client : RemoteDesktopClient = null
 
 export default function Home () {
     const remoteVideo = useRef<HTMLVideoElement>(null);
@@ -59,7 +59,7 @@ export default function Home () {
         setInterval(PingCallback,14000)
 
         await LogConnectionEvent(ConnectionEvent.ApplicationStarted)
-        client = new WebRTCClient(
+        client = new RemoteDesktopClient(
             SignalingURL,token, WebRTCConfig,
             remoteVideo.current, 
             remoteAudio.current,  

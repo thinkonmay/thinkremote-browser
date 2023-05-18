@@ -8,12 +8,11 @@ export const createBrowserClient = () => createBrowserSupabaseClient()
 export type AuthSessionResp = {
 	id 	  : string
 	email : string
-	token : string
 	webrtc : RTCConfiguration
 	signaling : {
-        HostName      : string 
-        SignalingPort : number 
-        WebsocketURL  : string 
+		audioURL : string
+		videoURL : string
+		dataURL  : string
     }
 }
 export default class SbCore {
@@ -50,9 +49,8 @@ export default class SbCore {
 
 
 	public async AuthenticateSession(ref : string, uref?: string): Promise<{
-		token: string
 		email: string
-		SignalingURL : string
+		SignalingURL : SignalingConfig
 		WebRTCConfig : RTCConfiguration
 		PingCallback : () => Promise<void>
 	} | Error> {
@@ -74,20 +72,21 @@ export default class SbCore {
 		if(error != null)
 			return new Error(error)
 
-		return  {
-			token : data.token,
-			email : data.email,
-			SignalingURL : data.signaling.WebsocketURL,
-			WebRTCConfig : data.webrtc,
-			PingCallback: async () => {
-				const { error } = await this.supabase.rpc(`ping_session`, { 
-					session_id: data.id 
-				})
+		const pingFunc = async () => {
+			const { error } = await this.supabase.rpc(`ping_session`, { 
+				session_id: data.id 
+			})
 
-				if (error != null ) {
-					throw `unable to ping ${error.message}`	
-				}
+			if (error != null ) {
+				throw `unable to ping ${error.message}`	
 			}
+		}
+
+		return  {
+			email 			: data.email,
+			SignalingURL 	: data.signaling,
+			WebRTCConfig 	: data.webrtc,
+			PingCallback	: pingFunc,
 		}
 	}
 }
