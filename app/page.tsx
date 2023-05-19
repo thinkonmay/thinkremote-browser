@@ -55,12 +55,12 @@ export default function Home () {
         if (result instanceof Error) 
             return
 
-        const {token,email,SignalingURL,WebRTCConfig,PingCallback} = result
+        const {Email ,SignalingConfig ,WebRTCConfig,PingCallback} = result
         setInterval(PingCallback,14000)
 
         await LogConnectionEvent(ConnectionEvent.ApplicationStarted)
         client = new RemoteDesktopClient(
-            SignalingURL,token, WebRTCConfig,
+            SignalingConfig,WebRTCConfig,
             remoteVideo.current, 
             remoteAudio.current,  
             Platform)

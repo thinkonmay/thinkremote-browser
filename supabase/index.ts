@@ -26,6 +26,7 @@ export default class SbCore {
 			provider: "google",
 			options: {
 				redirectTo:'https://remote.thinkmay.net',
+				// redirectTo:'http://localhost:3000',
 				queryParams: {
 					access_type: "offline",
 					prompt: "consent",
@@ -49,8 +50,8 @@ export default class SbCore {
 
 
 	public async AuthenticateSession(ref : string, uref?: string): Promise<{
-		email: string
-		SignalingURL : SignalingConfig
+		Email: string
+		SignalingConfig : SignalingConfig
 		WebRTCConfig : RTCConfiguration
 		PingCallback : () => Promise<void>
 	} | Error> {
@@ -83,8 +84,8 @@ export default class SbCore {
 		}
 
 		return  {
-			email 			: data.email,
-			SignalingURL 	: data.signaling,
+			Email 			: data.email,
+			SignalingConfig : data.signaling,
 			WebRTCConfig 	: data.webrtc,
 			PingCallback	: pingFunc,
 		}
