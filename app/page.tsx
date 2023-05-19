@@ -88,9 +88,6 @@ export default function Home () {
             }
             
             TurnOnStatus(message,text);
-
-            if(message == ConnectionEvent.WebRTCConnectionClosed) 
-                router.refresh();
         })
 
         SetupConnection().catch(error => {
