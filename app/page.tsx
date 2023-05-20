@@ -74,20 +74,8 @@ export default function Home () {
 
     useEffect(() => {
         AddNotifier(async (message: ConnectionEvent, text?: string) => {
-            if(message == ConnectionEvent.WebSocketConnected || 
-                message == ConnectionEvent.ExchangingSignalingMessage || 
-                message == ConnectionEvent.WaitingAvailableDeviceSelection)  {
-                return;
-            }
-
-            if (message == ConnectionEvent.ApplicationStarted ||
-                message == ConnectionEvent.ReceivedVideoStream ||
-                message == ConnectionEvent.ReceivedAudioStream ) {
+            if (message == ConnectionEvent.ApplicationStarted) 
                 await TurnOnConfirm(message,text)
-                return
-            }
-            
-            TurnOnStatus(message,text);
         })
 
         SetupConnection().catch(error => {
