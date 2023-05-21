@@ -22,6 +22,7 @@ import {
 import SbCore from "../supabase";
 import { Modal } from "@mui/material";
 import { IconHorizontalPhone } from "../public/assets/svg/svg_cpn";
+import StatusConnect from "../components/status";
 
 let client : WebRTCClient = null
 
@@ -44,26 +45,26 @@ export default function Home () {
     const SetupConnection = async () => {
         localStorage.setItem("reference",ref)
         
-        const core = new SbCore()
-        if (!await core.Authenticated() && user_ref == undefined) 
-			await core.LoginWithGoogle()
+        //const core = new SbCore()
+        //if (!await core.Authenticated() && user_ref == undefined) 
+		//	await core.LoginWithGoogle()
         
-        if(ref == null) 
-            return
+        //if(ref == null) 
+        //    return
 
-        const result = await core.AuthenticateSession(ref,user_ref)
-        if (result instanceof Error) 
-            return
+        //const result = await core.AuthenticateSession(ref,user_ref)
+        //if (result instanceof Error) 
+        //    return
 
-        const {token,email,SignalingURL,WebRTCConfig,PingCallback} = result
-        setInterval(PingCallback,14000)
+        //const {token,email,SignalingURL,WebRTCConfig,PingCallback} = result
+        //setInterval(PingCallback,14000)
 
-        await LogConnectionEvent(ConnectionEvent.ApplicationStarted)
-        client = new WebRTCClient(
-            SignalingURL,token, WebRTCConfig,
-            remoteVideo.current, 
-            remoteAudio.current,  
-            Platform)
+        //await LogConnectionEvent(ConnectionEvent.ApplicationStarted)
+        //client = new WebRTCClient(
+        //    SignalingURL,token, WebRTCConfig,
+        //    remoteVideo.current, 
+        //    remoteAudio.current,  
+        //    Platform)
     }
 
     
@@ -154,7 +155,7 @@ export default function Home () {
     }
     return (
         <Body>
-            <RemoteVideo
+            {/*<RemoteVideo
                 ref={remoteVideo}
                 src={platform == 'desktop' ? video_desktop : video_desktop}
                 autoPlay
@@ -209,7 +210,9 @@ export default function Home () {
 					<IconHorizontalPhone />
 					<TextModal>Please rotate the phone horizontally!!</TextModal>
 				</ContentModal>
-			</Modal>
+			</Modal>*/}
+
+            <StatusConnect />
         </Body>
     );
 };
