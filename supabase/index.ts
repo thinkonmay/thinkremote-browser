@@ -3,9 +3,10 @@
 import { SupabaseClient, User } from "@supabase/supabase-js";
 import { createBrowserSupabaseClient } from '@supabase/auth-helpers-nextjs'
 import { SignalingConfig } from "../core/src/signaling/config";
-
-export type SbFunction = 'worker_session_create' | 'worker_session_deactivate' | 'worker_profile_fetch' | 'session_authenticate' 
 export const createBrowserClient = () => createBrowserSupabaseClient()
+
+export type SbFunction = 'worker_session_create' | 'worker_session_deactivate' | 'worker_profile_fetch' | 'session_authenticate' | 'fetch_worker_status'
+
 export type AuthSessionResp = {
 	id 	  : string
 	email : string
@@ -16,6 +17,17 @@ export type AuthSessionResp = {
 		dataURL  : string
     }
 }
+export type WorkerStatusFetch = {
+	last_check : string
+	connecting_users : {
+		id: number
+		email: string
+		connect_at: string
+    }[]
+}
+
+
+
 export default class SbCore {
 	private supabase: SupabaseClient;
 	constructor() {
@@ -26,8 +38,8 @@ export default class SbCore {
 		await this.supabase.auth.signInWithOAuth({
 			provider: "google",
 			options: {
-				// redirectTo:'https://remote.thinkmay.net',
-				redirectTo:'http://localhost:3000',
+				redirectTo:'https://remote.thinkmay.net',
+				// redirectTo:'http://localhost:3000',
 				queryParams: {
 					access_type: "offline",
 					prompt: "consent",
@@ -56,6 +68,7 @@ export default class SbCore {
 		WebRTCConfig : RTCConfiguration
 		PingCallback : () => Promise<void>
 	} | Error> {
+
 		const session = await this.supabase.auth.getSession()
 		if (session.error != null && uref == undefined) 
 			return new Error(session.error.message)
@@ -65,10 +78,11 @@ export default class SbCore {
 			{ "uref": uref }  
 
 		const body = JSON.stringify({ reference: ref })
-		const {data,error} = await this.supabase.functions.invoke<AuthSessionResp>("session_authenticate" as SbFunction,{
-			headers: headers,
-			body: body,
-			method: 'POST',
+		const {data,error} = await this.supabase.functions
+			.invoke<AuthSessionResp>("session_authenticate" as SbFunction,{
+				headers: headers,
+				body: body,
+				method: 'POST',
 		})
 
 		if(error != null)
@@ -89,6 +103,32 @@ export default class SbCore {
 			SignalingConfig : data.signaling,
 			WebRTCConfig 	: data.webrtc,
 			PingCallback	: pingFunc,
+		}
+	}
+
+
+
+	public async FetchServerStatus(ref : string): Promise<{
+	} | Error> {
+		const session = await this.supabase.auth.getSession()
+
+		const headers = { 
+			access_token: session.data?.session?.access_token 
+		} 
+
+		const body = JSON.stringify({ reference: ref })
+		const {data,error} = await this.supabase.functions
+			.invoke<AuthSessionResp>('fetch_worker_status' as SbFunction,{
+				headers: headers,
+				body: body,
+				method: 'POST',
+		})
+
+		if(error != null)
+			return new Error(error)
+
+		return  {
+
 		}
 	}
 }
