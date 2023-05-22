@@ -65,12 +65,21 @@ export default function Home () {
        const {Email ,SignalingConfig ,WebRTCConfig,PingCallback} = authorizeResult
        setInterval(PingCallback,14000)
 
-       await LogConnectionEvent(ConnectionEvent.ApplicationStarted,JSON.stringify(fetchResult))
-       client = new RemoteDesktopClient(
-           SignalingConfig,WebRTCConfig,
-           remoteVideo.current, 
-           remoteAudio.current,  
-           Platform)
+        const isActive = (time: string) => {
+            const diff = Date.now() -  Date.parse(time)
+            return diff < 15 * 1000
+        }
+        const concurent = fetchResult.user_session.filter(x => { return isActive(x.last_check)}).map(x => x.email)
+        await LogConnectionEvent(ConnectionEvent.ApplicationStarted,
+            `GPU : ${fetchResult.hardware.GPUs} 
+             CPU: ${fetchResult.hardware.CPU} 
+             Sessions: ${concurent.length}`)
+
+        client = new RemoteDesktopClient(
+            SignalingConfig,WebRTCConfig,
+            remoteVideo.current, 
+            remoteAudio.current,  
+            Platform)
     }
 
     
