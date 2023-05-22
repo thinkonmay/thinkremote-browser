@@ -37,9 +37,8 @@ export default function Home () {
     }
     const user_ref   = searchParams.get('uref') ?? undefined
     const ref        = searchParams.get('ref')  ?? ref_local 
-    const platform   = searchParams.get('platform'); 
 
-    const [Platform,setPlatform] = useState<Platform>(null);
+    const [Platform,setPlatform] = useState<Platform>(searchParams.get('platform') as Platform);
 
     const SetupConnection = async () => {
         localStorage.setItem("reference",ref)
@@ -97,7 +96,12 @@ export default function Home () {
             TurnOnStatus(error);
         })
 
-        setPlatform(old => { if (old == null) return getPlatform() })
+        setPlatform(old => { 
+            if (old == 'desktop' || old == 'mobile') 
+                return 
+
+            return getPlatform() 
+        })
 
         if(getPlatform() != 'mobile')
             return
@@ -156,7 +160,7 @@ export default function Home () {
         <Body>
             <RemoteVideo
                 ref={remoteVideo}
-                src={platform == 'desktop' ? video_desktop : video_desktop}
+                src={Platform == 'desktop' ? video_desktop : video_desktop}
                 autoPlay
                 muted
                 playsInline
