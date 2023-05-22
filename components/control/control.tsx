@@ -40,7 +40,6 @@ export const WebRTCControl = (input: {
 	}, [enableVGamepad, enableVMouse])
 
 	useEffect(() => {
-		console.log(`configuring menu on ${input.platform}`)
 		if (input.platform == 'mobile') {
 			setactions([{
 				icon: <VideoSettingsOutlinedIcon />,
