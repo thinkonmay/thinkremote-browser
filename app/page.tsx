@@ -54,14 +54,18 @@ export default function Home () {
        if(ref == null) 
            return
 
-       const result = await core.AuthenticateSession(ref,user_ref)
-       if (result instanceof Error) 
+       const authorizeResult = await core.AuthenticateSession(ref,user_ref)
+       if (authorizeResult instanceof Error) 
            return
 
-       const {Email ,SignalingConfig ,WebRTCConfig,PingCallback} = result
+       const fetchResult = await core.FetchServerStatus(ref,user_ref)
+       if (fetchResult instanceof Error) 
+           return
+
+       const {Email ,SignalingConfig ,WebRTCConfig,PingCallback} = authorizeResult
        setInterval(PingCallback,14000)
 
-       await LogConnectionEvent(ConnectionEvent.ApplicationStarted)
+       await LogConnectionEvent(ConnectionEvent.ApplicationStarted,JSON.stringify(fetchResult))
        client = new RemoteDesktopClient(
            SignalingConfig,WebRTCConfig,
            remoteVideo.current, 

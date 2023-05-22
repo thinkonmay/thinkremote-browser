@@ -19,11 +19,24 @@ export type AuthSessionResp = {
 }
 export type WorkerStatusFetch = {
 	last_check : string
-	connecting_users : {
-		id: number
+	hardware : {
+		Hostname    ?: string  
+		CPU         ?: string  
+		RAM         ?: string  
+		BIOS        ?: string  
+
+		PublicIP    ?: string  
+		PrivateIP   ?: string  
+
+		GPUs        ?: string[]
+		Disks       ?: string[]
+		NICs        ?: string[]
+	}
+	user_session : {
 		email: string
-		connect_at: string
-    }[]
+		start_at: string
+		last_check: string
+	}[]
 }
 
 
@@ -98,6 +111,8 @@ export default class SbCore {
 			}
 		}
 
+		
+
 		return  {
 			Email 			: data.email,
 			SignalingConfig : data.signaling,
@@ -108,17 +123,18 @@ export default class SbCore {
 
 
 
-	public async FetchServerStatus(ref : string): Promise<{
-	} | Error> {
+	public async FetchServerStatus(ref : string, uref? : string): Promise<WorkerStatusFetch | Error> {
 		const session = await this.supabase.auth.getSession()
+		if (session.error != null && uref == undefined) 
+			return new Error(session.error.message)
 
-		const headers = { 
-			access_token: session.data?.session?.access_token 
-		} 
+		const headers = uref == undefined ?
+			{ "access_token": session.data?.session?.access_token }  :
+			{ "uref": uref }  
 
 		const body = JSON.stringify({ reference: ref })
 		const {data,error} = await this.supabase.functions
-			.invoke<AuthSessionResp>('fetch_worker_status' as SbFunction,{
+			.invoke<WorkerStatusFetch>('fetch_worker_status' as SbFunction,{
 				headers: headers,
 				body: body,
 				method: 'POST',
@@ -127,9 +143,7 @@ export default class SbCore {
 		if(error != null)
 			return new Error(error)
 
-		return  {
-
-		}
+		return  data
 	}
 }
 
