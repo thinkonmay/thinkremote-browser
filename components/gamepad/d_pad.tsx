@@ -1,5 +1,9 @@
 import React from "react";
 import styled from "styled-components";
+import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
+import KeyboardArrowLeftIcon from '@mui/icons-material/KeyboardArrowLeft';
+import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
+import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import {
     IconCircle,
     DPadTop,
@@ -18,12 +22,17 @@ const Container = styled.div`
 // Ban kinh gap 5 lan chieu rong
 // chieu dai gap 2.25 chieu rong
 const DefaultButton = styled.button`
-    display: block;
-    /* width: 10px; */
-    /* height: calc(10px * 2.25); */
+     /* depened on Container */
+     width: inherit;
+    height: inherit;
+    :active {
+        background-color: rgba(0, 0, 0, 0.05);
+    }
+    color: #C3B5B5;
+    border: 1px solid currentColor;
+    border-radius: 50%;
     position: absolute;
     background-color: transparent;
-    border: unset;
 `;
 const Top = styled(DefaultButton)`
     top: 0;
@@ -50,32 +59,32 @@ interface Props {
     size;
 }
 const DPad = (props: Props) => {
-    const { onTouch = () => {}, size } = props;
+    const { onTouch = () => { }, size } = props;
     return (
         <Container size={size}>
             <Top
                 onTouchStart={(e: React.TouchEvent) => onTouch(e, "down", 12)}
                 onTouchEnd={(e: React.TouchEvent) => onTouch(e, "up", 12)}
             >
-                <DPadTop></DPadTop>
+                <KeyboardArrowUpIcon sx={{color:'#C3B5B5'}}/>
             </Top>
             <Bottom
                 onTouchStart={(e: React.TouchEvent) => onTouch(e, "down", 13)}
                 onTouchEnd={(e: React.TouchEvent) => onTouch(e, "up", 13)}
             >
-                <DPadBottom></DPadBottom>
+                <KeyboardArrowDownIcon sx={{color:'#C3B5B5'}}/>
             </Bottom>
             <Right
                 onTouchStart={(e: React.TouchEvent) => onTouch(e, "down", 15)}
                 onTouchEnd={(e: React.TouchEvent) => onTouch(e, "up", 15)}
             >
-                <DPadRight></DPadRight>
+                <KeyboardArrowRightIcon sx={{color:'#C3B5B5'}}/>
             </Right>
             <Left
                 onTouchStart={(e: React.TouchEvent) => onTouch(e, "down", 14)}
                 onTouchEnd={(e: React.TouchEvent) => onTouch(e, "up", 14)}
             >
-                <DPadLeft></DPadLeft>
+                <KeyboardArrowLeftIcon sx={{color:'#C3B5B5'}}/>
             </Left>
         </Container>
     );
