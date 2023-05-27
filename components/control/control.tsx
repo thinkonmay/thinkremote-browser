@@ -14,6 +14,7 @@ import { AskSelectBitrate, TurnOnClipboard } from "../popup/popup";
 import { VirtualGamepad } from "../virtGamepad/virtGamepad";
 import { VirtualMouse } from "../virtMouse/virtMouse";
 import Draggable, { DraggableData, DraggableEvent } from "react-draggable";
+import MobileControl from "./mobileControl";
 
 
 export type ButtonMode = "static" | "draggable" | "disable";
@@ -43,9 +44,9 @@ export const WebRTCControl = (input: {
 		console.log(`configuring menu on ${input.platform}`)
 		if (input.platform == 'mobile') {
 			setactions([{
-				icon: <VideoSettingsOutlinedIcon />,
+				icon: <VideoSettingsOutlinedIcon/>,
 				name: "Bitrate",
-				action: async () => {
+				action: async () => {     
 					let bitrate = await AskSelectBitrate();
 					if (bitrate < 500) {
 						return;
@@ -55,7 +56,7 @@ export const WebRTCControl = (input: {
 				},
 			},
 			{
-				icon: <SportsEsportsOutlinedIcon />,
+				icon: <SportsEsportsOutlinedIcon  />,
 				name: "Edit VGamepad",
 				action: async () => {
 
@@ -89,11 +90,11 @@ export const WebRTCControl = (input: {
 
 				},
 			}, {
-				icon: <VolumeUp />,
+				icon: <VolumeUp  />,
 				name: "If your audio is muted",
 				action: () => { input.audioCallback() },
 			}, {
-				icon: <KeyboardIcon />,
+				icon: <KeyboardIcon  />,
 				name: "Write to clipboard",
 				action: async () => {
 					const text = await TurnOnClipboard()
@@ -132,50 +133,38 @@ export const WebRTCControl = (input: {
 
 
 
-
-
-
-	let sxSpeedDial
-
-	if (input.platform === 'mobile') {
-		sxSpeedDial =
-		{
-			opacity: 0.3,
-			position: 'absolute',
-			bottom: '10%',
-			right: '2%',
-			'& .MuiFab-primary': { backgroundColor: 'white', color: 'white' }
-		}
+	let sxSpeedDial = {
+		opacity: 0.3,
+		position: 'absolute',
+		bottom: '2%',
+		right: '2%',
+		'& .MuiFab-primary': { backgroundColor: 'white', color: 'white' }
 	}
-	else if (input.platform === 'desktop') {
-		sxSpeedDial = {
-			opacity: 0.3,
-			position: 'absolute',
-			bottom: '2%',
-			right: '2%',
-			'& .MuiFab-primary': { backgroundColor: 'white', color: 'white' }
-		}
-	}
+
 	return (
 		<div>
 			<div
 				className="containerDrag"
 				style={{ maxWidth: 'max-content', maxHeight: 'max-content' }}
 			>
-				<SpeedDial
-					ariaLabel="SpeedDial basic example"
-					sx={sxSpeedDial}
-					icon={<ListIcon sx={{ color: 'black' }} />}
-				>
-					{actions.map((action) => (
-						<SpeedDialAction
-							key={action.name}
-							icon={action.icon}
-							tooltipTitle={action.name}
-							onClick={action.action}
-						/>
-					))}
-				</SpeedDial>
+				{
+					input.platform === 'mobile' ? 
+						(<MobileControl actions={actions}/>) :
+						<SpeedDial
+							ariaLabel="SpeedDial basic example"
+							sx={sxSpeedDial}
+							icon={<ListIcon sx={{ color: 'black' }} />}
+						>
+							{actions.map((action) => (
+								<SpeedDialAction
+									key={action.name}
+									icon={action.icon}
+									tooltipTitle={action.name}
+									onClick={action.action}
+								/>
+							))}
+						</SpeedDial>
+				}
 			</div>
 
 			<VirtualMouse
@@ -187,6 +176,6 @@ export const WebRTCControl = (input: {
 				ButtonCallback={input.GamepadBCallback}
 				AxisCallback={input.GamepadACallback}
 				draggable={enableVGamepad} />
-		</div>
+		</div >
 	);
 };
