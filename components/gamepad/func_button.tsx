@@ -7,15 +7,10 @@ const DefautContainer = styled.div`
 `;
 const ContainerRightBtn = styled(DefautContainer)`
     align-items: flex-start;
-    /*position: absolute;
-    top: 5%;
-    right: 35%;*/
 `;
 const ContainerLeftBtn = styled(DefautContainer)`
     align-items: flex-end;
-    /*position: absolute;
-    top: 5%;
-    left: 35%;*/
+
 `;
 export const BumperBtn = styled.button`
     display: flex;
@@ -24,7 +19,7 @@ export const BumperBtn = styled.button`
     outline: none;
     color: #C3B5B5;
    
-    border: 2px solid #C3B5B5;
+    border: 1px solid #C3B5B5;
     border-radius: 50%;
     background-color: transparent;
     :active {
@@ -37,10 +32,9 @@ export const TriggerBtn = styled.button`
     justify-content:center;
     outline: none;
     color: #C3B5B5;
-    border: 2px solid #C3B5B5;
+    border: 1px solid #C3B5B5;
     border-radius: 50%;
-    /*border-top-left-radius: 20px;
-    border-top-right-radius: 20px;*/
+
     background-color: transparent;
     :active {
         background-color: rgba(0, 0, 0, 0.05);
@@ -49,55 +43,33 @@ export const TriggerBtn = styled.button`
 
 interface PropsTrigger {
     Touch: (index: number, type: 'up' | 'down') => void
-    scale: number
     name?: string
     className?: string
     style?: any
+    size: number;
 }
 
+export function RightFuncButton(props: PropsTrigger) {
+    const { Touch, name, className,size, ...rest } = props;
 
-const TRIGGER_WIDTH = 50
-const TRIGGER_HEIGHT = 50
-const BUMPER_WIDTH = 50
-const BUMPER_HEIGHT = 50
-export function RightFuncButton(props: PropsTrigger){
-    const { Touch, scale,   name, className, style={}, ...rest } =
-        props;
-
-    const triggerBtnSizeWidth = TRIGGER_WIDTH * scale
-    const triggerBtnSizeHeight = TRIGGER_HEIGHT * scale
-
-    const bumperBtnSizeWidth = BUMPER_WIDTH * scale
-    const bumperBtnSizeHeight = BUMPER_HEIGHT * scale
-
-    const triggerBtnCss = {
-        width: triggerBtnSizeWidth,
-        height: triggerBtnSizeHeight
-    }
-    const bumperBtnCss = {
-        width: bumperBtnSizeWidth,
-        height: bumperBtnSizeHeight
+    const buttonSize = {
+        width: size,
+        height: size
     }
     return (
-        <ContainerRightBtn 
-            name={name}
+        <ContainerRightBtn
             className={className}
-            style={style}
             {...rest}
         >
             <TriggerBtn
-            name={name}
 
-                style={{ ...triggerBtnCss }}
-                scale={scale}
+                style={{ ...buttonSize }}
                 onTouchStart={(e: React.TouchEvent) => Touch(7, 'down')}
                 onTouchEnd={(e: React.TouchEvent) => Touch(7, 'up')}
             >RT</TriggerBtn>
             <BumperBtn
-            name={name}
 
-                style={{ ...bumperBtnCss }}
-                scale={scale}
+                style={{ ...buttonSize }}
                 onTouchStart={(e: React.TouchEvent) => Touch(5, 'down')}
                 onTouchEnd={(e: React.TouchEvent) => Touch(5, 'up')}
             >RB</BumperBtn>
@@ -106,33 +78,22 @@ export function RightFuncButton(props: PropsTrigger){
 }
 
 export function LeftFuncButton(props: PropsTrigger) {
-    const { Touch, scale } =
-        props;
-    const triggerBtnSizeWidth = TRIGGER_WIDTH * scale
-    const triggerBtnSizeHeight = TRIGGER_HEIGHT * scale
-
-    const bumperBtnSizeWidth = BUMPER_WIDTH * scale
-    const bumperBtnSizeHeight = BUMPER_HEIGHT * scale
-
-    const triggerBtnCss = {
-        width: triggerBtnSizeWidth,
-        height: triggerBtnSizeHeight
-    }
-    const bumperBtnCss = {
-        width: bumperBtnSizeWidth,
-        height: bumperBtnSizeHeight
+    const { Touch, size = 50, className } = props;
+    const buttonSize = {
+        width: size,
+        height: size
     }
     return (
-        <ContainerLeftBtn>
+        <ContainerLeftBtn
+        className={className}
+        >
             <TriggerBtn
-                style={{ ...triggerBtnCss }}
-                scale={scale}
+                style={{ ...buttonSize }}
                 onTouchStart={(e: React.TouchEvent) => Touch(6, 'down')}
                 onTouchEnd={(e: React.TouchEvent) => Touch(6, 'up')}
             >LT</TriggerBtn>
             <BumperBtn
-                style={{ ...bumperBtnCss }}
-                scale={scale}
+                style={{ ...buttonSize }}
                 onTouchStart={(e: React.TouchEvent) => Touch(4, 'down')}
                 onTouchEnd={(e: React.TouchEvent) => Touch(4, 'up')}
             >LB</BumperBtn>
