@@ -27,10 +27,12 @@ const slideOutAnimation = keyframes`
   }
 `
 const Container = styled.div`
+	z-index:3;
 	display: flex;
 	position: fixed;
 	top: 0;
 	left: 0;
+	
 	height: 45px;
 	animation-duration: 0.5s;
 	animation-timing-function: ease-in-out;
@@ -101,7 +103,7 @@ function MobileControl(props: Props) {
 
 			<WrapperContent >
 				{actions.map(action =>(
-					<ButtonIcon onClick={action.action}>
+					<ButtonIcon key={Math.random()} onClick={action.action}>
 						{action.icon}
 					</ButtonIcon>
 				))}
