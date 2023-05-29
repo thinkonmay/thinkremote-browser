@@ -4,20 +4,12 @@ import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowLeftIcon from '@mui/icons-material/KeyboardArrowLeft';
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
-import {
-    IconCircle,
-    DPadTop,
-    DPadRight,
-    DPadBottom,
-    DPadLeft,
-} from "../../public/assets/svg/svg_cpn";
+
 const Container = styled.div`
     width: ${(props) => props.size ?? "20"}px;
     height: ${(props) => props.size ?? "20"}px;
-    /* background-color: red; */
-    position: absolute;
-    right: 25%;
-    bottom: 15%;
+    position: relative;
+  
 `;
 // Ban kinh gap 5 lan chieu rong
 // chieu dai gap 2.25 chieu rong
