@@ -3,7 +3,7 @@
 
 import { Translate } from "@mui/icons-material";
 import { Button, Stack } from "@mui/material";
-import React, { useRef, useState, useEffect, useLayoutEffect } from "react"; // we need this to make JSX compile
+import React, { useRef, useState, useEffect, useLayoutEffect, useTransition } from "react"; // we need this to make JSX compile
 import Draggable, { DraggableData, DraggableEvent } from "react-draggable";
 import styled from "styled-components";
 import {
@@ -14,40 +14,315 @@ import { ButtonMode } from "../control/control";
 import { YBXA } from "../gamepad/y_b_x_a";
 import DPad from "../gamepad/d_pad";
 import { LeftFuncButton, RightFuncButton } from "../gamepad/func_button";
+import { useSetting } from "../../context/settingProvider";
+import { event } from "nextjs-google-analytics";
+
+export const VirtualGamepad = (props: {
+    draggable: ButtonMode;
+    AxisCallback: (
+        x: number,
+        y: number,
+        type: "left" | "right"
+    ) => Promise<void>;
+    ButtonCallback: (index: number, type: "up" | "down") => Promise<void>;
+}) => {
+    const { draggable = 'draggable',
+        AxisCallback = () => { },
+        ButtonCallback = () => { } } = props
+    return (
+        <>
+            {draggable == "static" || draggable == "draggable" ? (
+                <ContainerVirGamepad style={{ zIndex: 2 }}>
+                    <ButtonGroupLeft
+                        AxisCallback={AxisCallback}
+                        ButtonCallback={ButtonCallback}
+                        draggable={draggable}
+                    />
+
+                    <ButtonGroupRight
+                        AxisCallback={AxisCallback}
+                        ButtonCallback={ButtonCallback}
+                        draggable={draggable}
+                    />
+                </ContainerVirGamepad>
+            ) : null}
+        </>
+    );
+};
 
 export const JoyStick = (param: {
     draggable: ButtonMode;
     moveCallback: (x: number, y: number) => Promise<void>;
     className: string;
+    size: number,
 }) => {
+
+    const { draggable, moveCallback, className, size = 100 } = param
     const [enableJT, setenableJT] = useState<boolean>(false);
 
     const move = (event: IJoystickUpdateEvent) => {
         if (event.type == "move") {
             if (!enableJT) {
-                param.moveCallback(0, 0);
+                moveCallback(0, 0);
                 return;
             }
-            param.moveCallback(event.x, -event.y);
+            moveCallback(event.x, -event.y);
         } else if (event.type == "stop") {
             setenableJT(false);
-            param.moveCallback(0, 0);
+            moveCallback(0, 0);
         } else if (event.type == "start") {
             setenableJT(true);
         }
     };
 
     return (
-        <WrapperJoyStick className={param.className}>
+        <WrapperJoyStick className={className}>
             <Joystick
                 start={move}
                 stop={move}
                 move={move}
-                // className={param.className}
+                size={size}
                 baseColor="#000"
                 stickColor="hwb(360 51% 76%)"
+                disabled={draggable === 'draggable'}
             />
         </WrapperJoyStick>
+    );
+};
+interface Coordinates {
+    x: number;
+    y: number
+}
+
+type Position = {
+    ybxa?: Coordinates
+    joystick: Coordinates
+    funcBtn: Coordinates
+    dpad?: Coordinates
+}
+export const ButtonGroupRight = (param: ButtonGroupProps) => {
+    const { settingValue } = useSetting()
+    const [isPending, startTransition] = useTransition()
+
+    const rightScale = settingValue.gamepad.rightScale
+
+    const [posBtn, setPosBtn] = useState<Position>({
+        ybxa: {
+            x: 0,
+            y: 0
+        },
+        joystick: {
+            x: 0,
+            y: 0
+        },
+        funcBtn: {
+            x: 0,
+            y: 0
+        },
+    });
+
+    useLayoutEffect(() => {
+        let cache = localStorage.getItem(`right_group_pos`);
+        if (cache === null) {
+            cache = '{"ybxa":{"x":512,"y":70},"joystick":{"x":389,"y":157},"funcBtn":{"x":605,"y":11}}';
+        }
+        const {
+            ybxa,
+            joystick,
+            funcBtn,
+        } = JSON.parse(cache);
+
+        setPosBtn({
+            ybxa,
+            joystick,
+            funcBtn,
+        });
+    }, []);
+    console.log(posBtn, 'posBtn');
+    const handleDrag = (e: DraggableEvent, data: DraggableData) => {
+        //getname => setPos by name. 
+        console.log(data);
+        const key = data.node.id
+        const value = { x: data.x, y: data.y }
+        setPosBtn((prev => {
+            return {
+                ...prev, [key]: value
+            }
+        }))
+
+    };
+
+    const handleStop = (e: DraggableEvent, data: DraggableData) => {
+        localStorage.setItem(`right_group_pos`, JSON.stringify(posBtn));
+    };
+    return (
+        <>
+            <WrapperGroupBtn
+            >
+                <Draggable
+                    disabled={param.draggable != "draggable"}
+                    position={{ x: posBtn?.funcBtn?.x, y: posBtn?.funcBtn?.y }}
+                    onStop={handleStop}
+                    onDrag={handleDrag}
+                >
+                    <div id="funcBtn">
+                        <RightFuncButton
+                            name='funcBtn'
+                            Touch={(index, type) => param.ButtonCallback(index, type)}
+                            scale={rightScale}
+                        />
+                    </div>
+                </Draggable>
+                <Draggable
+                    disabled={param.draggable != "draggable"}
+                    position={{ x: posBtn?.ybxa?.x, y: posBtn?.ybxa?.y }}
+
+                    onStop={handleStop}
+                    onDrag={handleDrag}
+                >
+                    <div id="ybxa">
+                        <YBXA
+                            size={50 * rightScale}
+                            onTouch={(e: React.TouchEvent, type, index) =>
+                                param.ButtonCallback(index, type)
+                            }
+                        />
+                    </div>
+                </Draggable>
+                <StartBtn />
+                <Draggable
+                    disabled={param.draggable != "draggable"}
+                    position={{ x: posBtn?.joystick?.x, y: posBtn?.joystick?.y }}
+                    onStop={handleStop}
+                    onDrag={handleDrag}
+                >
+                    <div id="joystick">
+                        <JoyStickRight
+                            moveCallback={(x: number, y: number) =>
+                                param.AxisCallback(x, y, "right")
+                            }
+                            draggable={param.draggable}
+                            size={100 * rightScale}
+                        />
+                    </div>
+                </Draggable>
+                {/* right */}
+            </WrapperGroupBtn>
+        </>
+    );
+};
+export const ButtonGroupLeft = (param: ButtonGroupProps) => {
+    const { settingValue } = useSetting()
+    const [isPending, startTransition] = useTransition()
+
+    const leftScale = settingValue.gamepad.leftScale
+
+    const [posBtn, setPosBtn] = useState<Position>({
+        dpad: {
+            x: 0,
+            y: 0
+        },
+        joystick: {
+            x: 0,
+            y: 0
+        },
+        funcBtn: {
+            x: 0,
+            y: 0
+        },
+    });
+
+    useLayoutEffect(() => {
+        let cache = localStorage.getItem(`left_group_pos`);
+        if (cache === null) {
+            cache = '{"dpad":{"x":180,"y":60},"joystick":{"x":244,"y":102},"funcBtn":{"x":75,"y":10}}';
+        }
+        const {
+            dpad,
+            joystick,
+            funcBtn,
+        } = JSON.parse(cache);
+
+        setPosBtn({
+            dpad,
+            joystick,
+            funcBtn,
+        });
+    }, []);
+    console.log(posBtn, 'posBtn');
+    const handleDrag = (e: DraggableEvent, data: DraggableData) => {
+        //getname => setPos by name. 
+        console.log(data);
+        const key = data.node.id
+        const value = { x: data.x, y: data.y }
+        setPosBtn((prev => {
+            return {
+                ...prev, [key]: value
+            }
+        }))
+
+    };
+
+    const handleStop = (e: DraggableEvent, data: DraggableData) => {
+        localStorage.setItem(`left_group_pos`, JSON.stringify(posBtn));
+    };
+    return (
+        <>
+            <WrapperGroupBtn>
+                <Draggable
+                    disabled={param.draggable != "draggable"}
+                    position={{ x: posBtn?.funcBtn?.x, y: posBtn?.funcBtn?.y }}
+                    onStop={handleStop}
+                    onDrag={handleDrag}>
+                    <div
+                        id="funcBtn"
+                    >
+                        <LeftFuncButton
+                            Touch={(index, type) => param.ButtonCallback(index, type)}
+                            scale={leftScale}
+                        />
+                    </div>
+                </Draggable>
+                <Draggable
+                    disabled={param.draggable != "draggable"}
+                    position={{ x: posBtn?.dpad?.x, y: posBtn?.dpad?.y }}
+                    onStop={handleStop}
+                    onDrag={handleDrag}
+                >
+                    <div
+                        id="dpad"
+                    >
+                        <DPad
+                            size={50 * leftScale}
+                            onTouch={(e: React.TouchEvent, type, index) => {
+                                param.ButtonCallback(index, type);
+                            }}
+                        />
+
+                    </div>
+                </Draggable>
+                <Draggable
+                    disabled={param.draggable != "draggable"}
+                    position={{ x: posBtn?.joystick?.x, y: posBtn?.joystick?.y }}
+                    onStop={handleStop}
+                    onDrag={handleDrag}
+                >
+                    <div
+                        id="joystick"
+                    >
+                        <JoyStickLeft
+                            moveCallback={async (x: number, y: number) => {
+                                param.AxisCallback(x, y, "left");
+                                return;
+                            }}
+                            draggable={param.draggable}
+                            size={100 * leftScale}
+                        />
+                    </div>
+                </Draggable>
+                {/* left */}
+            </WrapperGroupBtn>
+        </>
     );
 };
 interface ButtonGroupProps {
@@ -58,156 +333,9 @@ interface ButtonGroupProps {
         type: "left" | "right"
     ) => Promise<void>;
     ButtonCallback: (index: number, type: "up" | "down") => Promise<void>;
+    scale: number
 }
-export const ButtonGroupRight = (param: ButtonGroupProps) => {
-    const [posBtn, setPosBtn] = useState<{x: number, y: number}>({x:null, y: null});
-    useLayoutEffect(() => {
-        let cache = localStorage.getItem(`right_group_pos`);
-        const { x, y } = JSON.parse(
-            cache != null ? cache : `{"x": 0, "y" : 0}`
-        );
-        if (x == null || y == null) {
-            return;
-        }
 
-        setPosBtn({ x: x, y: y });
-    }, []);
-
-    const handleDrag = (e: DraggableEvent, data: DraggableData) => {
-        setPosBtn({
-            x: data.x,
-            y: data.y,
-        });
-    };
-
-    const handleStop = (e: DraggableEvent, data: DraggableData) => {
-        const { x, y } = posBtn;
-        if (x == null || y == null) {
-            return;
-        }
-
-        localStorage.setItem(`right_group_pos`, JSON.stringify(posBtn));
-    };
-
-    return (
-        <Draggable
-            disabled={param.draggable != "draggable"}
-            position={{ x: posBtn.x, y: posBtn.y }}
-            onStop={handleStop}
-            onDrag={handleDrag}
-        >
-            <WrapperGroupBtn>
-                <RightFuncButton
-                    Touch={(index, type) => param.ButtonCallback(index, type)}
-                />
-                <YBXA
-                    size={50}
-                    onTouch={(e: React.TouchEvent, type, index) =>
-                        param.ButtonCallback(index, type)
-                    }
-                />
-                <StartBtn />
-                <JoyStickRight
-                    moveCallback={(x: number, y: number) =>
-                        param.AxisCallback(x, y, "right")
-                    }
-                    draggable={param.draggable}
-                />
-                {/* right */}
-            </WrapperGroupBtn>
-        </Draggable>
-    );
-};
-export const ButtonGroupLeft = (param: ButtonGroupProps) => {
-    const [posBtn, setPosBtn] = useState({ x: 0, y: 0 });
-    useLayoutEffect(() => {
-        let cache = localStorage.getItem(`left_group_pos`);
-        const { x, y } = JSON.parse(
-            cache != null ? cache : `{"x": 0, "y" : 0}`
-        );
-        if (x == null || y == null) {
-            return;
-        }
-
-        setPosBtn({ x: x, y: y });
-    }, []);
-
-    const handleDrag = (e: DraggableEvent, data: DraggableData) => {
-        const { x, y } = posBtn;
-        setPosBtn({
-            x: data.x,
-            y: data.y,
-        });
-    };
-
-    const handleStop = (e: DraggableEvent, data: DraggableData) => {
-        const { x, y } = posBtn;
-        if (x == null || y == null) {
-            return;
-        }
-
-        localStorage.setItem(`left_group_pos`, JSON.stringify(posBtn));
-    };
-    return (
-        <Draggable
-            disabled={param.draggable != "draggable"}
-            position={{ x: posBtn.x, y: posBtn.y }}
-            onStop={handleStop}
-            onDrag={handleDrag}
-        >
-            <WrapperGroupBtn>
-                <LeftFuncButton
-                    Touch={(index, type) => param.ButtonCallback(index, type)}
-                />
-                <DPad
-                    size={50}
-                    onTouch={(e: React.TouchEvent, type, index) => {
-                        param.ButtonCallback(index, type);
-                    }}
-                />
-
-                <JoyStickLeft
-                    moveCallback={async (x: number, y: number) => {
-                        param.AxisCallback(x, y, "left");
-                        return;
-                    }}
-                    draggable={param.draggable}
-                />
-                {/* left */}
-            </WrapperGroupBtn>
-        </Draggable>
-    );
-};
-
-export const VirtualGamepad = (param: {
-    draggable: ButtonMode;
-    AxisCallback: (
-        x: number,
-        y: number,
-        type: "left" | "right"
-    ) => Promise<void>;
-    ButtonCallback: (index: number, type: "up" | "down") => Promise<void>;
-}) => {
-    return (
-        <div>
-            {param.draggable == "static" || param.draggable == "draggable" ? (
-                <ContainerVirGamepad style={{ zIndex: 2 }}>
-                    <ButtonGroupLeft
-                        AxisCallback={param.AxisCallback}
-                        ButtonCallback={param.ButtonCallback}
-                        draggable={param.draggable}
-                    />
-                    
-                    <ButtonGroupRight
-                        AxisCallback={param.AxisCallback}
-                        ButtonCallback={param.ButtonCallback}
-                        draggable={param.draggable}
-                    />
-                </ContainerVirGamepad>
-            ) : null}
-        </div>
-    );
-};
 
 
 const ContainerVirGamepad = styled.div`
@@ -219,9 +347,9 @@ const WrapperDrag = styled.div`
     opacity: 0.3;
 `;
 const WrapperGroupBtn = styled.div`
-    width: 50vw;
+    /*width: 50vw;
     height: 100vh;
-    position: relative;
+    position: relative;*/
 `;
 
 const CssDefaultCenterBtn = styled.button`
@@ -245,14 +373,14 @@ const StartBtn = styled(CssDefaultCenterBtn)`
 `;
 
 const JoyStickRight = styled(JoyStick)`
-    position: absolute;
+    /*position: absolute;
     opacity: 0.3;
     bottom: 10%;
-    right: 50%;
+    right: 50%;*/
 `;
 const JoyStickLeft = styled(JoyStick)`
-    position: absolute;
+    /*position: absolute;
     opacity: 0.3;
     top: 50%;
-    right: 50%;
+    right: 50%;*/
 `;
