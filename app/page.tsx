@@ -1,8 +1,10 @@
 "use client"
 
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
 import video_desktop from "../public/assets/videos/video_demo_desktop.mp4";
 import styled from "styled-components";
+import dpadTopSvg from '../public/assets/svg/d_pad_top.svg'
+
 import {
     TurnOnConfirm,
     TurnOnStatus,
@@ -23,24 +25,38 @@ import SbCore from "../supabase";
 import { Modal } from "@mui/material";
 import { IconHorizontalPhone } from "../public/assets/svg/svg_cpn";
 import StatusConnect from "../components/status";
+import GuideLine from "../components/guideline";
+import { VirtualMouse } from "../components/virtMouse/virtMouse";
+import Image from "next/image";
+import MobileControl from "../components/control/mobileControl";
+import { VirtualGamepad } from "../components/virtGamepad/virtGamepad";
+import Setting from "../components/setting";
 
 let client : RemoteDesktopClient = null
 
 export default function Home () {
-    //const remoteVideo = useRef<HTMLVideoElement>(null);
-    //const remoteAudio = useRef<HTMLAudioElement>(null);
-    //const searchParams = useSearchParams();
-    //const router = useRouter()
+    const [isGuideModalOpen, setGuideModalOpen] = useState(true)
 
-    //let ref_local        = ''
-    //if (typeof window !== 'undefined') {
-    //    ref_local        = localStorage.getItem("reference")
-    //}
-    //const user_ref   = searchParams.get('uref') ?? undefined
-    //const ref        = searchParams.get('ref')  ?? ref_local 
-    //const platform   = searchParams.get('platform'); 
+    useLayoutEffect(()=>{
+        const isGuideModalLocal = localStorage.getItem('isGuideModalLocal')
+        if(isGuideModalLocal == 'false' || isGuideModalLocal == 'true'){
+            setGuideModalOpen(JSON.parse(isGuideModalLocal))
+        }
+    },[])
+    const remoteVideo = useRef<HTMLVideoElement>(null);
+    const remoteAudio = useRef<HTMLAudioElement>(null);
+    const searchParams = useSearchParams();
+    const router = useRouter()
 
-    //const [Platform,setPlatform] = useState<Platform>(null);
+    let ref_local        = ''
+    if (typeof window !== 'undefined') {
+        ref_local        = localStorage.getItem("reference")
+    }
+    const user_ref   = searchParams.get('uref') ?? undefined
+    const ref        = searchParams.get('ref')  ?? ref_local 
+    const platform   = searchParams.get('platform'); 
+
+    const [Platform,setPlatform] = useState<Platform>(null);
 
     //const SetupConnection = async () => {
     //    localStorage.setItem("reference",ref)
@@ -63,11 +79,11 @@ export default function Home () {
     //    client = new RemoteDesktopClient(
     //        SignalingConfig,WebRTCConfig,
     //        remoteVideo.current, 
-    //        remoteAudio.current,  
+    //        remoteAudio.current,   
     //        Platform)
     //}
 
-    
+
 	//const [isModalOpen, setModalOpen] = useState(false)
 	//const checkHorizontal = (width: number,height:number) => {
     //    setModalOpen(width < height)
@@ -101,43 +117,43 @@ export default function Home () {
     //}, []);
 
 
-    //const toggle_mouse_touch_callback=async function(enable: boolean) { 
-    //    client?.hid?.DisableTouch(!enable);
-    //    client?.hid?.DisableMouse(!enable);
-    //} 
-    //const bitrate_callback= async function (bitrate: number) { 
-    //    client?.ChangeBitrate(bitrate);
-    //    client?.ChangeFramerate(55);
-    //} 
-    //const GamepadACallback=async function(x: number, y: number, type: "left" | "right"): Promise<void> {
-    //    client?.hid?.VirtualGamepadAxis(x,y,type);
-    //} 
-    //const GamepadBCallback=async function(index: number, type: "up" | "down"): Promise<void> {
-    //    client?.hid?.VirtualGamepadButtonSlider(type == 'down',index);
-    //}  
-    //const MouseMoveCallback=async function (x: number, y: number): Promise<void> {
-    //    client?.hid?.mouseMoveRel({movementX:x,movementY:y});
-    //} 
-    //const MouseButtonCallback=async function (index: number, type: "up" | "down"): Promise<void> {
-    //    type == 'down' ? client?.hid?.MouseButtonDown({button: index}) : client?.hid?.MouseButtonUp({button: index})
-    //} 
-    //const keystuckCallback= async function (): Promise<void> {
-    //    client?.hid?.ResetKeyStuck();
-    //}
-    //const clipboardSetCallback= async function (val: string): Promise<void> {
-    //    console.log(val)
-    //    client?.hid?.SetClipboard(val)
-    //    client?.hid?.PasteClipboard()
-    //}
-    //const audioCallback = async() => {
-    //    try { 
-    //        client?.ResetAudio()
-    //        await remoteAudio.current.play() 
-    //        await remoteVideo.current.play() 
-    //    } catch (e) {
-    //        console.log(`error play audio ${JSON.stringify(e)}`)
-    //    }
-    //}
+    const toggle_mouse_touch_callback=async function(enable: boolean) { 
+        client?.hid?.DisableTouch(!enable);
+        client?.hid?.DisableMouse(!enable);
+    } 
+    const bitrate_callback= async function (bitrate: number) { 
+        client?.ChangeBitrate(bitrate);
+        client?.ChangeFramerate(55);
+    } 
+    const GamepadACallback=async function(x: number, y: number, type: "left" | "right"): Promise<void> {
+        client?.hid?.VirtualGamepadAxis(x,y,type);
+    } 
+    const GamepadBCallback=async function(index: number, type: "up" | "down"): Promise<void> {
+        client?.hid?.VirtualGamepadButtonSlider(type == 'down',index);
+    }  
+    const MouseMoveCallback=async function (x: number, y: number): Promise<void> {
+        client?.hid?.mouseMoveRel({movementX:x,movementY:y});
+    } 
+    const MouseButtonCallback=async function (index: number, type: "up" | "down"): Promise<void> {
+        type == 'down' ? client?.hid?.MouseButtonDown({button: index}) : client?.hid?.MouseButtonUp({button: index})
+    } 
+    const keystuckCallback= async function (): Promise<void> {
+        client?.hid?.ResetKeyStuck();
+    }
+    const clipboardSetCallback= async function (val: string): Promise<void> {
+        console.log(val)
+        client?.hid?.SetClipboard(val)
+        client?.hid?.PasteClipboard()
+    }
+    const audioCallback = async() => {
+        try { 
+            client?.ResetAudio()
+            await remoteAudio.current.play() 
+            await remoteVideo.current.play() 
+        } catch (e) {
+            console.log(`error play audio ${JSON.stringify(e)}`)
+        }
+    }
     return (
         <Body>
             {/*<RemoteVideo
@@ -147,7 +163,7 @@ export default function Home () {
                 muted
                 playsInline
                 loop
-            ></RemoteVideo>
+            ></RemoteVideo>*/}
             <App
                 onContextMenu={(e) => {
                     e.preventDefault()
@@ -165,7 +181,7 @@ export default function Home () {
                     e.preventDefault();
                 }}
             >
-                <WebRTCControl platform={Platform} 
+                <WebRTCControl platform={'mobile'} 
                 toggle_mouse_touch_callback={toggle_mouse_touch_callback}
                 bitrate_callback={bitrate_callback}
                 GamepadACallback={GamepadACallback}
@@ -177,7 +193,7 @@ export default function Home () {
                 clipboardSetCallback={clipboardSetCallback}
                 ></WebRTCControl>
             </App>
-            <audio
+            {/*<audio
                 ref={remoteAudio}
                 autoPlay={true}
                 playsInline={true}
@@ -196,7 +212,11 @@ export default function Home () {
 					<TextModal>Please rotate the phone horizontally!!</TextModal>
 				</ContentModal>
 			</Modal>*/}
+            {/*<GuideLine isModalOpen={isGuideModalOpen} closeModal={() => {setGuideModalOpen(false)}}/>*/}
             <StatusConnect/>
+            {/*<MobileControl/>*/}
+            <Setting/>
+
         </Body>
     );
 };
