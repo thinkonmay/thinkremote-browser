@@ -31,11 +31,11 @@ export const VirtualGamepad = (props: {
     SelectCallback: () => void;
     StartCallback: () => void;
 }) => {
-    const { draggable = 'draggable',
-        AxisCallback = () => { },
-        ButtonCallback = () => { },
-        SelectCallback = () => { },
-        StartCallback = () => { }
+    const { draggable,
+        AxisCallback ,
+        ButtonCallback,
+        SelectCallback,
+        StartCallback ,
     } = props
     return (
         <>
