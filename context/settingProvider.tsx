@@ -37,12 +37,12 @@ const reducer = (state: ISettingState, action) => {
 //}
 
 function SettingProvider({ children }: { children: React.ReactNode }) {
-	useEffect(() => {
-		// Perform localStorage action
-		const item  = JSON.parse(localStorage.getItem('settingData'))
-		if(item) setInitialData(item)
-	  }, [])
 	const [initialData, setInitialData] = useState(initialSetting)
+	//React.useLayoutEffect(() => {
+	//	// Perform localStorage action
+	//	const item  = JSON.parse(localStorage.getItem('settingData'))
+	//	if(item) setInitialData(item)
+	//  }, [])
 	const [state, dispatch] = React.useReducer(reducer, initialData)
 	const saveDataLocal = React.useCallback(() => {
 		localStorage.setItem('settingData', JSON.stringify(state))
