@@ -44,9 +44,9 @@ export const WebRTCControl = (input: {
 		console.log(`configuring menu on ${input.platform}`)
 		if (input.platform == 'mobile') {
 			setactions([{
-				icon: <VideoSettingsOutlinedIcon/>,
+				icon: <VideoSettingsOutlinedIcon />,
 				name: "Bitrate",
-				action: async () => {     
+				action: async () => {
 					let bitrate = await AskSelectBitrate();
 					if (bitrate < 500) {
 						return;
@@ -56,7 +56,7 @@ export const WebRTCControl = (input: {
 				},
 			},
 			{
-				icon: <SportsEsportsOutlinedIcon  />,
+				icon: <SportsEsportsOutlinedIcon />,
 				name: "Edit VGamepad",
 				action: async () => {
 
@@ -90,11 +90,11 @@ export const WebRTCControl = (input: {
 
 				},
 			}, {
-				icon: <VolumeUp  />,
+				icon: <VolumeUp />,
 				name: "If your audio is muted",
 				action: () => { input.audioCallback() },
 			}, {
-				icon: <KeyboardIcon  />,
+				icon: <KeyboardIcon />,
 				name: "Write to clipboard",
 				action: async () => {
 					const text = await TurnOnClipboard()
@@ -148,8 +148,8 @@ export const WebRTCControl = (input: {
 				style={{ maxWidth: 'max-content', maxHeight: 'max-content' }}
 			>
 				{
-					input.platform === 'mobile' ? 
-						(<MobileControl actions={actions}/>) :
+					input.platform === 'mobile' ?
+						(<MobileControl actions={actions} />) :
 						<SpeedDial
 							ariaLabel="SpeedDial basic example"
 							sx={sxSpeedDial}
@@ -175,7 +175,10 @@ export const WebRTCControl = (input: {
 			<VirtualGamepad
 				ButtonCallback={input.GamepadBCallback}
 				AxisCallback={input.GamepadACallback}
-				draggable={enableVGamepad} />
+				draggable={enableVGamepad}
+				SelectCallback={() => { }}
+				StartCallback={() => { }}
+			/>
 		</div >
 	);
 };
