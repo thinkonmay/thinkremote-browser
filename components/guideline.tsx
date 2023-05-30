@@ -79,7 +79,7 @@ const ButtonGotit = styled(ResetButton)`
 `
 function GuideLine({ isModalOpen, closeModal }) {
 	const handleDontShow = () => {
-		localStorage.setItem('isGuideModalLocal', false)
+		localStorage.setItem('isGuideModalLocal', 'false')
 		closeModal()
 
 	}
