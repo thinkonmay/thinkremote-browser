@@ -37,6 +37,8 @@ export const VirtualGamepad = (props: {
         SelectCallback,
         StartCallback ,
     } = props
+
+
     return (
         <>
             {draggable == "static" || draggable == "draggable" ? (
@@ -396,6 +398,9 @@ const CssDefaultCenterBtn = styled.button`
     display: flex;
     align-items: center;
     justify-content: center;
+    :active {
+        background-color: rgb(97 76 76 / 15%);;
+    }
 `;
 const SelectBtn = styled(CssDefaultCenterBtn)`
     /*position: absolute;

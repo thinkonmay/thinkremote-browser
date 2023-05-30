@@ -37,7 +37,7 @@ export const TriggerBtn = styled.button`
 
     background-color: transparent;
     :active {
-        background-color: rgba(0, 0, 0, 0.05);
+        background-color: rgb(97 76 76 / 15%);;
     }
 `;
 

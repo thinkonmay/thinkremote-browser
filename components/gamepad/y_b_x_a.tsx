@@ -16,12 +16,12 @@ const DefaultButton = styled.button`
     width: inherit;
     height: inherit;
     :active {
-        background-color: rgba(0, 0, 0, 0.05);
+        background-color: rgb(97 76 76 / 15%);;
     }
     color: #C3B5B5;
     border: 1px solid currentColor;
     border-radius: 50%;
-    position: absolute;
+    /*position: absolute;*/
     background-color: transparent;
 `;
 
