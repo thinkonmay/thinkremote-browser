@@ -43,7 +43,7 @@ function SettingProvider({ children }: { children: React.ReactNode }) {
 	//	const item  = JSON.parse(localStorage.getItem('settingData'))
 	//	if(item) setInitialData(item)
 	//  }, [])
-	const [state, dispatch] = React.useReducer(reducer, initialData)
+	const [state, dispatch] = React.useReducer(reducer, initialSetting)
 	const saveDataLocal = React.useCallback(() => {
 		localStorage.setItem('settingData', JSON.stringify(state))
 	}, [state])
