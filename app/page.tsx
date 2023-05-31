@@ -212,7 +212,7 @@ export default function Home () {
 					<TextModal>Please rotate the phone horizontally!!</TextModal>
 				</ContentModal>
 			</Modal>*/}
-            {/*<GuideLine isModalOpen={isGuideModalOpen} closeModal={() => {setGuideModalOpen(false)}}/>*/}
+            <GuideLine isModalOpen={isGuideModalOpen} closeModal={() => {setGuideModalOpen(false)}}/>
             <StatusConnect/>
             {/*<MobileControl/>*/}
             {/*<Setting/>*/}
