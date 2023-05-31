@@ -3,7 +3,6 @@
 import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
 import video_desktop from "../public/assets/videos/video_demo_desktop.mp4";
 import styled from "styled-components";
-import dpadTopSvg from '../public/assets/svg/d_pad_top.svg'
 
 import {
     TurnOnConfirm,
@@ -24,13 +23,8 @@ import {
 import SbCore from "../supabase";
 import { Modal } from "@mui/material";
 import { IconHorizontalPhone } from "../public/assets/svg/svg_cpn";
-import StatusConnect from "../components/status";
-import GuideLine from "../components/guideline";
-import { VirtualMouse } from "../components/virtMouse/virtMouse";
-import Image from "next/image";
-import MobileControl from "../components/control/mobileControl";
-import { VirtualGamepad } from "../components/virtGamepad/virtGamepad";
-import Setting from "../components/setting";
+import StatusConnect from "../components/status/status";
+import Setting from "../components/setting/setting";
 
 let client : RemoteDesktopClient = null
 
@@ -45,13 +39,13 @@ export default function Home () {
     },[])
     const remoteVideo = useRef<HTMLVideoElement>(null);
     const remoteAudio = useRef<HTMLAudioElement>(null);
-    const searchParams = useSearchParams();
-    const router = useRouter()
 
     let ref_local        = ''
     if (typeof window !== 'undefined') {
         ref_local        = localStorage.getItem("reference")
     }
+
+    const searchParams = useSearchParams();
     const user_ref   = searchParams.get('uref') ?? undefined
     const ref        = searchParams.get('ref')  ?? ref_local 
     const platform   = searchParams.get('platform'); 
@@ -90,23 +84,27 @@ export default function Home () {
 	}
 
     useEffect(() => {
-       AddNotifier(async (message: ConnectionEvent, text?: string) => {
-           if (message == ConnectionEvent.ApplicationStarted) 
-               await TurnOnConfirm(message,text)
-       })
+        AddNotifier(async (message: ConnectionEvent, text?: string) => {
+            if (message == ConnectionEvent.ApplicationStarted) 
+                await TurnOnConfirm(message,text)
+        })
 
-       SetupConnection().catch(error => {
-           TurnOnStatus(error);
-       })
+        setPlatform(old => { 
+            if (platform == null) 
+                return getPlatform() 
+            else 
+                return platform as Platform
+        })
 
-       setPlatform(old => { if (old == null) return getPlatform() })
+        SetupConnection().catch(error => {
+            TurnOnStatus(error);
+        })
 
-       if(getPlatform() != 'mobile')
-           return
+
         
 		checkHorizontal(window.innerWidth,window.innerHeight)
-       window.addEventListener('resize', (e: UIEvent) => {
-			checkHorizontal(window.innerWidth, window.innerHeight)
+        window.addEventListener('resize', (e: UIEvent) => {
+                checkHorizontal(window.innerWidth, window.innerHeight)
 		})
 
 		return () => { 
@@ -164,24 +162,8 @@ export default function Home () {
                 playsInline
                 loop
             ></RemoteVideo>
-            <App
-                onContextMenu={(e) => {
-                    e.preventDefault()
-                }}
-                onMouseUp={(e: MouseEvent) => {
-                    e.preventDefault();
-                }}
-                onMouseDown={(e: MouseEvent) => {
-                    e.preventDefault();
-                }}
-                onKeyUp={(e: KeyboardEvent) => {
-                    e.preventDefault();
-                }}
-                onKeyDown={(e: KeyboardEvent) => {
-                    e.preventDefault();
-                }}
-            >
-                <WebRTCControl platform={'mobile'} 
+            <WebRTCControl 
+                platform={Platform} 
                 toggle_mouse_touch_callback={toggle_mouse_touch_callback}
                 bitrate_callback={bitrate_callback}
                 GamepadACallback={GamepadACallback}
@@ -191,8 +173,7 @@ export default function Home () {
                 keystuckCallback={keystuckCallback}
                 audioCallback={audioCallback}
                 clipboardSetCallback={clipboardSetCallback}
-                ></WebRTCControl>
-            </App>
+            ></WebRTCControl>
             <audio
                 ref={remoteAudio}
                 autoPlay={true}
@@ -213,9 +194,8 @@ export default function Home () {
 				</ContentModal>
 			</Modal>
             {/*<GuideLine isModalOpen={isGuideModalOpen} closeModal={() => {setGuideModalOpen(false)}}/>*/}
+            {/* <Setting/> */}
             <StatusConnect/>
-            <Setting/>
-
         </Body>
     );
 };
@@ -242,7 +222,6 @@ const Body = styled.div`
     background-color: black;
 `;
 const App = styled.div`
-    touch-action: none;
     position: relative;
     width: 100vw;
     height: 100vh;
