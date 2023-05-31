@@ -82,7 +82,8 @@ export default function Home () {
 
 	const [isModalOpen, setModalOpen] = useState(false)
 	const checkHorizontal = (width: number,height:number) => {
-       setModalOpen(width < height)
+        if (Platform == 'mobile') 
+            setModalOpen(width < height)
 	}
 
     useEffect(() => {

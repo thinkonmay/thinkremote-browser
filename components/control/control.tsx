@@ -37,7 +37,8 @@ export const WebRTCControl = (input: {
 	const [actions, setactions] = useState<any[]>([]);
 
 	useEffect(() => {
-		input.toggle_mouse_touch_callback((enableVGamepad == 'disable') && (enableVMouse == 'disable'));
+		input.toggle_mouse_touch_callback((enableVGamepad == 'disable') 
+										&&(enableVMouse   == 'disable'));
 	}, [enableVGamepad, enableVMouse])
 
 	useEffect(() => {
@@ -139,9 +140,9 @@ export const WebRTCControl = (input: {
 				className="containerDrag"
 				style={{ maxWidth: 'max-content', maxHeight: 'max-content' }}
 			> { 
-			input.platform === 'mobile' ?
-				(<MobileControl actions={actions} />) :
-				(<DesktopControl actions={actions}/>)
+			input.platform === 'mobile' 
+				?  (<MobileControl  actions={actions} />) 
+				:  (<DesktopControl actions={actions} />)
 			} </div>
 
 			<VirtualMouse
