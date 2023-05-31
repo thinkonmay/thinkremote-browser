@@ -6,7 +6,6 @@ import MouseOutlinedIcon from '@mui/icons-material/MouseOutlined';
 import VideoSettingsOutlinedIcon from '@mui/icons-material/VideoSettingsOutlined';
 import KeyboardIcon from '@mui/icons-material/Keyboard';
 import { List, SpeedDial, SpeedDialAction } from "@mui/material";
-import ListIcon from '@mui/icons-material/List';
 import React, { useEffect, useState, useLayoutEffect } from "react"; // we need this to make JSX compile
 import { Platform } from "../../core/src/utils/platform";
 import { requestFullscreen } from "../../core/src/utils/screen";
@@ -15,6 +14,7 @@ import { VirtualGamepad } from "../virtGamepad/virtGamepad";
 import { VirtualMouse } from "../virtMouse/virtMouse";
 import Draggable, { DraggableData, DraggableEvent } from "react-draggable";
 import MobileControl from "./mobileControl";
+import DesktopControl from "./desktopControl";
 
 
 export type ButtonMode = "static" | "draggable" | "disable";
@@ -133,39 +133,16 @@ export const WebRTCControl = (input: {
 
 
 
-	let sxSpeedDial = {
-		opacity: 0.3,
-		position: 'absolute',
-		bottom: '2%',
-		right: '2%',
-		'& .MuiFab-primary': { backgroundColor: 'white', color: 'white' }
-	}
-
 	return (
 		<div>
 			<div
 				className="containerDrag"
 				style={{ maxWidth: 'max-content', maxHeight: 'max-content' }}
-			>
-				{
-					input.platform === 'mobile' ?
-						(<MobileControl actions={actions} />) :
-						<SpeedDial
-							ariaLabel="SpeedDial basic example"
-							sx={sxSpeedDial}
-							icon={<ListIcon sx={{ color: 'black' }} />}
-						>
-							{actions.map((action) => (
-								<SpeedDialAction
-									key={action.name}
-									icon={action.icon}
-									tooltipTitle={action.name}
-									onClick={action.action}
-								/>
-							))}
-						</SpeedDial>
-				}
-			</div>
+			> { 
+			input.platform === 'mobile' ?
+				(<MobileControl actions={actions} />) :
+				(<DesktopControl actions={actions}/>)
+			} </div>
 
 			<VirtualMouse
 				MouseMoveCallback={input.MouseMoveCallback}

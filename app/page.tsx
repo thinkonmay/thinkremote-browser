@@ -214,7 +214,6 @@ export default function Home () {
 			</Modal>
             {/*<GuideLine isModalOpen={isGuideModalOpen} closeModal={() => {setGuideModalOpen(false)}}/>*/}
             <StatusConnect/>
-            {/* <MobileControl/> */}
             <Setting/>
 
         </Body>
