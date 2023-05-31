@@ -21,7 +21,7 @@ const DefaultButton = styled.button`
     color: #C3B5B5;
     border: 1px solid currentColor;
     border-radius: 50%;
-    /*position: absolute;*/
+    position: absolute;
     background-color: transparent;
 `;
 
