@@ -1,9 +1,38 @@
+import { Slider, ThemeProvider, createTheme } from '@mui/material'
 import styled from 'styled-components'
+
 const MAIN_COLOR = '#003F2A'
 const SECOND_COLOR = '#F4DE00'
 const THIRD_COLOR = '#F84D07'
 const SUB_COLOR = '#F5E8D5'
 const arr = [1, 2, 3, 4, 5, 6]
+
+const theme = createTheme({
+	components: {
+		MuiSlider: {
+			styleOverrides: {
+				root: {
+					'@media (min-width: 600px)': {
+						padding: 0,
+					}
+				},
+				track: {
+					height: 10,
+					borderRadius: 4,
+					color: SECOND_COLOR
+				},
+				thumb: {
+					height: 20,
+					width: 20,
+					color: "#fff",
+				},
+				rail: {
+					color: "#fff"
+				}
+			},
+		},
+	},
+});
 function Setting() {
 
 	return (
@@ -13,7 +42,15 @@ function Setting() {
 				{arr.map(i => (
 					<WrapperButton>
 						<ButtonName>JoyStick lef {i}</ButtonName>
-						<Range type='range' />
+						<ThemeProvider theme={theme}>
+							<Slider
+								sx={{
+									padding: 0,
+								}}
+								aria-label="Temperature"
+								defaultValue={30}
+							/>
+						</ThemeProvider>
 					</WrapperButton>
 				))}
 			</Content>
@@ -24,54 +61,34 @@ function Setting() {
 
 export default Setting;
 const Container = styled.div`
+	display: flex;
+	flex-direction: column;
 	width: 100%;
 	height: 100%;
 	background: ${MAIN_COLOR};
 	padding: 16px 40px;
 `
-
 const Content = styled.div`
 	display: flex;
 	flex-direction: column;
-	gap: 8px;
+	gap: 16px;
 `
 const Title = styled.h3`
 	color: ${SECOND_COLOR};
-	font-size: 24px;
+	font-size: 32px;
+	margin-top: 16px;
+    margin-bottom: 32px;
 `
 const WrapperButton = styled.div`
 	display: flex;
-`
-const Range = styled.input`	
-	flex: 1;
-    input[type='range'] {
-      overflow: hidden;
-      width: 80px;
-      -webkit-appearance: none;
-      background-color: #9a905d;
-    }
-    
-    input[type='range']::-webkit-slider-runnable-track {
-      height: 10px;
-      -webkit-appearance: none;
-      color: #13bba4;
-      margin-top: -1px;
-    }
-    
-    input[type='range']::-webkit-slider-thumb {
-      width: 10px;
-      -webkit-appearance: none;
-      height: 10px;
-      cursor: ew-resize;
-      background: #434343;
-      box-shadow: -80px 0 0 80px #43e5f7;
-    }
-
+	align-items: center;
 `
 
 const ButtonName = styled.div`
 	min-width: 155px;
 	color: ${SUB_COLOR};
+	font-size: 1.6rem;
+
 `
 
 const DefaultButton = styled.div`
@@ -87,4 +104,7 @@ const BtnSave = styled(DefaultButton)`
 	background: ${SUB_COLOR};
 	color: ${MAIN_COLOR};
 	height: 46px;
+    font-size: 18px;
+    font-weight: bold;
+	margin-top: auto;
 `
