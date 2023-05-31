@@ -109,9 +109,9 @@ export default function Home () {
                 return platform as Platform
         })
 
-        SetupConnection().catch(error => {
-            TurnOnStatus(error);
-        })
+        // SetupConnection().catch(error => {
+        //     TurnOnStatus(error);
+        // })
 
 
         
