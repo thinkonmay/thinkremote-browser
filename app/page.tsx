@@ -29,6 +29,8 @@ import Setting from "../components/setting/setting";
 let client : RemoteDesktopClient = null
 
 export default function Home () {
+    const [videoConnectivity,setVideoConnectivity] = useState<string>('not started');
+    const [audioConnectivity,setAudioConnectivity] = useState<string>('not started');
     const [isGuideModalOpen, setGuideModalOpen] = useState(true)
 
     useLayoutEffect(()=>{
@@ -84,9 +86,19 @@ export default function Home () {
 	}
 
     useEffect(() => {
-        AddNotifier(async (message: ConnectionEvent, text?: string) => {
-            if (message == ConnectionEvent.ApplicationStarted) 
+       AddNotifier(async (message: ConnectionEvent, text?: string, source?: string) => {
+            if (message == ConnectionEvent.WebRTCConnectionClosed) 
+                await source == "audio" ? setAudioConnectivity("closed") : setVideoConnectivity("closed")
+            if (message == ConnectionEvent.WebRTCConnectionDoneChecking) 
+                await source == "audio" ? setAudioConnectivity("connected") : setVideoConnectivity("connected")
+            if (message == ConnectionEvent.WebRTCConnectionChecking) 
+                await source == "audio" ? setAudioConnectivity("connecting") : setVideoConnectivity("connecting")
+
+            if (message == ConnectionEvent.ApplicationStarted) {
                 await TurnOnConfirm(message,text)
+                setAudioConnectivity("started") 
+                setVideoConnectivity("started")
+            }
         })
 
         setPlatform(old => { 
@@ -195,7 +207,11 @@ export default function Home () {
 			</Modal>
             {/*<GuideLine isModalOpen={isGuideModalOpen} closeModal={() => {setGuideModalOpen(false)}}/>*/}
             {/* <Setting/> */}
-            <StatusConnect/>
+            <StatusConnect
+            	videoConnect={videoConnectivity}
+	            audioConnect={audioConnectivity}
+	            fps={'55fps'}
+            />
         </Body>
     );
 };
