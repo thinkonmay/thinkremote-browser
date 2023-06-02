@@ -3,7 +3,6 @@
 import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
 import video_desktop from "../public/assets/videos/video_demo_desktop.mp4";
 import styled from "styled-components";
-import dpadTopSvg from '../public/assets/svg/d_pad_top.svg'
 
 import {
     TurnOnConfirm,
@@ -24,17 +23,14 @@ import {
 import SbCore from "../supabase";
 import { Modal } from "@mui/material";
 import { IconHorizontalPhone } from "../public/assets/svg/svg_cpn";
-import StatusConnect from "../components/status";
-import GuideLine from "../components/guideline";
-import { VirtualMouse } from "../components/virtMouse/virtMouse";
-import Image from "next/image";
-import MobileControl from "../components/control/mobileControl";
-import { VirtualGamepad } from "../components/virtGamepad/virtGamepad";
-import Setting from "../components/setting";
+import StatusConnect from "../components/status/status";
+import Setting from "../components/setting/setting";
 
 let client : RemoteDesktopClient = null
 
 export default function Home () {
+    const [videoConnectivity,setVideoConnectivity] = useState<string>('not started');
+    const [audioConnectivity,setAudioConnectivity] = useState<string>('not started');
     const [isGuideModalOpen, setGuideModalOpen] = useState(true)
 
     useLayoutEffect(()=>{
@@ -45,76 +41,91 @@ export default function Home () {
     },[])
     const remoteVideo = useRef<HTMLVideoElement>(null);
     const remoteAudio = useRef<HTMLAudioElement>(null);
-    const searchParams = useSearchParams();
-    const router = useRouter()
 
     let ref_local        = ''
     if (typeof window !== 'undefined') {
         ref_local        = localStorage.getItem("reference")
     }
+
+    const searchParams = useSearchParams();
     const user_ref   = searchParams.get('uref') ?? undefined
     const ref        = searchParams.get('ref')  ?? ref_local 
     const platform   = searchParams.get('platform'); 
 
     const [Platform,setPlatform] = useState<Platform>(null);
 
-    //const SetupConnection = async () => {
-    //    localStorage.setItem("reference",ref)
+    const SetupConnection = async () => {
+       localStorage.setItem("reference",ref)
         
-    //    const core = new SbCore()
-    //    if (!await core.Authenticated() && user_ref == undefined) 
-	//		await core.LoginWithGoogle()
+       const core = new SbCore()
+       if (!await core.Authenticated() && user_ref == undefined) 
+			await core.LoginWithGoogle()
         
-    //    if(ref == null) 
-    //        return
+       if(ref == null) 
+           return
 
-    //    const result = await core.AuthenticateSession(ref,user_ref)
-    //    if (result instanceof Error) 
-    //        return
+       const result = await core.AuthenticateSession(ref,user_ref)
+       if (result instanceof Error) 
+           return
 
-    //    const {Email ,SignalingConfig ,WebRTCConfig,PingCallback} = result
-    //    setInterval(PingCallback,14000)
+       const {Email ,SignalingConfig ,WebRTCConfig,PingCallback} = result
+       setInterval(PingCallback,14000)
 
-    //    await LogConnectionEvent(ConnectionEvent.ApplicationStarted)
-    //    client = new RemoteDesktopClient(
-    //        SignalingConfig,WebRTCConfig,
-    //        remoteVideo.current, 
-    //        remoteAudio.current,   
-    //        Platform)
-    //}
+       await LogConnectionEvent(ConnectionEvent.ApplicationStarted)
+       client = new RemoteDesktopClient(
+           SignalingConfig,WebRTCConfig,
+           remoteVideo.current, 
+           remoteAudio.current,   
+           Platform)
+    }
 
 
-	//const [isModalOpen, setModalOpen] = useState(false)
-	//const checkHorizontal = (width: number,height:number) => {
-    //    setModalOpen(width < height)
-	//}
+	const [isModalOpen, setModalOpen] = useState(false)
+	const checkHorizontal = (width: number,height:number) => {
+        if (Platform == 'mobile') 
+            setModalOpen(width < height)
+	}
 
-    //useEffect(() => {
-    //    AddNotifier(async (message: ConnectionEvent, text?: string) => {
-    //        if (message == ConnectionEvent.ApplicationStarted) 
-    //            await TurnOnConfirm(message,text)
-    //    })
+    useEffect(() => {
+       AddNotifier(async (message: ConnectionEvent, text?: string, source?: string) => {
+            if (message == ConnectionEvent.WebRTCConnectionClosed) 
+                await source == "audio" ? setAudioConnectivity("closed") : setVideoConnectivity("closed")
+            if (message == ConnectionEvent.WebRTCConnectionDoneChecking) 
+                await source == "audio" ? setAudioConnectivity("connected") : setVideoConnectivity("connected")
+            if (message == ConnectionEvent.WebRTCConnectionChecking) 
+                await source == "audio" ? setAudioConnectivity("connecting") : setVideoConnectivity("connecting")
 
-    //    SetupConnection().catch(error => {
-    //        TurnOnStatus(error);
-    //    })
+            if (message == ConnectionEvent.ApplicationStarted) {
+                await TurnOnConfirm(message,text)
+                setAudioConnectivity("started") 
+                setVideoConnectivity("started")
+            }
+        })
 
-    //    setPlatform(old => { if (old == null) return getPlatform() })
+        setPlatform(old => { 
+            if (platform == null) 
+                return getPlatform() 
+            else 
+                return platform as Platform
+        })
 
-    //    if(getPlatform() != 'mobile')
-    //        return
+        // SetupConnection().catch(error => {
+        //     TurnOnStatus(error);
+        // })
+
+
         
-	//	checkHorizontal(window.innerWidth,window.innerHeight)
-    //    window.addEventListener('resize', (e: UIEvent) => {
-	//		checkHorizontal(window.innerWidth, window.innerHeight)
-	//	})
+		checkHorizontal(window.innerWidth,window.innerHeight)
+        window.addEventListener('resize', (e: UIEvent) => {
+                checkHorizontal(window.innerWidth, window.innerHeight)
+		})
 
-	//	return () => { 
-    //        window.removeEventListener('resize', (e: UIEvent) => { 
-    //            checkHorizontal(window.innerWidth, window.innerHeight)
-	//		})
-	//	}
-    //}, []);
+		return () => { 
+           window.removeEventListener('resize', (e: UIEvent) => { 
+               checkHorizontal(window.innerWidth, window.innerHeight)
+			})
+		}
+    }, []);
 
 
     const toggle_mouse_touch_callback=async function(enable: boolean) { 
@@ -156,32 +167,16 @@ export default function Home () {
     }
     return (
         <Body>
-            {/*<RemoteVideo
+            <RemoteVideo
                 ref={remoteVideo}
                 src={platform == 'desktop' ? video_desktop : video_desktop}
                 autoPlay
                 muted
                 playsInline
                 loop
-            ></RemoteVideo>*/}
-            <App
-                onContextMenu={(e) => {
-                    e.preventDefault()
-                }}
-                onMouseUp={(e: MouseEvent) => {
-                    e.preventDefault();
-                }}
-                onMouseDown={(e: MouseEvent) => {
-                    e.preventDefault();
-                }}
-                onKeyUp={(e: KeyboardEvent) => {
-                    e.preventDefault();
-                }}
-                onKeyDown={(e: KeyboardEvent) => {
-                    e.preventDefault();
-                }}
-            >
-                <WebRTCControl platform={'mobile'} 
+            ></RemoteVideo>
+            <WebRTCControl 
+                platform={Platform} 
                 toggle_mouse_touch_callback={toggle_mouse_touch_callback}
                 bitrate_callback={bitrate_callback}
                 GamepadACallback={GamepadACallback}
@@ -191,9 +186,8 @@ export default function Home () {
                 keystuckCallback={keystuckCallback}
                 audioCallback={audioCallback}
                 clipboardSetCallback={clipboardSetCallback}
-                ></WebRTCControl>
-            </App>
-            {/*<audio
+            ></WebRTCControl>
+            <audio
                 ref={remoteAudio}
                 autoPlay={true}
                 playsInline={true}
@@ -211,12 +205,14 @@ export default function Home () {
 					<IconHorizontalPhone />
 					<TextModal>Please rotate the phone horizontally!!</TextModal>
 				</ContentModal>
-			</Modal>*/}
+			</Modal>
             {/*<GuideLine isModalOpen={isGuideModalOpen} closeModal={() => {setGuideModalOpen(false)}}/>*/}
-            <StatusConnect/>
-            {/*<MobileControl/>*/}
-            {/*<Setting/>*/}
-
+            {/* <Setting/> */}
+            <StatusConnect
+            	videoConnect={videoConnectivity}
+	            audioConnect={audioConnectivity}
+	            fps={'55fps'}
+            />
         </Body>
     );
 };
@@ -243,7 +239,6 @@ const Body = styled.div`
     background-color: black;
 `;
 const App = styled.div`
-    touch-action: none;
     position: relative;
     width: 100vw;
     height: 100vh;

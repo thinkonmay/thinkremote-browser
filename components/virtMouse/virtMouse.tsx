@@ -9,7 +9,8 @@ import {
     Joystick,
 } from "react-joystick-component/build/lib/Joystick";
 import { ButtonMode, ConTrolContext } from "../control/control";
-import { LR } from "../gamepad/y_b_x_a";
+
+import { LR } from "./mouse/mouse";
 
 export const JoyStick = (param: {
     draggable: ButtonMode;

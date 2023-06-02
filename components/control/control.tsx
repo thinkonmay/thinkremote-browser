@@ -15,8 +15,10 @@ import { VirtualGamepad } from "../virtGamepad/virtGamepad";
 import { VirtualMouse } from "../virtMouse/virtMouse";
 import Draggable, { DraggableData, DraggableEvent } from "react-draggable";
 import MobileControl from "./mobileControl";
-import Setting from "../setting";
 import SettingsIcon from '@mui/icons-material/Settings';
+import DesktopControl from "./desktopControl";
+import Setting from "../setting/setting";
+
 
 export type ButtonMode = "static" | "draggable" | "disable";
 
@@ -52,7 +54,8 @@ export const WebRTCControl = (input: {
 	const [isModalSettingOpen, setModalSettingOpen] = useState(false)
 
 	useEffect(() => {
-		input.toggle_mouse_touch_callback((enableVGamepad == 'disable') && (enableVMouse == 'disable'));
+		input.toggle_mouse_touch_callback((enableVGamepad == 'disable') 
+										&&(enableVMouse   == 'disable'));
 	}, [enableVGamepad, enableVMouse])
 
 	const handleDraggable = (type: 'VGamePad' | 'VMouse', value: boolean) => {
@@ -209,22 +212,7 @@ export const WebRTCControl = (input: {
 							isShowBtn={enableVGamepad === 'draggable' || enableVMouse === 'draggable'}
 							onOkey={handleOkeyDragValue}
 							onDefault={handleSetDeafaultDragValue}
-						/> :
-
-						<SpeedDial
-							ariaLabel="SpeedDial basic example"
-							sx={sxSpeedDial}
-							icon={<ListIcon sx={{ color: 'black' }} />}
-						>
-							{actions.map((action) => (
-								<SpeedDialAction
-									key={action.name}
-									icon={action.icon}
-									tooltipTitle={action.name}
-									onClick={action.action}
-								/>
-							))}
-						</SpeedDial>
+						/> : (<DesktopControl actions={actions} />)
 				}
 			</div>
 

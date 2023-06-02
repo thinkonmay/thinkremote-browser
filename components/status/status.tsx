@@ -68,8 +68,8 @@ const Button = styled.button`
 	background: none;
 `
 interface Props {
-	videoConnect?: 'loading' | 'connect' | 'disconnect'
-	audioConnect?: 'loading' | 'connect' | 'disconnect'
+	videoConnect?: 'loading' | 'connect' | 'disconnect' | string
+	audioConnect?: 'loading' | 'connect' | 'disconnect' | string
 	fps?: string
 }
 

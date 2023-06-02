@@ -2,8 +2,8 @@ import { IconButton, Modal, Slider, ThemeProvider, createTheme } from '@mui/mate
 import React, { useLayoutEffect } from 'react'
 import { Joystick } from 'react-joystick-component'
 import styled from 'styled-components'
-import { useSetting } from '../context/settingProvider'
 import CloseIcon from '@mui/icons-material/Close';
+import { useSetting } from '../../context/settingProvider';
 const MAIN_COLOR = '#003F2A'
 const SECOND_COLOR = '#F4DE00'
 const THIRD_COLOR = '#F84D07'

@@ -3,11 +3,6 @@ import * as React from 'react';
 import { IoIosArrowForward, IoIosArrowBack } from "react-icons/io";
 
 
-import { Fullscreen, Key, VolumeUp } from "@mui/icons-material";
-import SportsEsportsOutlinedIcon from '@mui/icons-material/SportsEsportsOutlined';
-import MouseOutlinedIcon from '@mui/icons-material/MouseOutlined';
-import VideoSettingsOutlinedIcon from '@mui/icons-material/VideoSettingsOutlined';
-import KeyboardIcon from '@mui/icons-material/Keyboard';
 
 const slideInAnimation = keyframes`
   from {
@@ -124,8 +119,9 @@ function MobileControl(props: Props) {
 			</WrapperContent>
 			<Button onClick={handleOpen}>
 				{
-					isOpen ? <IoIosArrowForward color="white" /> :
-						<IoIosArrowBack color="white" />
+					isOpen 
+					? <IoIosArrowForward color="white" /> 
+					: <IoIosArrowBack color="white" />
 				}
 			</Button>
 

@@ -10,10 +10,11 @@ import {
     IJoystickUpdateEvent,
     Joystick,
 } from "react-joystick-component/build/lib/Joystick";
+
 import { ButtonMode, ConTrolContext } from "../control/control";
-import { YBXA } from "../gamepad/y_b_x_a";
-import DPad from "../gamepad/d_pad";
-import { LeftFuncButton, RightFuncButton } from "../gamepad/func_button";
+import { YBXA } from "./gamepad/y_b_x_a";
+import DPad from "./gamepad/d_pad";
+import { LeftFuncButton, RightFuncButton } from "./gamepad/func_button";
 import { useSetting } from "../../context/settingProvider";
 import ArrowLeftIcon from '@mui/icons-material/ArrowLeft';
 import ArrowRightIcon from '@mui/icons-material/ArrowRight';
