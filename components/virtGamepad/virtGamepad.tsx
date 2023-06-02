@@ -140,6 +140,14 @@ export const ButtonGroupRight = (props: ButtonGroupProps) => {
         let cache = localStorage.getItem(`right_group_pos`);
         if (cache === null) {
             setPosBtn(defaultButtonGroupRightValue)
+            const deviceWidth = window.innerWidth
+            const deviceHeight = window.innerHeight
+            setPosBtn({
+                ybxa: { x: deviceWidth * 0.75, y: deviceHeight * 0.413 },
+                joystick: { x: deviceWidth * 0.6, y: deviceHeight * 0.6 },
+                funcBtn: { x: deviceWidth * 0.68, y: deviceHeight * 0.043 },
+                subBtn: { x: deviceWidth * 0.45, y: deviceHeight * 0.03 },
+            })
             return
         }
         const {
@@ -186,67 +194,64 @@ export const ButtonGroupRight = (props: ButtonGroupProps) => {
     }, [isSetVGamePadDefaultValue])
     return (
         <>
-            <WrapperGroupBtn
+            <Draggable
+                disabled={props.draggable != "draggable"}
+                position={{ x: posBtn?.funcBtn?.x, y: posBtn?.funcBtn?.y }}
+                onStop={handleStop}
+                onDrag={handleDrag}
             >
-                <Draggable
-                    disabled={props.draggable != "draggable"}
-                    position={{ x: posBtn?.funcBtn?.x, y: posBtn?.funcBtn?.y }}
-                    onStop={handleStop}
-                    onDrag={handleDrag}
-                >
-                    <div id="funcBtn">
-                        <RightFuncButton
-                            name='funcBtn'
-                            Touch={(index, type) => props.ButtonCallback(index, type)}
-                            size={BUTTON_SIZE * rbRt}
-                        />
-                    </div>
-                </Draggable>
-                <Draggable
-                    disabled={props.draggable != "draggable"}
-                    position={{ x: posBtn?.ybxa?.x, y: posBtn?.ybxa?.y }}
+                <WrapperDraggable id="funcBtn">
+                    <RightFuncButton
+                        name='funcBtn'
+                        Touch={(index, type) => props.ButtonCallback(index, type)}
+                        size={BUTTON_SIZE * rbRt}
+                    />
+                </WrapperDraggable>
+            </Draggable>
+            <Draggable
+                disabled={props.draggable != "draggable"}
+                position={{ x: posBtn?.ybxa?.x, y: posBtn?.ybxa?.y }}
 
-                    onStop={handleStop}
-                    onDrag={handleDrag}
-                >
-                    <div id="ybxa">
-                        <YBXA
-                            size={BUTTON_SIZE * ybxa}
-                            onTouch={(e: React.TouchEvent, type, index) =>
-                                props.ButtonCallback(index, type)
-                            }
-                        />
-                    </div>
-                </Draggable>
-                <Draggable
-                    disabled={props.draggable != "draggable"}
-                    position={{ x: posBtn?.subBtn?.x, y: posBtn?.subBtn?.y }}
-                    onStop={handleStop}
-                    onDrag={handleDrag}
-                >
-                    <ContainerSubButton id="subBtn">
-                        <SelectBtn onClick={props.SelectCallback}><ArrowLeftIcon /></SelectBtn>
-                        <StartBtn onClick={props.StartCallback}><ArrowRightIcon /></StartBtn>
-                    </ContainerSubButton>
-                </Draggable>
-                <Draggable
-                    disabled={props.draggable != "draggable"}
-                    position={{ x: posBtn?.joystick?.x, y: posBtn?.joystick?.y }}
-                    onStop={handleStop}
-                    onDrag={handleDrag}
-                >
-                    <div id="joystick">
-                        <JoyStickRight
-                            moveCallback={(x: number, y: number) =>
-                                props.AxisCallback(x, y, "right")
-                            }
-                            draggable={props.draggable}
-                            size={JOYSTICK_SIZE * rightJt}
-                        />
-                    </div>
-                </Draggable>
-                {/* right */}
-            </WrapperGroupBtn>
+                onStop={handleStop}
+                onDrag={handleDrag}
+            >
+                <WrapperDraggable id="ybxa">
+                    <YBXA
+                        size={BUTTON_SIZE * ybxa}
+                        onTouch={(e: React.TouchEvent, type, index) =>
+                            props.ButtonCallback(index, type)
+                        }
+                    />
+                </WrapperDraggable>
+            </Draggable>
+            <Draggable
+                disabled={props.draggable != "draggable"}
+                position={{ x: posBtn?.subBtn?.x, y: posBtn?.subBtn?.y }}
+                onStop={handleStop}
+                onDrag={handleDrag}
+            >
+                <ContainerSubButton id="subBtn">
+                    <SelectBtn onClick={props.SelectCallback}><ArrowLeftIcon /></SelectBtn>
+                    <StartBtn onClick={props.StartCallback}><ArrowRightIcon /></StartBtn>
+                </ContainerSubButton>
+            </Draggable>
+            <Draggable
+                disabled={props.draggable != "draggable"}
+                position={{ x: posBtn?.joystick?.x, y: posBtn?.joystick?.y }}
+                onStop={handleStop}
+                onDrag={handleDrag}
+            >
+                <WrapperDraggable id="joystick">
+                    <JoyStickRight
+                        moveCallback={(x: number, y: number) =>
+                            props.AxisCallback(x, y, "right")
+                        }
+                        draggable={props.draggable}
+                        size={JOYSTICK_SIZE * rightJt}
+                    />
+                </WrapperDraggable>
+            </Draggable>
+            {/* right */}
         </>
     );
 };
@@ -273,7 +278,13 @@ export const ButtonGroupLeft = (param: ButtonGroupProps) => {
     useLayoutEffect(() => {
         let cache = localStorage.getItem(`left_group_pos`);
         if (cache === null) {
-            setPosBtn(defaultButtonGroupLeftValue)
+            const deviceWidth = window.innerWidth
+            const deviceHeight = window.innerHeight
+            setPosBtn({
+                dpad: { x: deviceWidth * 0.22, y: deviceHeight * 0.41 },
+                joystick: { x: deviceWidth * 0.29, y: deviceHeight * 0.64 },
+                funcBtn: { x: deviceWidth * 0.15, y: deviceHeight * 0.043 },
+            })
             return
         }
         const {
@@ -282,12 +293,18 @@ export const ButtonGroupLeft = (param: ButtonGroupProps) => {
             funcBtn,
         } = JSON.parse(cache);
 
+
         setPosBtn({
             dpad,
             joystick,
             funcBtn,
         });
     }, []);
+    useEffect(() => {
+        console.log(window.innerHeight);
+        console.log(window.innerWidth);
+
+    }, [])
     const handleDrag = (e: DraggableEvent, data: DraggableData) => {
         //getname => setPos by name. 
         const key = data.node.id
@@ -318,60 +335,58 @@ export const ButtonGroupLeft = (param: ButtonGroupProps) => {
     }, [isSetVGamePadDefaultValue])
     return (
         <>
-            <WrapperGroupBtn>
-                <Draggable
-                    disabled={param.draggable != "draggable"}
-                    position={{ x: posBtn?.funcBtn?.x, y: posBtn?.funcBtn?.y }}
-                    onStop={handleStop}
-                    onDrag={handleDrag}>
-                    <div
-                        id="funcBtn"
-                    >
-                        <LeftFuncButton
-                            Touch={(index, type) => param.ButtonCallback(index, type)}
-                            size={BUTTON_SIZE * lbLt}
-                        />
-                    </div>
-                </Draggable>
-                <Draggable
-                    disabled={param.draggable != "draggable"}
-                    position={{ x: posBtn?.dpad?.x, y: posBtn?.dpad?.y }}
-                    onStop={handleStop}
-                    onDrag={handleDrag}
+            <Draggable
+                disabled={param.draggable != "draggable"}
+                position={{ x: posBtn?.funcBtn?.x, y: posBtn?.funcBtn?.y }}
+                onStop={handleStop}
+                onDrag={handleDrag}>
+                <WrapperDraggable
+                    id="funcBtn"
                 >
-                    <div
-                        id="dpad"
-                    >
-                        <DPad
-                            size={BUTTON_SIZE * dpad}
-                            onTouch={(e: React.TouchEvent, type, index) => {
-                                param.ButtonCallback(index, type);
-                            }}
-                        />
+                    <LeftFuncButton
+                        Touch={(index, type) => param.ButtonCallback(index, type)}
+                        size={BUTTON_SIZE * lbLt}
+                    />
+                </WrapperDraggable>
+            </Draggable>
+            <Draggable
+                disabled={param.draggable != "draggable"}
+                position={{ x: posBtn?.dpad?.x, y: posBtn?.dpad?.y }}
+                onStop={handleStop}
+                onDrag={handleDrag}
+            >
+                <WrapperDraggable
+                    id="dpad"
+                >
+                    <DPad
+                        size={BUTTON_SIZE * dpad}
+                        onTouch={(e: React.TouchEvent, type, index) => {
+                            param.ButtonCallback(index, type);
+                        }}
+                    />
 
-                    </div>
-                </Draggable>
-                <Draggable
-                    disabled={param.draggable != "draggable"}
-                    position={{ x: posBtn?.joystick?.x, y: posBtn?.joystick?.y }}
-                    onStop={handleStop}
-                    onDrag={handleDrag}
+                </WrapperDraggable>
+            </Draggable>
+            <Draggable
+                disabled={param.draggable != "draggable"}
+                position={{ x: posBtn?.joystick?.x, y: posBtn?.joystick?.y }}
+                onStop={handleStop}
+                onDrag={handleDrag}
+            >
+                <WrapperDraggable
+                    id="joystick"
                 >
-                    <div
-                        id="joystick"
-                    >
-                        <JoyStickLeft
-                            moveCallback={async (x: number, y: number) => {
-                                param.AxisCallback(x, y, "left");
-                                return;
-                            }}
-                            draggable={param.draggable}
-                            size={JOYSTICK_SIZE * leftJt}
-                        />
-                    </div>
-                </Draggable>
-                {/* left */}
-            </WrapperGroupBtn>
+                    <JoyStickLeft
+                        moveCallback={async (x: number, y: number) => {
+                            param.AxisCallback(x, y, "left");
+                            return;
+                        }}
+                        draggable={param.draggable}
+                        size={JOYSTICK_SIZE * leftJt}
+                    />
+                </WrapperDraggable>
+            </Draggable>
+            {/* left */}
         </>
     );
 };
@@ -387,15 +402,10 @@ interface ButtonGroupProps {
     StartCallback?: () => void;
 }
 
-const SubButton = () => {
-
-    return (
-        <></>
-    )
-}
-
 const ContainerVirGamepad = styled.div`
-    display: flex;
+    width: 100vw;
+    height: 100vh;
+    position: relative;
 `;
 const WrapperJoyStick = styled.div``;
 const WrapperDrag = styled.div`
@@ -450,4 +460,8 @@ const JoyStickLeft = styled(JoyStick)`
 const ContainerSubButton = styled.div`
     display: flex;
     gap: 8px;
+`
+const WrapperDraggable = styled.div`
+    width: max-content;
+    position: absolute;
 `
