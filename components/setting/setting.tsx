@@ -193,8 +193,7 @@ const Content = styled.div`
 const Title = styled.h3`
 	color: ${SECOND_COLOR};
 	font-size: 32px;
-	margin-top: 16px;
-    margin-bottom: 32px;
+    margin-bottom: 16px;
 `
 const WrapperButton = styled.div`
 	display: flex;
