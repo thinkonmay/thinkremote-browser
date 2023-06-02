@@ -3,25 +3,66 @@ import React, { useContext, useEffect, useState } from 'react';
 const Context = React.createContext(null)
 
 interface ISettingState {
-	gamepad: IGamePadValue
+	gamePad: IGamePadValue
+	virtMouse: any
 }
 interface IGamePadValue {
 	leftScale: number
 	rightScale: number
+	leftJt: number
+	rightJt: number
+	dpad: number
+	ybxa: number
+	rbRt: number
+	lbLt: number
+	subBtn: number
+
 }
 
 const initialSetting: ISettingState = {
-	gamepad: {
+	gamePad: {
 		leftScale: 1,
-		rightScale: 1
-	}
+		rightScale: 1,
+		leftJt: 1,
+		rightJt: 1,
+		dpad: 1,
+		ybxa: 1,
+		rbRt: 1,
+		lbLt: 1,
+		subBtn: 1,
+	},
+	virtMouse:{}
 };
 
-const reducer = (state: ISettingState, action) => {
-	const { data, type } = action
-	switch (type) {
-		case "ADD_STEP": {
-			return 1
+interface IActionData {
+	name: string
+	value: number
+	type: 'gamePad' | 'virtMouse'
+}
+interface IAction {
+	type: string
+	data: IActionData
+}
+const calValue = (value: number) => {
+	const STANDARD_VALUE = 50
+
+	const result = value  / STANDARD_VALUE
+
+	return result
+
+}
+const reducer = (state: ISettingState, action: IAction) => {
+	const { data } = action
+	switch (action.type) {
+		case "INIT": {
+			return data
+		}
+		case "UPDATE": {
+			const newData = { ...state}
+			const {	name, value, type	} = data
+			newData[type][name] = calValue(value)
+			return newData
+			
 		}
 
 		default:
@@ -30,24 +71,20 @@ const reducer = (state: ISettingState, action) => {
 };
 
 
-//let initialData: ISettingState 
-//if (typeof window !== 'undefined') {
-//	// Perform localStorage action
-//	initialData = JSON.parse(localStorage.getItem('settingData')) ?? 
-//}
+let initialData: ISettingState 
+if (typeof window !== 'undefined') {
+	// Perform localStorage action
+	initialData = JSON.parse(localStorage.getItem('settingData')) ?? initialSetting
+}
 
 function SettingProvider({ children }: { children: React.ReactNode }) {
-	const [initialData, setInitialData] = useState(initialSetting)
-	//React.useLayoutEffect(() => {
-	//	// Perform localStorage action
-	//	const item  = JSON.parse(localStorage.getItem('settingData'))
-	//	if(item) setInitialData(item)
-	//  }, [])
-	const [state, dispatch] = React.useReducer(reducer, initialSetting)
+	const [state, dispatch] = React.useReducer(reducer, initialData)
 	const saveDataLocal = React.useCallback(() => {
 		localStorage.setItem('settingData', JSON.stringify(state))
 	}, [state])
-
+	
+	
+	
 	React.useEffect(() => {
 		saveDataLocal()
 	}, [saveDataLocal])

@@ -77,7 +77,7 @@ const ButtonIcon = styled.button`
 	background: none;
 	width: 45px;
 	height: 100%;
-
+	font-weight: 500;
 	:hover{
 		background: #dbcfcf;
 	}
@@ -88,25 +88,39 @@ interface Action {
 	action: () => void,
 }
 interface Props {
-	actions: Action[]
+	actions: Action[],
+	isShowBtn: boolean
+	onOkey: () => void
+	onDefault: (type: 'VGamePad' | 'VMouse') => void
 }
 
 function MobileControl(props: Props) {
-	const { actions } = props
+	const { actions, isShowBtn, onOkey,
+		onDefault } = props
 	const [isOpen, setOpen] = React.useState(false)
 
 	const handleOpen = () => {
 		setOpen(!isOpen)
 	}
+	
 	return (
 		<Container className={isOpen ? 'slide-out' : 'slide-in'}>
 
 			<WrapperContent >
-				{actions.map(action =>(
-					<ButtonIcon key={Math.random()} onClick={action.action}>
-						{action.icon}
-					</ButtonIcon>
-				))}
+				{
+					isShowBtn ? 
+					<>
+						<ButtonIcon onClick={onDefault}>Default</ButtonIcon>
+						<ButtonIcon onClick={onOkey}>Ok</ButtonIcon>
+					</> : 
+					actions.map(action => (
+						<ButtonIcon key={Math.random()} onClick={action.action}>
+							{action.icon}
+						</ButtonIcon>
+					))
+
+				}
+
 			</WrapperContent>
 			<Button onClick={handleOpen}>
 				{

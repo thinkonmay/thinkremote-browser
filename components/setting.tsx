@@ -1,11 +1,14 @@
-import { Slider, ThemeProvider, createTheme } from '@mui/material'
+import { IconButton, Modal, Slider, ThemeProvider, createTheme } from '@mui/material'
+import React, { useLayoutEffect } from 'react'
+import { Joystick } from 'react-joystick-component'
 import styled from 'styled-components'
-
+import { useSetting } from '../context/settingProvider'
+import CloseIcon from '@mui/icons-material/Close';
 const MAIN_COLOR = '#003F2A'
 const SECOND_COLOR = '#F4DE00'
 const THIRD_COLOR = '#F84D07'
 const SUB_COLOR = '#F5E8D5'
-const arr = [1, 2, 3, 4, 5, 6]
+
 
 const theme = createTheme({
 	components: {
@@ -33,40 +36,154 @@ const theme = createTheme({
 		},
 	},
 });
-function Setting() {
 
+interface Props {
+	isOpen: boolean
+	closeModal: () => void
+	onDraggable: (type: 'VGamePad' | 'VMouse', value: boolean) => void
+}
+function Setting(props: Props) {
+	const [listBtn, setListBtn] = React.useState([{
+		name: 'Left Joystick',
+		key: 'leftJt',
+		value: 50
+	}, {
+		name: 'Right Joystick',
+		key: 'rightJt',
+		value: 50
+	}, {
+		name: 'Dpad',
+		key: 'dpad',
+		value: 50
+	}, {
+		name: 'YBXA',
+		key: 'ybxa',
+		value: 50
+	}, {
+		name: 'RB & RT ',
+		key: 'rbRt',
+		value: 50
+	}, {
+		name: 'LB & LT',
+		key: 'lbLt',
+		value: 50
+	}])
+	const { isOpen, closeModal, onDraggable } = props
+	const { dispatch, settingValue } = useSetting()
+
+	const encodeValue = (value: number) =>{
+
+
+	}
+	useLayoutEffect(()=>{
+		const {gamePad} = settingValue
+
+		setListBtn(prev => {
+			const newData = prev.map(item =>({...item, value: gamePad[item.key] * 50}))
+			return newData
+		})
+	}, [])
+
+	const handleChangeAdjust = (event: Event, value: number) => {
+
+		//@ts-ignore
+		const name: string = event.target.name
+
+		setListBtn(prev => {
+			const newData = prev.map(item =>{
+				if(item.key == name) {
+					return {...item, value: value}
+				}
+				return item
+			})
+			return newData
+		})
+		dispatch({ type: 'UPDATE', data: { name, value, type: 'gamePad' } })
+		//cal
+		// val - 50 / 50
+
+	}
+
+	const onChangeInput =(event: React.ChangeEvent<HTMLInputElement>) =>{
+		const type = event.target.name as ('VGamePad' | 'VMouse')
+		const value = event.target.checked
+		onDraggable(type, value)
+
+	}	
 	return (
-		<Container>
-			<Title>Setting</Title>
-			<Content>
-				{arr.map(i => (
+		<Modal open={isOpen}>
+			<Container>
+				<Title>Setting</Title>
+				<IconButton
+					sx={{
+						position: 'absolute',
+						top: 8,
+						right: 8
+					}}
+					onClick={closeModal}
+				>
+					<CloseIcon sx={{ fontSize: '4rem', color: THIRD_COLOR }} fontSize="large" />
+				</IconButton>
+				<Content>
 					<WrapperButton>
-						<ButtonName>JoyStick lef {i}</ButtonName>
-						<ThemeProvider theme={theme}>
-							<Slider
-								sx={{
-									padding: 0,
-								}}
-								aria-label="Temperature"
-								defaultValue={30}
-							/>
-						</ThemeProvider>
+						<ButtonName>Draggable</ButtonName>
+						<WrapperCheckbox>
+							<CheckBox>
+								<label style={{fontSize: '1.5rem'}} htmlFor="checkbox1">Gamepad</label>
+								<input style={{width: 20, height: 20}} onChange={onChangeInput} type="checkbox" name="VGamePad" id="checkbox1" />
+							</CheckBox>
+							<CheckBox>
+								<label style={{fontSize: '1.5rem'}} htmlFor="checkbox2">Mouse</label>
+								<input style={{width: 20, height: 20}} onChange={onChangeInput} type="checkbox" name="VMouse" id="checkbox2" />
+							</CheckBox>
+						</WrapperCheckbox>
+						
 					</WrapperButton>
-				))}
-			</Content>
-			<BtnSave>Save</BtnSave>
-		</Container>
+					{listBtn. map(btn => (
+						<WrapperButton key={btn.key}>
+							<ButtonName>{btn.name}</ButtonName>
+							<ThemeProvider theme={theme}>
+								<Slider
+									sx={{
+										padding: 0,
+									}}
+									name={btn.key}
+									aria-label="Temperature"
+									defaultValue={btn.value}
+									onChange={handleChangeAdjust}
+									value={btn.value}
+								/>
+							</ThemeProvider>
+						</WrapperButton>
+					))}
+				</Content>
+				<BtnSave>Save</BtnSave>
+			</Container>
+		</Modal>
 	);
 }
 
 export default Setting;
+
+const WrapperCheckbox = styled.div`
+	display: flex;
+	gap: 150px;
+	align-items: center;
+`
+const CheckBox = styled.div`
+	display: flex;
+	align-items: center;
+	gap: 16px;
+	font-size: 1.5rem;
+`
 const Container = styled.div`
 	display: flex;
 	flex-direction: column;
 	width: 100%;
 	height: 100%;
-	background: ${MAIN_COLOR};
+	background: rgba(136, 136, 136, 0.71);
 	padding: 16px 40px;
+	color: #FCFFE7;
 `
 const Content = styled.div`
 	display: flex;
