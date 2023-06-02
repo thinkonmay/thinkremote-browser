@@ -157,7 +157,7 @@ function Setting(props: Props) {
 						</WrapperButton>
 					))}
 				</Content>
-				<BtnSave>Save</BtnSave>
+				{/*<BtnSave>Save</BtnSave>	*/}
 			</Container>
 		</Modal>
 	);
