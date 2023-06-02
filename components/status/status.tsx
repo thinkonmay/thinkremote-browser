@@ -68,14 +68,14 @@ const Button = styled.button`
 	background: none;
 `
 interface Props {
-	videoConnect?: string
-	audioConnect?: string
+	videoConnect?: 'loading' | 'connect' | 'disconnect' | string
+	audioConnect?: 'loading' | 'connect' | 'disconnect' | string
 	fps?: string
 }
 
 function StatusConnect(props: Props) {
 	const { videoConnect, audioConnect, fps } = props
-	const [isOpen, setOpen] = React.useState(true)
+	const [isOpen, setOpen] = React.useState(false)
 
 	const handleOpen = () => {
 		setOpen(!isOpen)
@@ -92,8 +92,8 @@ function StatusConnect(props: Props) {
 				isOpen &&
 				<WrapperContent >
 					<Text>Status Video: {videoConnect}</Text>
-					<Text>Status Audio: {audioConnect}</Text>
-					{/* <Text>Fps: {fps}</Text> */}
+					<Text>Status audio: {audioConnect}</Text>
+					<Text>Fps: {fps}</Text>
 				</WrapperContent>
 			}
 

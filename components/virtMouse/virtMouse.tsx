@@ -1,15 +1,16 @@
 "use client"
 
 
-import React, { useState, useEffect, useLayoutEffect } from "react"; // we need this to make JSX compile
+import React, { useState, useEffect, useLayoutEffect, useContext, useTransition } from "react"; // we need this to make JSX compile
 import Draggable, { DraggableData, DraggableEvent } from "react-draggable";
 import styled from "styled-components";
 import {
     IJoystickUpdateEvent,
     Joystick,
 } from "react-joystick-component/build/lib/Joystick";
-import { ButtonMode } from "../control/control";
-import { LR } from "../gamepad/y_b_x_a";
+import { ButtonMode, ConTrolContext } from "../control/control";
+
+import { LR } from "./mouse/mouse";
 
 export const JoyStick = (param: {
     draggable: ButtonMode;
@@ -61,37 +62,55 @@ interface ButtonGroupProps {
     AxisCallback: (x: number, y: number) => Promise<void>;
     ButtonCallback: (index: number, type: "up" | "down") => Promise<void>;
 }
+const defaultMouseGroupValue = { x: 25, y: 140 }
+const defaultJoyStickValue = { x: 160, y: 25 }
 
 const MouseGroup = (param: ButtonGroupProps) => {
-    const [posBtn, setPosBtn] = useState({ x: 0, y: 0 });
+    const [posBtn, setPosBtn] = useState(defaultMouseGroupValue);
+    const [isPending, startTransition] = useTransition()
+
+    const { isSetVMouseDefaultValue } = useContext(ConTrolContext);
+
     useLayoutEffect(() => {
         let cache = localStorage.getItem(`mouse_group_pos`);
-        const { x, y } = JSON.parse(
-            cache != null ? cache : `{"x": 25, "y" : 140}`
-        );
-        if (x == null || y == null) {
+
+        if (cache === null) {
+            setPosBtn(defaultMouseGroupValue)
             return;
         }
-
+        const { x, y } = JSON.parse(
+            cache
+        );
+        if(x === null || x ===null){
+            setPosBtn(defaultMouseGroupValue)
+            return
+        }
         setPosBtn({ x: x, y: y });
     }, []);
 
     const handleDrag = (e: DraggableEvent, data: DraggableData) => {
-        setPosBtn({
-            x: data.x,
-            y: data.y,
-        });
+        startTransition(()=>{
+            setPosBtn({
+                x: data.x,
+                y: data.y,
+            });
+        })
     };
 
     const handleStop = (e: DraggableEvent, data: DraggableData) => {
-        const { x, y } = posBtn;
-        if (x == null || y == null) {
-            return;
-        }
-
-        localStorage.setItem(`mouse_group_pos`, JSON.stringify(posBtn));
+        startTransition(()=>{
+            localStorage.setItem(`mouse_group_pos`, JSON.stringify(posBtn));
+        })
     };
 
+     //reset default value
+     useEffect(() => {
+        if (isSetVMouseDefaultValue === true) {
+            setPosBtn(defaultMouseGroupValue)
+            localStorage.setItem(`mouse_group_pos`, JSON.stringify(defaultMouseGroupValue));
+
+        }
+    }, [isSetVMouseDefaultValue])
     return (
         <Draggable
             disabled={param.draggable != "draggable"}
@@ -112,36 +131,49 @@ const MouseGroup = (param: ButtonGroupProps) => {
     );
 };
 const JoyStickBtn = (param: ButtonGroupProps) => {
-    const [posBtn, setPosBtn] = useState({ x: 0, y: 0 });
+    const [posBtn, setPosBtn] = useState(defaultJoyStickValue);
+    const { isSetVMouseDefaultValue } = useContext(ConTrolContext);
+    const [isPending, startTransition] = useTransition()
+
     useLayoutEffect(() => {
         let cache = localStorage.getItem(`joystick_btn_pos`);
-        const { x, y } = JSON.parse(
-            cache != null ? cache : `{"x": 160, "y" : 25}`
-        );
-        if (x == null || y == null) {
+
+        if (cache === null) {
+            setPosBtn(defaultJoyStickValue)
             return;
         }
-
+        const { x, y } = JSON.parse(cache);
+        //if(x === null || x ===null){
+        //    setPosBtn(defaultJoyStickValue)
+        //    return
+        //}
         setPosBtn({ x: x, y: y });
     }, []);
 
     const handleDrag = (e: DraggableEvent, data: DraggableData) => {
         const { x, y } = posBtn;
-        setPosBtn({
-            x: data.x,
-            y: data.y,
-        });
+        startTransition(()=>{
+            setPosBtn({
+                x: data.x,
+                y: data.y,
+            });
+        })
     };
 
     const handleStop = (e: DraggableEvent, data: DraggableData) => {
-        const { x, y } = posBtn;
-        if (x == null || y == null) {
-            return;
-        }
-
-        localStorage.setItem(`joystick_btn_pos`, JSON.stringify(posBtn));
+        startTransition(()=>{
+            localStorage.setItem(`joystick_btn_pos`, JSON.stringify(posBtn));
+        })
     };
 
+    
+     //reset default value
+     useEffect(() => {
+        if (isSetVMouseDefaultValue === true) {
+            setPosBtn(defaultJoyStickValue)
+            localStorage.setItem(`joystick_btn_pos`, JSON.stringify(defaultJoyStickValue));
+        }
+    }, [isSetVMouseDefaultValue])
     return (
         <Draggable
             disabled={param.draggable != "draggable"}
@@ -163,6 +195,8 @@ export const VirtualMouse = (param: {
     MouseMoveCallback: (move_x: number, move_y: number) => Promise<void>;
     MouseButtonCallback: (index: number, type: "up" | "down") => Promise<void>;
 }) => {
+
+
     return (
         <div>
             {param.draggable == "static" || param.draggable == "draggable" ? (

@@ -1,4 +1,5 @@
 import * as React from 'react';
+import SettingProvider from '../context/settingProvider';
 import StyledComponentsRegistry from '../lib/registry';
 import "../styles/globals.css"
 import GoogleAnalytics  from './googleAnalytics';
@@ -26,7 +27,9 @@ async function RootLayout({
 
 				<GoogleAnalytics trackPageViews></GoogleAnalytics>
 				<StyledComponentsRegistry>
-					{children}
+					<SettingProvider>
+						{children}
+					</SettingProvider>
 				</StyledComponentsRegistry>
 			</body>
 		</html>

@@ -1,8 +1,9 @@
 "use client"
 
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
 import video_desktop from "../public/assets/videos/video_demo_desktop.mp4";
 import styled from "styled-components";
+
 import {
     TurnOnConfirm,
     TurnOnStatus,
@@ -22,22 +23,31 @@ import {
 import SbCore from "../supabase";
 import { Modal } from "@mui/material";
 import { IconHorizontalPhone } from "../public/assets/svg/svg_cpn";
-import StatusConnect from "../components/status";
+import StatusConnect from "../components/status/status";
+import Setting from "../components/setting/setting";
 
 let client : RemoteDesktopClient = null
 
 export default function Home () {
     const [videoConnectivity,setVideoConnectivity] = useState<string>('not started');
     const [audioConnectivity,setAudioConnectivity] = useState<string>('not started');
+    const [isGuideModalOpen, setGuideModalOpen] = useState(true)
 
+    useLayoutEffect(()=>{
+        const isGuideModalLocal = localStorage.getItem('isGuideModalLocal')
+        if(isGuideModalLocal == 'false' || isGuideModalLocal == 'true'){
+            setGuideModalOpen(JSON.parse(isGuideModalLocal))
+        }
+    },[])
     const remoteVideo = useRef<HTMLVideoElement>(null);
     const remoteAudio = useRef<HTMLAudioElement>(null);
-    const searchParams = useSearchParams();
 
     let ref_local        = ''
     if (typeof window !== 'undefined') {
-       ref_local        = localStorage.getItem("reference")
+        ref_local        = localStorage.getItem("reference")
     }
+
+    const searchParams = useSearchParams();
     const user_ref   = searchParams.get('uref') ?? undefined
     const ref        = searchParams.get('ref')  ?? ref_local 
     const platform   = searchParams.get('platform'); 
@@ -65,14 +75,15 @@ export default function Home () {
        client = new RemoteDesktopClient(
            SignalingConfig,WebRTCConfig,
            remoteVideo.current, 
-           remoteAudio.current,  
+           remoteAudio.current,   
            Platform)
     }
 
-    
+
 	const [isModalOpen, setModalOpen] = useState(false)
 	const checkHorizontal = (width: number,height:number) => {
-       setModalOpen(width < height)
+        if (Platform == 'mobile') 
+            setModalOpen(width < height)
 	}
 
     useEffect(() => {
@@ -89,20 +100,24 @@ export default function Home () {
                 setAudioConnectivity("started") 
                 setVideoConnectivity("started")
             }
-       })
+        })
 
-       SetupConnection().catch(error => {
-           TurnOnStatus(error);
-       })
+        setPlatform(old => { 
+            if (platform == null) 
+                return getPlatform() 
+            else 
+                return platform as Platform
+        })
 
-       setPlatform(old => { if (old == null) return getPlatform() })
+        // SetupConnection().catch(error => {
+        //     TurnOnStatus(error);
+        // })
 
-       if(getPlatform() != 'mobile')
-           return
+
         
 		checkHorizontal(window.innerWidth,window.innerHeight)
-       window.addEventListener('resize', (e: UIEvent) => {
-			checkHorizontal(window.innerWidth, window.innerHeight)
+        window.addEventListener('resize', (e: UIEvent) => {
+                checkHorizontal(window.innerWidth, window.innerHeight)
 		})
 
 		return () => { 
@@ -114,41 +129,41 @@ export default function Home () {
 
 
     const toggle_mouse_touch_callback=async function(enable: boolean) { 
-       client?.hid?.DisableTouch(!enable);
-       client?.hid?.DisableMouse(!enable);
+        client?.hid?.DisableTouch(!enable);
+        client?.hid?.DisableMouse(!enable);
     } 
     const bitrate_callback= async function (bitrate: number) { 
-       client?.ChangeBitrate(bitrate);
-       client?.ChangeFramerate(55);
+        client?.ChangeBitrate(bitrate);
+        client?.ChangeFramerate(55);
     } 
     const GamepadACallback=async function(x: number, y: number, type: "left" | "right"): Promise<void> {
-       client?.hid?.VirtualGamepadAxis(x,y,type);
+        client?.hid?.VirtualGamepadAxis(x,y,type);
     } 
     const GamepadBCallback=async function(index: number, type: "up" | "down"): Promise<void> {
-       client?.hid?.VirtualGamepadButtonSlider(type == 'down',index);
+        client?.hid?.VirtualGamepadButtonSlider(type == 'down',index);
     }  
     const MouseMoveCallback=async function (x: number, y: number): Promise<void> {
-       client?.hid?.mouseMoveRel({movementX:x,movementY:y});
+        client?.hid?.mouseMoveRel({movementX:x,movementY:y});
     } 
     const MouseButtonCallback=async function (index: number, type: "up" | "down"): Promise<void> {
-       type == 'down' ? client?.hid?.MouseButtonDown({button: index}) : client?.hid?.MouseButtonUp({button: index})
+        type == 'down' ? client?.hid?.MouseButtonDown({button: index}) : client?.hid?.MouseButtonUp({button: index})
     } 
     const keystuckCallback= async function (): Promise<void> {
-       client?.hid?.ResetKeyStuck();
+        client?.hid?.ResetKeyStuck();
     }
     const clipboardSetCallback= async function (val: string): Promise<void> {
-       console.log(val)
-       client?.hid?.SetClipboard(val)
-       client?.hid?.PasteClipboard()
+        console.log(val)
+        client?.hid?.SetClipboard(val)
+        client?.hid?.PasteClipboard()
     }
     const audioCallback = async() => {
-       try { 
-           client?.ResetAudio()
-           await remoteAudio.current.play() 
-           await remoteVideo.current.play() 
-       } catch (e) {
-           console.log(`error play audio ${JSON.stringify(e)}`)
-       }
+        try { 
+            client?.ResetAudio()
+            await remoteAudio.current.play() 
+            await remoteVideo.current.play() 
+        } catch (e) {
+            console.log(`error play audio ${JSON.stringify(e)}`)
+        }
     }
     return (
         <Body>
@@ -160,24 +175,8 @@ export default function Home () {
                 playsInline
                 loop
             ></RemoteVideo>
-            <App
-                onContextMenu={(e) => {
-                    e.preventDefault()
-                }}
-                onMouseUp={(e: MouseEvent) => {
-                    e.preventDefault();
-                }}
-                onMouseDown={(e: MouseEvent) => {
-                    e.preventDefault();
-                }}
-                onKeyUp={(e: KeyboardEvent) => {
-                    e.preventDefault();
-                }}
-                onKeyDown={(e: KeyboardEvent) => {
-                    e.preventDefault();
-                }}
-            >
-                <WebRTCControl platform={Platform} 
+            <WebRTCControl 
+                platform={Platform} 
                 toggle_mouse_touch_callback={toggle_mouse_touch_callback}
                 bitrate_callback={bitrate_callback}
                 GamepadACallback={GamepadACallback}
@@ -187,8 +186,7 @@ export default function Home () {
                 keystuckCallback={keystuckCallback}
                 audioCallback={audioCallback}
                 clipboardSetCallback={clipboardSetCallback}
-                ></WebRTCControl>
-            </App>
+            ></WebRTCControl>
             <audio
                 ref={remoteAudio}
                 autoPlay={true}
@@ -208,6 +206,8 @@ export default function Home () {
 					<TextModal>Please rotate the phone horizontally!!</TextModal>
 				</ContentModal>
 			</Modal>
+            {/*<GuideLine isModalOpen={isGuideModalOpen} closeModal={() => {setGuideModalOpen(false)}}/>*/}
+            {/* <Setting/> */}
             <StatusConnect
             	videoConnect={videoConnectivity}
 	            audioConnect={audioConnectivity}
@@ -239,7 +239,6 @@ const Body = styled.div`
     background-color: black;
 `;
 const App = styled.div`
-    touch-action: none;
     position: relative;
     width: 100vw;
     height: 100vh;
