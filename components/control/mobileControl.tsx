@@ -51,7 +51,7 @@ const WrapperContent = styled.div`
 	align-items: center;
 	gap: 5px;	
 	margin-right: 16px;
-	background: rgb(242 232 232 / 16%);
+	background: rgb(242 232 232 / 60%);
 
 `
 const Text = styled.span`
@@ -74,7 +74,8 @@ const ButtonIcon = styled.button`
 	height: 100%;
 	font-weight: 500;
 	:hover{
-		background: #dbcfcf;
+		background: black;
+		color: white;
 	}
 `
 interface Action {
