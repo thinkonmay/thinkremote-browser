@@ -98,7 +98,7 @@ export const WebRTCControl = (input: {
 	useEffect(()=>{
 		setVGamePadDefaultValue(false)
 		setVMouseDefaultValue(false)
-	}, [isSetVGamePadDefaultValue])
+	}, [isSetVGamePadDefaultValue, isSetVMouseDefaultValue])
 
 	useEffect(() => {
 		console.log(`configuring menu on ${input.platform}`)

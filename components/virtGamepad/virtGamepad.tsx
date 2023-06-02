@@ -180,6 +180,8 @@ export const ButtonGroupRight = (props: ButtonGroupProps) => {
     useEffect(() => {
         if (isSetVGamePadDefaultValue === true) {
             setPosBtn(defaultButtonGroupRightValue)
+            localStorage.setItem(`right_group_pos`, JSON.stringify(defaultButtonGroupRightValue));
+
         }
     }, [isSetVGamePadDefaultValue])
     return (
@@ -310,6 +312,8 @@ export const ButtonGroupLeft = (param: ButtonGroupProps) => {
     useEffect(() => {
         if (isSetVGamePadDefaultValue === true) {
             setPosBtn(defaultButtonGroupLeftValue)
+            localStorage.setItem(`left_group_pos`, JSON.stringify(defaultButtonGroupLeftValue));
+
         }
     }, [isSetVGamePadDefaultValue])
     return (

@@ -1,7 +1,7 @@
 "use client"
 
 
-import React, { useState, useEffect, useLayoutEffect, useContext } from "react"; // we need this to make JSX compile
+import React, { useState, useEffect, useLayoutEffect, useContext, useTransition } from "react"; // we need this to make JSX compile
 import Draggable, { DraggableData, DraggableEvent } from "react-draggable";
 import styled from "styled-components";
 import {
@@ -67,6 +67,7 @@ const defaultJoyStickValue = { x: 160, y: 25 }
 
 const MouseGroup = (param: ButtonGroupProps) => {
     const [posBtn, setPosBtn] = useState(defaultMouseGroupValue);
+    const [isPending, startTransition] = useTransition()
 
     const { isSetVMouseDefaultValue } = useContext(ConTrolContext);
 
@@ -88,25 +89,26 @@ const MouseGroup = (param: ButtonGroupProps) => {
     }, []);
 
     const handleDrag = (e: DraggableEvent, data: DraggableData) => {
-        setPosBtn({
-            x: data.x,
-            y: data.y,
-        });
+        startTransition(()=>{
+            setPosBtn({
+                x: data.x,
+                y: data.y,
+            });
+        })
     };
 
     const handleStop = (e: DraggableEvent, data: DraggableData) => {
-        const { x, y } = posBtn;
-        if (x == null || y == null) {
-            return;
-        }
-
-        localStorage.setItem(`mouse_group_pos`, JSON.stringify(posBtn));
+        startTransition(()=>{
+            localStorage.setItem(`mouse_group_pos`, JSON.stringify(posBtn));
+        })
     };
 
      //reset default value
      useEffect(() => {
         if (isSetVMouseDefaultValue === true) {
             setPosBtn(defaultMouseGroupValue)
+            localStorage.setItem(`mouse_group_pos`, JSON.stringify(defaultMouseGroupValue));
+
         }
     }, [isSetVMouseDefaultValue])
     return (
@@ -131,37 +133,37 @@ const MouseGroup = (param: ButtonGroupProps) => {
 const JoyStickBtn = (param: ButtonGroupProps) => {
     const [posBtn, setPosBtn] = useState(defaultJoyStickValue);
     const { isSetVMouseDefaultValue } = useContext(ConTrolContext);
+    const [isPending, startTransition] = useTransition()
 
     useLayoutEffect(() => {
         let cache = localStorage.getItem(`joystick_btn_pos`);
 
-        if (cache == null) {
+        if (cache === null) {
             setPosBtn(defaultJoyStickValue)
             return;
         }
         const { x, y } = JSON.parse(cache);
-        if(x === null || x ===null){
-            setPosBtn(defaultJoyStickValue)
-            return
-        }
+        //if(x === null || x ===null){
+        //    setPosBtn(defaultJoyStickValue)
+        //    return
+        //}
         setPosBtn({ x: x, y: y });
     }, []);
 
     const handleDrag = (e: DraggableEvent, data: DraggableData) => {
         const { x, y } = posBtn;
-        setPosBtn({
-            x: data.x,
-            y: data.y,
-        });
+        startTransition(()=>{
+            setPosBtn({
+                x: data.x,
+                y: data.y,
+            });
+        })
     };
 
     const handleStop = (e: DraggableEvent, data: DraggableData) => {
-        const { x, y } = posBtn;
-        if (x == null || y == null) {
-            return;
-        }
-
-        localStorage.setItem(`joystick_btn_pos`, JSON.stringify(posBtn));
+        startTransition(()=>{
+            localStorage.setItem(`joystick_btn_pos`, JSON.stringify(posBtn));
+        })
     };
 
     
@@ -169,6 +171,7 @@ const JoyStickBtn = (param: ButtonGroupProps) => {
      useEffect(() => {
         if (isSetVMouseDefaultValue === true) {
             setPosBtn(defaultJoyStickValue)
+            localStorage.setItem(`joystick_btn_pos`, JSON.stringify(defaultJoyStickValue));
         }
     }, [isSetVMouseDefaultValue])
     return (
