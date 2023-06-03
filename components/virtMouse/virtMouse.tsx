@@ -53,6 +53,8 @@ export const JoyStick = (param: {
             move={move}
             baseColor="#000"
             stickColor="hwb(360 51% 76%)"
+            disabled={param.draggable === 'draggable'}
+
         />
     );
 };
