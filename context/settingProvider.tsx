@@ -43,14 +43,7 @@ interface IAction {
 	type: string
 	data: IActionData
 }
-const calValue = (value: number) => {
-	const STANDARD_VALUE = 50
 
-	const result = value  / STANDARD_VALUE
-
-	return result
-
-}
 const reducer = (state: ISettingState, action: IAction) => {
 	const { data } = action
 	switch (action.type) {
@@ -60,7 +53,7 @@ const reducer = (state: ISettingState, action: IAction) => {
 		case "UPDATE": {
 			const newData = { ...state}
 			const {	name, value, type	} = data
-			newData[type][name] = calValue(value)
+			newData[type][name] = value
 			return newData
 			
 		}

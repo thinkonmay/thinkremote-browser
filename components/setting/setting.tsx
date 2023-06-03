@@ -1,5 +1,5 @@
 import { IconButton, Modal, Slider, ThemeProvider, createTheme } from '@mui/material'
-import React, { useLayoutEffect } from 'react'
+import React, { startTransition, useLayoutEffect } from 'react'
 import { Joystick } from 'react-joystick-component'
 import styled from 'styled-components'
 import CloseIcon from '@mui/icons-material/Close';
@@ -42,6 +42,9 @@ interface Props {
 	closeModal: () => void
 	onDraggable: (type: 'VGamePad' | 'VMouse', value: boolean) => void
 }
+
+const STANDARD_VALUE = 50
+
 function Setting(props: Props) {
 	const [listBtn, setListBtn] = React.useState([{
 		name: 'Left Joystick',
@@ -71,15 +74,18 @@ function Setting(props: Props) {
 	const { isOpen, closeModal, onDraggable } = props
 	const { dispatch, settingValue } = useSetting()
 
-	const encodeValue = (value: number) =>{
-
-
+	const calScaleValue = (value: number) => {
+	
+		const scaleValue = value  / STANDARD_VALUE
+	
+		return scaleValue
+	
 	}
 	useLayoutEffect(()=>{
 		const {gamePad} = settingValue
 
 		setListBtn(prev => {
-			const newData = prev.map(item =>({...item, value: gamePad[item.key] * 50}))
+			const newData = prev.map(item =>({...item, value: gamePad[item.key] * STANDARD_VALUE}))
 			return newData
 		})
 	}, [])
@@ -89,6 +95,7 @@ function Setting(props: Props) {
 		//@ts-ignore
 		const name: string = event.target.name
 
+		if(value < 1) return
 		setListBtn(prev => {
 			const newData = prev.map(item =>{
 				if(item.key == name) {
@@ -98,9 +105,10 @@ function Setting(props: Props) {
 			})
 			return newData
 		})
-		dispatch({ type: 'UPDATE', data: { name, value, type: 'gamePad' } })
-		//cal
-		// val - 50 / 50
+		startTransition(()=>{
+			dispatch({ type: 'UPDATE', data: { name, value: calScaleValue(value), type: 'gamePad' } })
+		})
+	
 
 	}
 
