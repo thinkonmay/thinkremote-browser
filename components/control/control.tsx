@@ -78,21 +78,19 @@ export const WebRTCControl = (input: {
 	const [isSetVGamePadDefaultValue, setVGamePadDefaultValue] = useState(false)
 	const [isSetVMouseDefaultValue, setVMouseDefaultValue] = useState(false)
 
-	const handleOkeyDragValue = () => {
-		if (enableVGamepad === 'draggable') {
+	const handleOkeyDragValue = async () => {
+		if (enableVGamepad === 'draggable') 
 			setenableVGamepad('static')
-		}
-		else if (enableVMouse === 'draggable') {
+		else if (enableVMouse === 'draggable') 
 			setenableVMouse('static')
-		}
 	}
 
-	const handleSetDeafaultDragValue = () => {
-		if(enableVGamepad ==='draggable'){
+	const handleSetDeafaultDragValue = async () => {
+		if(enableVGamepad ==='draggable')
 			setVGamePadDefaultValue(true)
-		}else if(enableVMouse ==='draggable'){
+		else if(enableVMouse ==='draggable')
 			setVMouseDefaultValue(true)
-		}
+		
 	}
 	//reset per/click default
 	useEffect(()=>{

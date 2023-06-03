@@ -86,13 +86,12 @@ interface Action {
 interface Props {
 	actions: Action[],
 	isShowBtn: boolean
-	onOkey: () => void
-	onDefault: (type: 'VGamePad' | 'VMouse') => void
+	onOkey: () => Promise<void>
+	onDefault: () => Promise<void>
 }
 
 function MobileControl(props: Props) {
-	const { actions, isShowBtn, onOkey,
-		onDefault } = props
+	const { actions, isShowBtn, onOkey, onDefault } = props
 	const [isOpen, setOpen] = React.useState(false)
 
 	const handleOpen = () => {
@@ -106,8 +105,8 @@ function MobileControl(props: Props) {
 				{
 					isShowBtn ? 
 					<>
-						<ButtonIcon onClick={()=>{onDefault()}}>Default</ButtonIcon>
-						<ButtonIcon onClick={()=>{onOkey()}}>Ok</ButtonIcon>
+						<ButtonIcon onClick={onDefault}>Default</ButtonIcon>
+						<ButtonIcon onClick={onOkey}>Ok</ButtonIcon>
 					</> : 
 					actions.map(action => (
 						<ButtonIcon key={Math.random()} onClick={()=>{action.action()}}>
