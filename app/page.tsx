@@ -109,9 +109,9 @@ export default function Home () {
                 return platform as Platform
         })
 
-        // SetupConnection().catch(error => {
-        //     TurnOnStatus(error);
-        // })
+        SetupConnection().catch(error => {
+            TurnOnStatus(error);
+        })
 
 
         
@@ -152,7 +152,6 @@ export default function Home () {
         client?.hid?.ResetKeyStuck();
     }
     const clipboardSetCallback= async function (val: string): Promise<void> {
-        console.log(val)
         client?.hid?.SetClipboard(val)
         client?.hid?.PasteClipboard()
     }
@@ -206,8 +205,6 @@ export default function Home () {
 					<TextModal>Please rotate the phone horizontally!!</TextModal>
 				</ContentModal>
 			</Modal>
-            {/*<GuideLine isModalOpen={isGuideModalOpen} closeModal={() => {setGuideModalOpen(false)}}/>*/}
-            {/* <Setting/> */}
             <StatusConnect
             	videoConnect={videoConnectivity}
 	            audioConnect={audioConnectivity}

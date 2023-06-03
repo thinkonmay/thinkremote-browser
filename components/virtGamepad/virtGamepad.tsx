@@ -300,13 +300,8 @@ export const ButtonGroupLeft = (param: ButtonGroupProps) => {
             funcBtn,
         });
     }, []);
-    useEffect(() => {
-        console.log(window.innerHeight);
-        console.log(window.innerWidth);
 
-    }, [])
     const handleDrag = (e: DraggableEvent, data: DraggableData) => {
-        //getname => setPos by name. 
         const key = data.node.id
         const value = { x: data.x, y: data.y }
         startTransition(() => {

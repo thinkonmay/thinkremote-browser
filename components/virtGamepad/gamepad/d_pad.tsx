@@ -11,8 +11,7 @@ const Container = styled.div`
     position: relative;
   
 `;
-// Ban kinh gap 5 lan chieu rong
-// chieu dai gap 2.25 chieu rong
+
 const DefaultButton = styled.button`
      /* depened on Container */
      width: inherit;
