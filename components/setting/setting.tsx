@@ -22,7 +22,7 @@ const theme = createTheme({
 				track: {
 					height: 10,
 					borderRadius: 4,
-					color: SECOND_COLOR
+					color: "#d9d9d9"
 				},
 				thumb: {
 					height: 20,
@@ -199,7 +199,7 @@ const Content = styled.div`
 	gap: 16px;
 `
 const Title = styled.h3`
-	color: ${SECOND_COLOR};
+	color: #FCFFE7;
 	font-size: 32px;
     margin-bottom: 16px;
 `

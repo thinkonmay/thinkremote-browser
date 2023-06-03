@@ -75,7 +75,7 @@ interface Props {
 
 function StatusConnect(props: Props) {
 	const { videoConnect, audioConnect, fps } = props
-	const [isOpen, setOpen] = React.useState(false)
+	const [isOpen, setOpen] = React.useState(true)
 
 	const handleOpen = () => {
 		setOpen(!isOpen)

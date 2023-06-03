@@ -73,7 +73,7 @@ const ButtonIcon = styled.button`
 	width: 45px;
 	height: 100%;
 	font-weight: 500;
-	:hover{
+	:active{
 		background: black;
 		color: white;
 	}
@@ -106,11 +106,11 @@ function MobileControl(props: Props) {
 				{
 					isShowBtn ? 
 					<>
-						<ButtonIcon onClick={onDefault}>Default</ButtonIcon>
-						<ButtonIcon onClick={onOkey}>Ok</ButtonIcon>
+						<ButtonIcon onClick={()=>{onDefault()}}>Default</ButtonIcon>
+						<ButtonIcon onClick={()=>{onOkey()}}>Ok</ButtonIcon>
 					</> : 
 					actions.map(action => (
-						<ButtonIcon key={Math.random()} onClick={action.action}>
+						<ButtonIcon key={Math.random()} onClick={()=>{action.action()}}>
 							{action.icon}
 						</ButtonIcon>
 					))
