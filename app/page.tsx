@@ -8,7 +8,7 @@ import {
     TurnOnConfirm,
     TurnOnStatus,
 } from "../components/popup/popup";
-import { RemoteDesktopClient } from "../core/src/app";
+import { Metrics, RemoteDesktopClient } from "../core/src/app";
 import { useRouter, useSearchParams } from "next/navigation";
 import {
     AddNotifier,
@@ -55,28 +55,32 @@ export default function Home () {
     const [Platform,setPlatform] = useState<Platform>(null);
 
     const SetupConnection = async () => {
-       localStorage.setItem("reference",ref)
+        localStorage.setItem("reference",ref)
+            
+        const core = new SbCore()
+        if (!await core.Authenticated() && user_ref == undefined) 
+                await core.LoginWithGoogle()
+            
+        if(ref == null) 
+            return
+
+        const result = await core.AuthenticateSession(ref,user_ref)
+        if (result instanceof Error) 
+            return
+
+        const {Email ,SignalingConfig ,WebRTCConfig,PingCallback} = result
+        setInterval(PingCallback,14000)
+
+        await LogConnectionEvent(ConnectionEvent.ApplicationStarted)
+        client = new RemoteDesktopClient(
+            SignalingConfig,WebRTCConfig,
+            remoteVideo.current, 
+            remoteAudio.current,   
+            Platform)
         
-       const core = new SbCore()
-       if (!await core.Authenticated() && user_ref == undefined) 
-			await core.LoginWithGoogle()
-        
-       if(ref == null) 
-           return
+        client.HandleMetrics = async (metrics: Metrics) => {
 
-       const result = await core.AuthenticateSession(ref,user_ref)
-       if (result instanceof Error) 
-           return
-
-       const {Email ,SignalingConfig ,WebRTCConfig,PingCallback} = result
-       setInterval(PingCallback,14000)
-
-       await LogConnectionEvent(ConnectionEvent.ApplicationStarted)
-       client = new RemoteDesktopClient(
-           SignalingConfig,WebRTCConfig,
-           remoteVideo.current, 
-           remoteAudio.current,   
-           Platform)
+        }
     }
 
 
