@@ -128,11 +128,11 @@ export default function Home () {
     }, []);
 
 
-    const toggle_mouse_touch_callback=async function(enable: boolean) { 
+    const toggleMouseTouchCallback=async function(enable: boolean) { 
         client?.hid?.DisableTouch(!enable);
         client?.hid?.DisableMouse(!enable);
     } 
-    const bitrate_callback= async function (bitrate: number) { 
+    const bitrateCallback= async function (bitrate: number) { 
         client?.ChangeBitrate(bitrate);
         client?.ChangeFramerate(55);
     } 
@@ -146,7 +146,9 @@ export default function Home () {
         client?.hid?.mouseMoveRel({movementX:x,movementY:y});
     } 
     const MouseButtonCallback=async function (index: number, type: "up" | "down"): Promise<void> {
-        type == 'down' ? client?.hid?.MouseButtonDown({button: index}) : client?.hid?.MouseButtonUp({button: index})
+        type == 'down' 
+            ? client?.hid?.MouseButtonDown({button: index}) 
+            : client?.hid?.MouseButtonUp({button: index})
     } 
     const keystuckCallback= async function (): Promise<void> {
         client?.hid?.ResetKeyStuck();
@@ -176,8 +178,8 @@ export default function Home () {
             ></RemoteVideo>
             <WebRTCControl 
                 platform={Platform} 
-                toggle_mouse_touch_callback={toggle_mouse_touch_callback}
-                bitrate_callback={bitrate_callback}
+                toggle_mouse_touch_callback={toggleMouseTouchCallback}
+                bitrate_callback={bitrateCallback}
                 GamepadACallback={GamepadACallback}
                 GamepadBCallback={GamepadBCallback}
                 MouseMoveCallback={MouseMoveCallback}
