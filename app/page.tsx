@@ -25,6 +25,7 @@ import { Modal } from "@mui/material";
 import { IconHorizontalPhone } from "../public/assets/svg/svg_cpn";
 import StatusConnect from "../components/status/status";
 import Setting from "../components/setting/setting";
+import Metric from "../components/metric";
 
 let client : RemoteDesktopClient = null
 
@@ -54,78 +55,78 @@ export default function Home () {
 
     const [Platform,setPlatform] = useState<Platform>(null);
 
-    const SetupConnection = async () => {
-       localStorage.setItem("reference",ref)
+    //const SetupConnection = async () => {
+    //   localStorage.setItem("reference",ref)
         
-       const core = new SbCore()
-       if (!await core.Authenticated() && user_ref == undefined) 
-			await core.LoginWithGoogle()
+    //   const core = new SbCore()
+    //   if (!await core.Authenticated() && user_ref == undefined) 
+	//		await core.LoginWithGoogle()
         
-       if(ref == null) 
-           return
+    //   if(ref == null) 
+    //       return
 
-       const result = await core.AuthenticateSession(ref,user_ref)
-       if (result instanceof Error) 
-           return
+    //   const result = await core.AuthenticateSession(ref,user_ref)
+    //   if (result instanceof Error) 
+    //       return
 
-       const {Email ,SignalingConfig ,WebRTCConfig,PingCallback} = result
-       setInterval(PingCallback,14000)
+    //   const {Email ,SignalingConfig ,WebRTCConfig,PingCallback} = result
+    //   setInterval(PingCallback,14000)
 
-       await LogConnectionEvent(ConnectionEvent.ApplicationStarted)
-       client = new RemoteDesktopClient(
-           SignalingConfig,WebRTCConfig,
-           remoteVideo.current, 
-           remoteAudio.current,   
-           Platform)
-    }
+    //   await LogConnectionEvent(ConnectionEvent.ApplicationStarted)
+    //   client = new RemoteDesktopClient(
+    //       SignalingConfig,WebRTCConfig,
+    //       remoteVideo.current, 
+    //       remoteAudio.current,   
+    //       Platform)
+    //}
 
 
 	const [isModalOpen, setModalOpen] = useState(false)
-	const checkHorizontal = (width: number,height:number) => {
-        if (Platform == 'mobile') 
-            setModalOpen(width < height)
-	}
+	//const checkHorizontal = (width: number,height:number) => {
+    //    if (Platform == 'mobile') 
+    //        setModalOpen(width < height)
+	//}
 
-    useEffect(() => {
-       AddNotifier(async (message: ConnectionEvent, text?: string, source?: string) => {
-            if (message == ConnectionEvent.WebRTCConnectionClosed) 
-                await source == "audio" ? setAudioConnectivity("closed") : setVideoConnectivity("closed")
-            if (message == ConnectionEvent.WebRTCConnectionDoneChecking) 
-                await source == "audio" ? setAudioConnectivity("connected") : setVideoConnectivity("connected")
-            if (message == ConnectionEvent.WebRTCConnectionChecking) 
-                await source == "audio" ? setAudioConnectivity("connecting") : setVideoConnectivity("connecting")
+    //useEffect(() => {
+    //   AddNotifier(async (message: ConnectionEvent, text?: string, source?: string) => {
+    //        if (message == ConnectionEvent.WebRTCConnectionClosed) 
+    //            await source == "audio" ? setAudioConnectivity("closed") : setVideoConnectivity("closed")
+    //        if (message == ConnectionEvent.WebRTCConnectionDoneChecking) 
+    //            await source == "audio" ? setAudioConnectivity("connected") : setVideoConnectivity("connected")
+    //        if (message == ConnectionEvent.WebRTCConnectionChecking) 
+    //            await source == "audio" ? setAudioConnectivity("connecting") : setVideoConnectivity("connecting")
 
-            if (message == ConnectionEvent.ApplicationStarted) {
-                await TurnOnConfirm(message,text)
-                setAudioConnectivity("started") 
-                setVideoConnectivity("started")
-            }
-        })
+    //        if (message == ConnectionEvent.ApplicationStarted) {
+    //            await TurnOnConfirm(message,text)
+    //            setAudioConnectivity("started") 
+    //            setVideoConnectivity("started")
+    //        }
+    //    })
 
-        setPlatform(old => { 
-            if (platform == null) 
-                return getPlatform() 
-            else 
-                return platform as Platform
-        })
+    //    setPlatform(old => { 
+    //        if (platform == null) 
+    //            return getPlatform() 
+    //        else 
+    //            return platform as Platform
+    //    })
 
-        SetupConnection().catch(error => {
-            TurnOnStatus(error);
-        })
+    //    SetupConnection().catch(error => {
+    //        TurnOnStatus(error);
+    //    })
 
 
         
-		checkHorizontal(window.innerWidth,window.innerHeight)
-        window.addEventListener('resize', (e: UIEvent) => {
-                checkHorizontal(window.innerWidth, window.innerHeight)
-		})
+	//	checkHorizontal(window.innerWidth,window.innerHeight)
+    //    window.addEventListener('resize', (e: UIEvent) => {
+    //            checkHorizontal(window.innerWidth, window.innerHeight)
+	//	})
 
-		return () => { 
-           window.removeEventListener('resize', (e: UIEvent) => { 
-               checkHorizontal(window.innerWidth, window.innerHeight)
-			})
-		}
-    }, []);
+	//	return () => { 
+    //       window.removeEventListener('resize', (e: UIEvent) => { 
+    //           checkHorizontal(window.innerWidth, window.innerHeight)
+	//		})
+	//	}
+    //}, []);
 
 
     const toggleMouseTouchCallback=async function(enable: boolean) { 
@@ -212,6 +213,10 @@ export default function Home () {
 	            audioConnect={audioConnectivity}
 	            fps={'55fps'}
             />
+            {   
+            //add logic check
+                 <Metric/>
+            }
         </Body>
     );
 };
