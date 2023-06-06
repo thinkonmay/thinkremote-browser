@@ -18,6 +18,7 @@ import MobileControl from "./mobileControl";
 import SettingsIcon from '@mui/icons-material/Settings';
 import DesktopControl from "./desktopControl";
 import Setting from "../setting/setting";
+import styled from "styled-components";
 
 
 export type ButtonMode = "static" | "draggable" | "disable";
@@ -198,40 +199,57 @@ export const WebRTCControl = (input: {
 	}
 	return (
 		<ConTrolContext.Provider value={contextValue}>
-			<div
-				className="containerDrag"
-				style={{ maxWidth: 'max-content', maxHeight: 'max-content' }}
+			<App
+                onContextMenu=	{e => e.preventDefault()}
+                onMouseUp=		{e => e.preventDefault()}
+                onMouseDown=	{e => e.preventDefault()}
+                onKeyUp=		{e => e.preventDefault()}
+                onKeyDown=		{e => e.preventDefault()}
 			>
-				{
-					input.platform === 'mobile' ?
+				<div
+					className="containerDrag"
+					style={{ maxWidth: 'max-content', maxHeight: 'max-content' }}
+				>
+					{
+						input.platform === 'mobile' ?
 
-						<MobileControl
-							actions={actions}
-							isShowBtn={enableVGamepad === 'draggable' || enableVMouse === 'draggable'}
-							onOkey={handleOkeyDragValue}
-							onDefault={handleSetDeafaultDragValue}
-						/> : (<DesktopControl actions={actions} />)
-				}
-			</div>
+							<MobileControl
+								actions={actions}
+								isShowBtn={enableVGamepad === 'draggable' || enableVMouse === 'draggable'}
+								onOkey={handleOkeyDragValue}
+								onDefault={handleSetDeafaultDragValue}
+							/> : (<DesktopControl actions={actions} />)
+					}
+				</div>
 
-			<VirtualMouse
-				MouseMoveCallback={input.MouseMoveCallback}
-				MouseButtonCallback={input.MouseButtonCallback}
-				draggable={enableVMouse} />
+				<VirtualMouse
+					MouseMoveCallback={input.MouseMoveCallback}
+					MouseButtonCallback={input.MouseButtonCallback}
+					draggable={enableVMouse} />
 
-			<VirtualGamepad
-				ButtonCallback={input.GamepadBCallback}
-				AxisCallback={input.GamepadACallback}
-				draggable={enableVGamepad}
-				SelectCallback={() => { }}
-				StartCallback={() => { }}
-			/>
+				<VirtualGamepad
+					ButtonCallback={input.GamepadBCallback}
+					AxisCallback={input.GamepadACallback}
+					draggable={enableVGamepad}
+					SelectCallback={() => { }}
+					StartCallback={() => { }}
+				/>
 
-			<Setting
-				onDraggable={handleDraggable}
-				isOpen={isModalSettingOpen}
-				closeModal={() => { setModalSettingOpen(false) }}
-			/>
+				<Setting
+					onDraggable={handleDraggable}
+					isOpen={isModalSettingOpen}
+					closeModal={() => { setModalSettingOpen(false) }}
+				/>
+			</App>
 		</ConTrolContext.Provider >
 	);
 };
+
+
+
+const App = styled.div`
+    touch-action: none;
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+`;
