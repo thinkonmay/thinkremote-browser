@@ -16,6 +16,11 @@ import {
 import { Line } from 'react-chartjs-2';
 import { Value } from 'sass';
 
+export interface Data{
+	key: number,
+	value: number
+}
+
 ChartJS.register(
 	CategoryScale,
 	LinearScale,
@@ -26,7 +31,7 @@ ChartJS.register(
 	Legend
 );
 
-export const options = {
+const options = {
 	responsive: true,
 	plugins: {
 		legend: {
@@ -35,58 +40,23 @@ export const options = {
 	},
 };
 
-const labels:Data[] = [{
-	key: '10:03',
-	value: 5
-},
-{
-	key: '10:04',
-	value: 6
-},{
-	key: '10:06',
-	value: 7
-},
-{
-	key: '10:08',
-	value: 4
-},
-{
-	key: '10:09',
-	value: 10
-},
-{
-	key: '10:14',
-	value: 1
-}];
-
-interface Data{
-	key: string,
-	value: number
-}
-
-export const data = {
-	labels: labels.map(item => item.key),
-	datasets: [
-		{
-			label: 'FPS',
-			data: labels.map((item)=>item.value),
-			borderColor: 'rgb(255, 99, 132)',
-			backgroundColor: 'rgba(255, 99, 132, 0.5)',
-		},
-		{
-			label: 'Bitrate',
-			data: labels.map(() => faker.datatype.number({ min: 0, max: 10 })),
-			borderColor: 'rgb(53, 162, 235)',
-			backgroundColor: 'rgba(53, 162, 235, 0.5)',
-		},
-	],
-};
 
 
-const Metric = () => {
+
+const Metric = (props: {metrics: Data[]}) => {
 	const [isOpen, setOpen] = React.useState(false)
 
-	console.log('render');
+	const data = {
+		labels: props.metrics.map(item => item.key),
+		datasets: [
+			{
+				label: 'FPS',
+				data: props.metrics.map((item)=>item.value),
+				borderColor: 'rgb(255, 99, 132)',
+				backgroundColor: 'rgba(255, 99, 132, 0.5)',
+			}
+		],
+	};
 	const handleOpen = () => {
 		setOpen(!isOpen)
 	}

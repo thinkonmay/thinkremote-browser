@@ -25,7 +25,7 @@ import { Modal } from "@mui/material";
 import { IconHorizontalPhone } from "../public/assets/svg/svg_cpn";
 import StatusConnect from "../components/status/status";
 import Setting from "../components/setting/setting";
-import Metric from "../components/metric";
+import Metric, { Data } from "../components/metric";
 
 let client : RemoteDesktopClient = null
 
@@ -33,6 +33,7 @@ export default function Home () {
     const [videoConnectivity,setVideoConnectivity] = useState<string>('not started');
     const [audioConnectivity,setAudioConnectivity] = useState<string>('not started');
     const [isGuideModalOpen, setGuideModalOpen] = useState(true)
+    const [metrics,setMetrics] = useState<Data[]>([])
 
     useLayoutEffect(()=>{
         const isGuideModalLocal = localStorage.getItem('isGuideModalLocal')
@@ -80,6 +81,21 @@ export default function Home () {
             Platform)
         
         client.HandleMetrics = async (metrics: Metrics) => {
+            switch (metrics.type) {
+                case 'VIDEO':
+                    const dat : Data[] = []
+                    for (let index = 0; index < metrics.decodefps.length; index++) {
+                        const element = metrics.decodefps[index];
+                        dat.push({
+                            key: index,
+                            value: metrics.decodefps[index]
+                        })
+                    }
+                    setMetrics(dat)
+                    break;
+                default:
+                    break;
+            }
 
         }
     }
@@ -217,10 +233,9 @@ export default function Home () {
 	            audioConnect={audioConnectivity}
 	            fps={'55fps'}
             />
-            {   
-            //add logic check
-                 <Metric/>
-            }
+            <Metric
+                metrics={metrics}
+            />
         </Body>
     );
 };
