@@ -9,7 +9,7 @@ import {
     TurnOnStatus,
 } from "../components/popup/popup";
 import { Metrics, RemoteDesktopClient } from "../core/src/app";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import {
     AddNotifier,
     ConnectionEvent,
@@ -23,9 +23,7 @@ import {
 import SbCore from "../supabase";
 import { Modal } from "@mui/material";
 import { IconHorizontalPhone } from "../public/assets/svg/svg_cpn";
-import StatusConnect from "../components/status/status";
-import Setting from "../components/setting/setting";
-import Metric, { Data } from "../components/metric";
+import Metric  from "../components/metric/metric";
 
 let client : RemoteDesktopClient = null
 
@@ -33,7 +31,14 @@ export default function Home () {
     const [videoConnectivity,setVideoConnectivity] = useState<string>('not started');
     const [audioConnectivity,setAudioConnectivity] = useState<string>('not started');
     const [isGuideModalOpen, setGuideModalOpen] = useState(true)
-    const [metrics,setMetrics] = useState<Data[]>([])
+    const [metrics,setMetrics] = useState<{
+        index                             : number
+        receivefps                        : number
+        decodefps                         : number
+        packetloss                        : number     
+        bandwidth                         : number     
+        buffer                            : number
+    }[]>([])
 
     useLayoutEffect(()=>{
         const isGuideModalLocal = localStorage.getItem('isGuideModalLocal')
@@ -83,12 +88,16 @@ export default function Home () {
         client.HandleMetrics = async (metrics: Metrics) => {
             switch (metrics.type) {
                 case 'VIDEO':
-                    const dat : Data[] = []
+                    const dat : any[] = []
                     for (let index = 0; index < metrics.decodefps.length; index++) {
                         const element = metrics.decodefps[index];
                         dat.push({
-                            key: index,
-                            value: metrics.decodefps[index]
+                            index: index,
+                            receivefps : metrics.receivefps[index],
+                            decodefps  : metrics.decodefps[index],
+                            packetloss : metrics.packetloss[index],
+                            bandwidth  : metrics.bandwidth[index],
+                            buffer     : metrics.buffer[index],
                         })
                     }
                     setMetrics(dat)
@@ -228,13 +237,14 @@ export default function Home () {
 					<TextModal>Please rotate the phone horizontally!!</TextModal>
 				</ContentModal>
 			</Modal>
-            <StatusConnect
+            <Metric
             	videoConnect={videoConnectivity}
 	            audioConnect={audioConnectivity}
-	            fps={'55fps'}
-            />
-            <Metric
-                metrics={metrics}
+                decodeFPS={metrics.map(x => { return {key: x.index, value: x.decodefps} })}
+                receiveFPS={metrics.map(x => { return {key: x.index, value: x.receivefps} })}
+                packetLoss={metrics.map(x => { return {key: x.index, value: x.packetloss} })}
+                bandwidth={metrics.map(x => { return {key: x.index, value: x.bandwidth} })}
+                buffer={metrics.map(x => { return {key: x.index, value: x.buffer} })}
             />
         </Body>
     );
