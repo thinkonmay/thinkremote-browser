@@ -110,12 +110,6 @@ export default function Home () {
     }
 
 
-	const [isModalOpen, setModalOpen] = useState(false)
-	const checkHorizontal = (width: number,height:number) => {
-       if (Platform == 'mobile') 
-           setModalOpen(width < height)
-	}
-
     useEffect(() => {
       AddNotifier(async (message: ConnectionEvent, text?: string, source?: string) => {
            if (message == ConnectionEvent.WebRTCConnectionClosed) 
@@ -142,20 +136,25 @@ export default function Home () {
        SetupConnection().catch(error => {
            TurnOnStatus(error);
        })
+    }, []);
 
-
-        
+	const [isModalOpen, setModalOpen] = useState(false)
+	const checkHorizontal = (width: number,height:number) => {
+        if (Platform == 'mobile') 
+            setModalOpen(width < height)
+	}
+    useEffect(() => {
 		checkHorizontal(window.innerWidth,window.innerHeight)
-       window.addEventListener('resize', (e: UIEvent) => {
-               checkHorizontal(window.innerWidth, window.innerHeight)
+        window.addEventListener('resize', (e: UIEvent) => {
+            checkHorizontal(window.innerWidth, window.innerHeight)
 		})
 
 		return () => { 
-          window.removeEventListener('resize', (e: UIEvent) => { 
-              checkHorizontal(window.innerWidth, window.innerHeight)
-			})
+            window.removeEventListener('resize', (e: UIEvent) => { 
+                checkHorizontal(window.innerWidth, window.innerHeight)
+            })
 		}
-    }, []);
+    }, [Platform]);
 
 
     const toggleMouseTouchCallback=async function(enable: boolean) { 
@@ -229,7 +228,6 @@ export default function Home () {
             ></audio>
 			<Modal
 				open={isModalOpen}
-				onClose={() => setModalOpen(false)}
 			>
 				<ContentModal
 				>
