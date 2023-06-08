@@ -16,6 +16,7 @@ import {
 import { Line } from 'react-chartjs-2';
 import { Value } from 'sass';
 import { blue } from '@mui/material/colors';
+import { Platform } from '../../core/src/utils/platform';
 
 export interface Data{
 	key: number,
@@ -42,19 +43,33 @@ const options = {
 };
 
 
-
-
-const Metric = (props: {
+const MobileMetric = (props: {
 		receiveFPS: Data[]
 		decodeFPS: Data[]
 		packetLoss: Data[]
 		bandwidth: Data[]
 		buffer: Data[]
-		videoConnect: 'loading' | 'connect' | 'disconnect' | string
-		audioConnect: 'loading' | 'connect' | 'disconnect' | string
 	}) => {
-	const [isOpen, setOpen] = React.useState(false)
+	const getAvgData = (data: Data[]) => Math.round(data.map(e => e.value).reduce((a,b) => a+b, 0) / data.length) || 0;
 
+	return (
+		<React.Fragment>
+			<Text>FPS: {getAvgData(props.decodeFPS)}/{getAvgData(props.receiveFPS)}</Text>
+			<Text>Packetloss: {getAvgData(props.packetLoss)}</Text>
+			<Text>Bandwidth: {getAvgData(props.bandwidth)}</Text>
+			<Text>Buffer: {getAvgData(props.buffer)}</Text>
+		</React.Fragment>
+	);
+}
+
+
+const DesktopMetric = (props: {
+		receiveFPS: Data[]
+		decodeFPS: Data[]
+		packetLoss: Data[]
+		bandwidth: Data[]
+		buffer: Data[]
+	}) => {
 	const data = [{
 		labels: props.receiveFPS.map(item => item.key),
 		datasets: [{
@@ -94,11 +109,35 @@ const Metric = (props: {
 		}],
 	}]
 
+	return (
+		<React.Fragment>
+			{ data.map((val,key) => { return <Line key={key} options={options} data={val} /> }) }
+		</React.Fragment>
+	);
+}
+
+
+const Metric = (props: {
+		receiveFPS: Data[]
+		decodeFPS: Data[]
+		packetLoss: Data[]
+		bandwidth: Data[]
+		buffer: Data[]
+		videoConnect: 'loading' | 'connect' | 'disconnect' | string
+		audioConnect: 'loading' | 'connect' | 'disconnect' | string
+		platform: Platform
+	}) => {
+	const [isOpen, setOpen] = React.useState(false)
+
 	const handleOpen = () => {
 		setOpen(!isOpen)
 	}
+
 	return (
-		<Container className={isOpen ? 'slide-in' : 'slide-out'}>
+		<Container 
+			style={{minHeight: props.platform === 'mobile' ? 189 : 502}} 
+			className={isOpen ? 'slide-in' : 'slide-out'}
+		>
 			<Button onClick={handleOpen}>
 				{
 					isOpen 
@@ -111,7 +150,22 @@ const Metric = (props: {
 				<WrapperContent >
 					<Text>Status Video: {props.videoConnect}</Text>
 					<Text>Status audio: {props.audioConnect}</Text>
-					{ data.map((val,key) => { return <Line options={options} data={val} /> }) }
+					{
+						props.platform === 'desktop'
+							? <DesktopMetric
+								bandwidth={props.bandwidth}
+								buffer={props.buffer}
+								decodeFPS={props.decodeFPS}
+								packetLoss={props.packetLoss}
+								receiveFPS={props.receiveFPS}
+							/> : <MobileMetric
+								bandwidth={props.bandwidth}
+								buffer={props.buffer}
+								decodeFPS={props.decodeFPS}
+								packetLoss={props.packetLoss}
+								receiveFPS={props.receiveFPS}
+							/>
+					}
 				</WrapperContent>
 			}
 
@@ -144,7 +198,6 @@ const Container = styled.div`
 	right: 0;
 
 	width: 200px;
-	min-height: 500px;
 	animation-duration: 0.5s;
 	animation-timing-function: ease-in-out;
 	animation-fill-mode: both;
@@ -178,9 +231,9 @@ const Text = styled.span`
 `
 const Button = styled.button`
 	position: absolute;
-	top: -50%;
+	top: 0;
     left: -12px;
-    bottom: -50%;
+    bottom: 0;
 	outline: none;
 	border: none;
 	background: none;
