@@ -29,14 +29,10 @@ export const VirtualGamepad = (props: {
         type: "left" | "right"
     ) => Promise<void>;
     ButtonCallback: (index: number, type: "up" | "down") => Promise<void>;
-    SelectCallback: () => void;
-    StartCallback: () => void;
 }) => {
     const { draggable,
         AxisCallback,
         ButtonCallback,
-        SelectCallback,
-        StartCallback,
     } = props
 
 
@@ -54,8 +50,6 @@ export const VirtualGamepad = (props: {
                         AxisCallback={AxisCallback}
                         ButtonCallback={ButtonCallback}
                         draggable={draggable}
-                        SelectCallback={SelectCallback}
-                        StartCallback={StartCallback}
                     />
                 </ContainerVirGamepad>
             ) : null}
@@ -231,8 +225,18 @@ export const ButtonGroupRight = (props: ButtonGroupProps) => {
                 onDrag={handleDrag}
             >
                 <ContainerSubButton id="subBtn">
-                    <SelectBtn onClick={props.SelectCallback}><ArrowLeftIcon /></SelectBtn>
-                    <StartBtn onClick={props.StartCallback}><ArrowRightIcon /></StartBtn>
+                    <SelectBtn 
+                        onTouchStart={() => props.ButtonCallback(8, "down")} 
+                        onTouchEnd={() => props.ButtonCallback(8, "up")}
+                    >
+                        <ArrowLeftIcon />
+                    </SelectBtn>
+                    <StartBtn
+                        onTouchStart={() => props.ButtonCallback(9, "down")} 
+                        onTouchEnd={() => props.ButtonCallback(9, "up")}
+                    >
+                        <ArrowRightIcon />
+                    </StartBtn>
                 </ContainerSubButton>
             </Draggable>
             <Draggable
@@ -393,8 +397,6 @@ interface ButtonGroupProps {
         type: "left" | "right"
     ) => Promise<void>;
     ButtonCallback: (index: number, type: "up" | "down") => Promise<void>;
-    SelectCallback?: () => void;
-    StartCallback?: () => void;
 }
 
 const ContainerVirGamepad = styled.div`
