@@ -243,6 +243,7 @@ export default function Home () {
                 packetLoss={metrics.map(x => { return {key: x.index, value: x.packetloss} })}
                 bandwidth={metrics.map(x => { return {key: x.index, value: x.bandwidth} })}
                 buffer={metrics.map(x => { return {key: x.index, value: x.buffer} })}
+                platform={Platform}
             />
         </Body>
     );
