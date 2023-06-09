@@ -60,7 +60,7 @@ const Text = styled.span`
 const Button = styled.button`
 	position: absolute;
 	top: -50%;
-    right: 0;
+    right: -4px;
     bottom: -50%;
 	outline: none;
 	border: none;
@@ -120,8 +120,8 @@ function MobileControl(props: Props) {
 			<Button onClick={handleOpen}>
 				{
 					isOpen 
-					? <IoIosArrowForward color="white" /> 
-					: <IoIosArrowBack color="white" />
+					? <IoIosArrowForward color="white" style={{fontSize:20}}/> 
+					: <IoIosArrowBack color="white"    style={{fontSize:20}} />
 				}
 			</Button>
 
