@@ -38,7 +38,8 @@ export async function TurnOnConfirm(status: string, text?: string): Promise<void
     have_swal = 'confirm'
     await Swal.fire({
         title: `${status}`,
-        text: text ?? "Please wait while the client is getting ready...",
+        text: text ?? "Please click on screen to start",
+        confirmButtonText: "START",
         showConfirmButton: true,
     });
     have_swal = 'none'
