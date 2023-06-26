@@ -12,7 +12,9 @@ const ContainerLeftBtn = styled(DefautContainer)`
     align-items: flex-end;
 
 `;
-export const BumperBtn = styled.button`
+
+
+const DefaultFuncBtn = styled.button`
     display: flex;
     align-items: center;
     justify-content:center;
@@ -25,21 +27,11 @@ export const BumperBtn = styled.button`
     :active {
         background-color: rgba(0, 0, 0, 0.05);
     }
+    -webkit-user-select: none;
+    -ms-user-select: none; 
+    user-select: none;
 `;
-export const TriggerBtn = styled.button`
-    display: flex;
-    align-items: center;
-    justify-content:center;
-    outline: none;
-    color: #C3B5B5;
-    border: 1px solid #C3B5B5;
-    border-radius: 50%;
 
-    background-color: transparent;
-    :active {
-        background-color: rgb(97 76 76 / 15%);;
-    }
-`;
 
 interface PropsTrigger {
     Touch: (index: number, type: 'up' | 'down') => void
@@ -61,18 +53,18 @@ export function RightFuncButton(props: PropsTrigger) {
             className={className}
             {...rest}
         >
-            <TriggerBtn
+            <DefaultFuncBtn
 
                 style={{ ...buttonSize }}
                 onTouchStart={(e: React.TouchEvent) => Touch(7, 'down')}
                 onTouchEnd={(e: React.TouchEvent) => Touch(7, 'up')}
-            >RT</TriggerBtn>
-            <BumperBtn
+            >RT</DefaultFuncBtn>
+            <DefaultFuncBtn
 
                 style={{ ...buttonSize }}
                 onTouchStart={(e: React.TouchEvent) => Touch(5, 'down')}
                 onTouchEnd={(e: React.TouchEvent) => Touch(5, 'up')}
-            >RB</BumperBtn>
+            >RB</DefaultFuncBtn>
         </ContainerRightBtn>
     );
 }
@@ -87,16 +79,16 @@ export function LeftFuncButton(props: PropsTrigger) {
         <ContainerLeftBtn
         className={className}
         >
-            <TriggerBtn
+            <DefaultFuncBtn
                 style={{ ...buttonSize }}
                 onTouchStart={(e: React.TouchEvent) => Touch(6, 'down')}
                 onTouchEnd={(e: React.TouchEvent) => Touch(6, 'up')}
-            >LT</TriggerBtn>
-            <BumperBtn
+            >LT</DefaultFuncBtn>
+            <DefaultFuncBtn
                 style={{ ...buttonSize }}
                 onTouchStart={(e: React.TouchEvent) => Touch(4, 'down')}
                 onTouchEnd={(e: React.TouchEvent) => Touch(4, 'up')}
-            >LB</BumperBtn>
+            >LB</DefaultFuncBtn>
         </ContainerLeftBtn>
     );
 }
