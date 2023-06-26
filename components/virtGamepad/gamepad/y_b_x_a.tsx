@@ -23,6 +23,9 @@ const DefaultButton = styled.button`
     border-radius: 50%;
     position: absolute;
     background-color: transparent;
+    -webkit-user-select: none;
+    -ms-user-select: none; 
+    user-select: none;
 `;
 
 const ButtonY = styled(DefaultButton)`

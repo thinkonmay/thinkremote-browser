@@ -24,6 +24,10 @@ const DefaultButton = styled.button`
     border-radius: 50%;
     position: absolute;
     background-color: transparent;
+    -webkit-user-select: none;
+    -ms-user-select: none; 
+    user-select: none;
+    
 `;
 const Top = styled(DefaultButton)`
     top: 0;
@@ -57,25 +61,25 @@ const DPad = (props: Props) => {
                 onTouchStart={(e: React.TouchEvent) => onTouch(e, "down", 12)}
                 onTouchEnd={(e: React.TouchEvent) => onTouch(e, "up", 12)}
             >
-                <KeyboardArrowUpIcon sx={{color:'#C3B5B5'}}/>
+                <KeyboardArrowUpIcon sx={{ color: '#C3B5B5' }} />
             </Top>
             <Bottom
                 onTouchStart={(e: React.TouchEvent) => onTouch(e, "down", 13)}
                 onTouchEnd={(e: React.TouchEvent) => onTouch(e, "up", 13)}
             >
-                <KeyboardArrowDownIcon sx={{color:'#C3B5B5'}}/>
+                <KeyboardArrowDownIcon sx={{ color: '#C3B5B5' }} />
             </Bottom>
             <Right
                 onTouchStart={(e: React.TouchEvent) => onTouch(e, "down", 15)}
                 onTouchEnd={(e: React.TouchEvent) => onTouch(e, "up", 15)}
             >
-                <KeyboardArrowRightIcon sx={{color:'#C3B5B5'}}/>
+                <KeyboardArrowRightIcon sx={{ color: '#C3B5B5' }} />
             </Right>
             <Left
                 onTouchStart={(e: React.TouchEvent) => onTouch(e, "down", 14)}
                 onTouchEnd={(e: React.TouchEvent) => onTouch(e, "up", 14)}
             >
-                <KeyboardArrowLeftIcon sx={{color:'#C3B5B5'}}/>
+                <KeyboardArrowLeftIcon sx={{ color: '#C3B5B5' }} />
             </Left>
         </Container>
     );
