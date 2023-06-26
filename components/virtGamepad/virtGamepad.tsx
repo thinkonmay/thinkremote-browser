@@ -89,8 +89,8 @@ export const JoyStick = (param: {
                 stop={move}
                 move={move}
                 size={size}
-                baseColor="#000"
-                stickColor="hwb(360 51% 76%)"
+                baseColor="rgba(0, 0, 0, 0.1)"
+                stickColor="rgba(0, 0, 0, 0.12"
                 disabled={draggable === 'draggable'}
             />
         </WrapperJoyStick>
