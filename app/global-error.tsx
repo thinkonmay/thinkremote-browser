@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect } from "react"
+import styled from "styled-components";
 
 export default function GlobalError({
 	error,
@@ -15,10 +16,24 @@ export default function GlobalError({
 	}, [error])
 	return (
 		<html>
-			<body>
-				<h2>Some thing went wrong. See the console.log</h2>
+			<Body>
+				<h2>Some thing went wrong. </h2>
+				<h2>{error?.name}</h2>
+				<h2>{error?.message}</h2>
+				<h2>{error?.stack}</h2>
 				<button onClick={() => reset()}>Try again</button>
-			</body>
+			</Body>
 		</html>
 	)
 }
+
+const Body = styled.body`
+	display: flex;
+	align-items: center;
+	justify-content: center;
+
+	width: 100vw;
+	height: 100vh;
+
+
+`
