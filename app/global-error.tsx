@@ -29,6 +29,8 @@ export default function GlobalError({
 
 const Body = styled.body`
 	display: flex;
+	flex-direction: column;
+	gap: 14px;
 	align-items: center;
 	justify-content: center;
 
