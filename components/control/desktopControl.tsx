@@ -1,3 +1,5 @@
+"use client"
+
 import * as React from 'react';
 import { SpeedDial, SpeedDialAction } from "@mui/material";
 import ListIcon from '@mui/icons-material/List';

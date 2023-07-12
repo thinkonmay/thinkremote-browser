@@ -22,7 +22,7 @@ async function RootLayout({
 					content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"
 				></meta>
 				<link rel="icon" href="/favicon.ico" />
-				<meta http-equiv="Cache-control" content="no-cache"></meta>
+				<meta httpEquiv="Cache-control" content="no-cache"></meta>
 			</head>
 			<body>
 

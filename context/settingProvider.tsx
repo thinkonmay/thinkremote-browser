@@ -1,5 +1,5 @@
 "use client"
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext } from 'react';
 const Context = React.createContext(null)
 
 interface ISettingState {

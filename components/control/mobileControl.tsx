@@ -1,3 +1,5 @@
+"use client"
+
 import styled, { keyframes } from "styled-components";
 import * as React from 'react';
 import { IoIosArrowForward, IoIosArrowBack } from "react-icons/io";
