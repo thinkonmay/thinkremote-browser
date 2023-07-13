@@ -72,7 +72,15 @@ export default function Home () {
         warehouse.WarehouseLoggingSession()
         if (!await core.Authenticated() && user_ref == undefined) 
                 await core.LoginWithGoogle()
-            
+
+        window.addEventListener('beforeunload', (e) => {
+            e.returnValue = ''
+            e.preventDefault()
+        });
+        
+        window.addEventListener('unload', () => {
+            warehouse.WarehousePush('close')
+        });
         if(ref == null) 
             return
 
