@@ -29,13 +29,7 @@ interface IControlContext {
 }
 export const ConTrolContext = createContext<IControlContext | null>(null)
 
-const sxSpeedDial = {
-	opacity: 0.3,
-	position: 'absolute',
-	bottom: '2%',
-	right: '2%',
-	'& .MuiFab-primary': { backgroundColor: 'white', color: 'white' }
-}
+
 export const WebRTCControl = (input: {
 	GamepadACallback: (x: number, y: number, type: 'left' | 'right') => Promise<void>,
 	GamepadBCallback: (index: number, type: 'up' | 'down') => Promise<void>,
@@ -55,8 +49,12 @@ export const WebRTCControl = (input: {
 	const [isModalSettingOpen, setModalSettingOpen] = useState(false)
 
 	useEffect(() => {
-		input.toggle_mouse_touch_callback((enableVGamepad == 'disable') 
-										&&(enableVMouse   == 'disable'));
+		let enable = (enableVGamepad == 'disable') && (enableVMouse   == 'disable')
+		if( enableVGamepad == 'draggable' || enableVMouse =='draggable'){
+			enable = false
+		}
+		input.toggle_mouse_touch_callback(enable);
+		
 	}, [enableVGamepad, enableVMouse])
 
 	const handleDraggable = (type: 'VGamePad' | 'VMouse', value: boolean) => {
@@ -228,8 +226,11 @@ export const WebRTCControl = (input: {
 					draggable={enableVMouse} />
 
 				<VirtualGamepad
-					ButtonCallback={input.GamepadBCallback}
-					AxisCallback={input.GamepadACallback}
+					// disable touch when dragging
+					//@ts-ignore
+					ButtonCallback={enableVGamepad =='draggable' ? () => {} : input.GamepadBCallback}
+					//@ts-ignore
+					AxisCallback={enableVGamepad =='draggable' ? () => {} : input.GamepadACallback}
 					draggable={enableVGamepad}
 				/>
 
