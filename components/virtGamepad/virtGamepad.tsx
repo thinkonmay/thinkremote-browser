@@ -14,6 +14,7 @@ import { LeftFuncButton, RightFuncButton } from "./gamepad/func_button";
 import { useSetting } from "../../context/settingProvider";
 import ArrowLeftIcon from '@mui/icons-material/ArrowLeft';
 import ArrowRightIcon from '@mui/icons-material/ArrowRight';
+import Warehouse from "../../warehouse";
 const BUTTON_SIZE = 50
 const JOYSTICK_SIZE = 100
 
@@ -170,6 +171,8 @@ export const ButtonGroupRight = (props: ButtonGroupProps) => {
     const handleStop = (e: DraggableEvent, data: DraggableData) => {
         startTransition(() => {
             localStorage.setItem(`right_group_pos`, JSON.stringify(posBtn));
+            const warehouse = new Warehouse()
+            warehouse.UpdateRightGroupPos(posBtn)
         })
     };
 
@@ -186,6 +189,8 @@ export const ButtonGroupRight = (props: ButtonGroupProps) => {
             }
             setPosBtn(defaultPos)
             localStorage.setItem(`right_group_pos`, JSON.stringify(defaultPos));
+            const warehouse = new Warehouse()
+            warehouse.UpdateRightGroupPos(posBtn)
 
         }
     }, [isSetVGamePadDefaultValue])
@@ -324,6 +329,8 @@ export const ButtonGroupLeft = (param: ButtonGroupProps) => {
     const handleStop = (e: DraggableEvent, data: DraggableData) => {
         startTransition(() => {
             localStorage.setItem(`left_group_pos`, JSON.stringify(posBtn));
+            const warehouse = new Warehouse()
+            warehouse.UpdateLeftGroupPos(posBtn)
         })
     };
 
@@ -339,7 +346,8 @@ export const ButtonGroupLeft = (param: ButtonGroupProps) => {
             }
             setPosBtn(defaultPos)
             localStorage.setItem(`left_group_pos`, JSON.stringify(defaultPos));
-
+            const warehouse = new Warehouse()
+            warehouse.UpdateLeftGroupPos(posBtn)
         }
     }, [isSetVGamePadDefaultValue])
     return (
