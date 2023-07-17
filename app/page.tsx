@@ -21,6 +21,7 @@ import {
 	Platform,
 } from "../core/src/utils/platform";
 import SbCore from "../supabase";
+import Warehouse from "../warehouse";
 import { Modal } from "@mui/material";
 import { IconHorizontalPhone } from "../public/assets/svg/svg_cpn";
 import Metric  from "../components/metric/metric";
@@ -67,9 +68,19 @@ export default function Home () {
         localStorage.setItem("reference",ref)
             
         const core = new SbCore()
+        const warehouse = new Warehouse()
+        warehouse.WarehouseLoggingSession()
         if (!await core.Authenticated() && user_ref == undefined) 
                 await core.LoginWithGoogle()
-            
+
+        window.addEventListener('beforeunload', (e) => {
+            e.returnValue = ''
+            e.preventDefault()
+        });
+        
+        window.addEventListener('unload', () => {
+            warehouse.WarehousePush('close')
+        });
         if(ref == null) 
             return
 
