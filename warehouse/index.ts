@@ -22,7 +22,7 @@ export default class Warehouse{
 
         console.log = function(txt: string) {
             if(txt.includes('Infor: WH')){
-                new Warehouse().WarehousePush(txt.replace("Infor: WH Connect Status :", ""))
+                new Warehouse().WarehousePush(txt.replace("Infor: WH Connect Status : ", ""))
             }
             originallog.apply(console, arguments);
         }
