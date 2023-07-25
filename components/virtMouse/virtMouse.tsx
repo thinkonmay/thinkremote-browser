@@ -10,7 +10,6 @@ import {
 import { ButtonMode, ConTrolContext } from "../control/control";
 
 import { LR } from "./mouse/mouse";
-import Warehouse from "../../warehouse";
 
 export const JoyStick = (param: {
     draggable: ButtonMode;
@@ -102,8 +101,6 @@ const MouseGroup = (param: ButtonGroupProps) => {
     const handleStop = (e: DraggableEvent, data: DraggableData) => {
         startTransition(()=>{
             localStorage.setItem(`mouse_group_pos`, JSON.stringify(posBtn));
-            const warehouse = new Warehouse()
-            warehouse.UpdateMouseGroupPos(posBtn)
         })
     };
 
@@ -112,8 +109,7 @@ const MouseGroup = (param: ButtonGroupProps) => {
         if (isSetVMouseDefaultValue === true) {
             setPosBtn(defaultMouseGroupValue)
             localStorage.setItem(`mouse_group_pos`, JSON.stringify(defaultMouseGroupValue));
-            const warehouse = new Warehouse()
-            warehouse.UpdateMouseGroupPos(posBtn)
+
         }
     }, [isSetVMouseDefaultValue])
     return (

@@ -1,6 +1,5 @@
 "use client"
 import React, { useContext } from 'react';
-import Warehouse from '../warehouse';
 const Context = React.createContext(null)
 
 interface ISettingState {
@@ -73,11 +72,8 @@ if (typeof window !== 'undefined') {
 
 function SettingProvider({ children }: { children: React.ReactNode }) {
 	const [state, dispatch] = React.useReducer(reducer, initialData)
-
 	const saveDataLocal = React.useCallback(() => {
 		localStorage.setItem('settingData', JSON.stringify(state))
-		const warehouse = new Warehouse()
-		warehouse.UpdateUserSetting(state) 
 	}, [state])
 	
 	
