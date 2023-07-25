@@ -2,13 +2,6 @@
 
 import { SupabaseClient, createClient } from "@supabase/supabase-js";
 
-// console._log_old = console.log
-
-// console.log = function(msg) {
-//     if(msg.contain('Infor: WH'))
-//         console.log("Lagsana")
-// }
-
 export default class Warehouse{
     private supabase: SupabaseClient;
 	
