@@ -97,8 +97,8 @@ export default class SbCore {
 		await this.supabase.auth.signInWithOAuth({
 			provider: "google",
 			options: {
-				//redirectTo:'https://remote.thinkmay.net',
-				redirectTo: 'http://localhost:3001',
+				redirectTo:'https://remote.thinkmay.net',
+				// redirectTo: 'http://localhost:3000',
 				queryParams: {
 					access_type: "offline",
 					prompt: "consent",
