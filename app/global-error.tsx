@@ -12,15 +12,14 @@ export default function GlobalError({
 }) {
 	useEffect(() => {
 		// Log the error to an error reporting service
+		alert('To run our product seamlessly, please ensure your device is updated to the latest OS (iOS 16/15 or Android 14/13).')
 		console.error(error)
 	}, [error])
 	return (
 		<html>
 			<Body>
-				<h2>Some thing went wrong. </h2>
-				<h2>{error?.name}</h2>
-				<h2>{error?.message}</h2>
-				<h2>{error?.stack}</h2>
+				<h2>ERROR</h2>
+				<h2>To run our product seamlessly, please ensure your device is updated to the latest OS <strong>(iOS 16/15 or Android 14/13).</strong></h2>
 				<button onClick={() => reset()}>Try again</button>
 			</Body>
 		</html>
