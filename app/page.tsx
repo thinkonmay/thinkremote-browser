@@ -5,6 +5,7 @@ import video_desktop from "../public/assets/videos/video_demo_desktop.mp4";
 import styled from "styled-components";
 
 import {
+    TurnOnAlert,
     TurnOnConfirm,
     TurnOnStatus,
 } from "../components/popup/popup";
@@ -75,7 +76,7 @@ export default function Home () {
 
         const result = await core.AuthenticateSession(ref,user_ref)
         if (result instanceof Error) 
-            return
+            throw result
 
         const {Email ,SignalingConfig ,WebRTCConfig,PingCallback} = result
         setInterval(PingCallback,14000)
@@ -114,7 +115,6 @@ export default function Home () {
         }
     }
 
-
     useEffect(() => {
       AddNotifier(async (message: ConnectionEvent, text?: string, source?: string) => {
            if (message == ConnectionEvent.WebRTCConnectionClosed) 
@@ -139,7 +139,7 @@ export default function Home () {
        })
 
        SetupConnection().catch(error => {
-           TurnOnStatus(error);
+           TurnOnAlert(error);
        })
     }, []);
 

@@ -1,4 +1,7 @@
+"use client"
 import Swal from "sweetalert2";
+import 'sweetalert2/src/sweetalert2.scss'
+
 import { Soundcard, Monitor, } from "../../core/src/models/devices.model";
 
 let have_swal : 'confirm' | 'popup' | 'none' = "none";
@@ -20,7 +23,6 @@ export async function TurnOnAlert(error: string): Promise<void> {
         text: error,
         icon: "error",
         confirmButtonText: "OK",
-        timer: 3000,
     });
 }
 
