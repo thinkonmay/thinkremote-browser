@@ -31,7 +31,6 @@ let client : RemoteDesktopClient = null
 export default function Home () {
     const [videoConnectivity,setVideoConnectivity] = useState<string>('not started');
     const [audioConnectivity,setAudioConnectivity] = useState<string>('not started');
-    const [isGuideModalOpen, setGuideModalOpen] = useState(true)
     const [metrics,setMetrics] = useState<{
         index                             : number
         receivefps                        : number
@@ -40,12 +39,19 @@ export default function Home () {
         bandwidth                         : number     
         buffer                            : number
     }[]>([])
-
-    useLayoutEffect(()=>{
-        const isGuideModalLocal = localStorage.getItem('isGuideModalLocal')
-        if(isGuideModalLocal == 'false' || isGuideModalLocal == 'true'){
-            setGuideModalOpen(JSON.parse(isGuideModalLocal))
-        }
+    // confirm before close
+    useEffect(()=>{
+        window.onbeforeunload = function (e) {
+            e = e || window.event;
+        
+            // For IE and Firefox prior to version 4
+            if (e) {
+                e.returnValue = 'Any string';
+            }
+        
+            // For Safari
+            return 'Any string';
+        };
     },[])
     const remoteVideo = useRef<HTMLVideoElement>(null);
     const remoteAudio = useRef<HTMLAudioElement>(null);
@@ -200,6 +206,8 @@ export default function Home () {
             console.log(`error play audio ${JSON.stringify(e)}`)
         }
     }
+
+
     return (
         <Body>
             <RemoteVideo
