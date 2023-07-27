@@ -24,12 +24,14 @@ import SbCore from "../supabase";
 import { Modal } from "@mui/material";
 import { IconHorizontalPhone } from "../public/assets/svg/svg_cpn";
 import Metric  from "../components/metric/metric";
+import { AudioMetrics, NetworkMetrics, VideoMetrics } from "../core/qos/models";
 
 let client : RemoteDesktopClient = null
 
+type ConnectStatus = 'not started' | 'started' | 'connecting' | 'connected' | 'closed'
 export default function Home () {
-    const [videoConnectivity,setVideoConnectivity] = useState<string>('not started');
-    const [audioConnectivity,setAudioConnectivity] = useState<string>('not started');
+    const [videoConnectivity,setVideoConnectivity] = useState<ConnectStatus>('not started');
+    const [audioConnectivity,setAudioConnectivity] = useState<ConnectStatus>('not started');
     const [isGuideModalOpen, setGuideModalOpen] = useState(true)
     const [metrics,setMetrics] = useState<{
         index                             : number
@@ -78,9 +80,12 @@ export default function Home () {
             return
 
         const {Email ,SignalingConfig ,WebRTCConfig,PingCallback} = result
-        setInterval(PingCallback,14000)
+        setInterval(() => {
+            if (videoConnectivity == 'connected')
+                PingCallback()
+        },14000)
 
-        await LogConnectionEvent(ConnectionEvent.ApplicationStarted)
+        await LogConnectionEvent(ConnectionEvent.ApplicationStarted,`hi ${Email}`)
         client = new RemoteDesktopClient(
             SignalingConfig,
             {...WebRTCConfig,iceTransportPolicy: turn ? "relay" : "all"},
@@ -111,6 +116,8 @@ export default function Home () {
                     break;
             }
 
+        }
+        client.HandleMetricRaw = async (data: NetworkMetrics | VideoMetrics | AudioMetrics) => {
         }
     }
 
