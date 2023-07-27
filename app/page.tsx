@@ -5,6 +5,7 @@ import video_desktop from "../public/assets/videos/video_demo_desktop.mp4";
 import styled from "styled-components";
 
 import {
+    TurnOnAlert,
     TurnOnConfirm,
     TurnOnStatus,
 } from "../components/popup/popup";
@@ -32,7 +33,6 @@ type ConnectStatus = 'not started' | 'started' | 'connecting' | 'connected' | 'c
 export default function Home () {
     const [videoConnectivity,setVideoConnectivity] = useState<ConnectStatus>('not started');
     const [audioConnectivity,setAudioConnectivity] = useState<ConnectStatus>('not started');
-    const [isGuideModalOpen, setGuideModalOpen] = useState(true)
     const [metrics,setMetrics] = useState<{
         index                             : number
         receivefps                        : number
@@ -41,12 +41,19 @@ export default function Home () {
         bandwidth                         : number     
         buffer                            : number
     }[]>([])
-
-    useLayoutEffect(()=>{
-        const isGuideModalLocal = localStorage.getItem('isGuideModalLocal')
-        if(isGuideModalLocal == 'false' || isGuideModalLocal == 'true'){
-            setGuideModalOpen(JSON.parse(isGuideModalLocal))
-        }
+    // confirm before close
+    useEffect(()=>{
+        window.onbeforeunload = function (e) {
+            e = e || window.event;
+        
+            // For IE and Firefox prior to version 4
+            if (e) {
+                e.returnValue = 'Any string';
+            }
+        
+            // For Safari
+            return 'Any string';
+        };
     },[])
     const remoteVideo = useRef<HTMLVideoElement>(null);
     const remoteAudio = useRef<HTMLAudioElement>(null);
@@ -77,7 +84,7 @@ export default function Home () {
 
         const result = await core.AuthenticateSession(ref,user_ref)
         if (result instanceof Error) 
-            return
+            throw result
 
         const {Email ,SignalingConfig ,WebRTCConfig,PingCallback} = result
         setInterval(() => {
@@ -121,7 +128,6 @@ export default function Home () {
         }
     }
 
-
     useEffect(() => {
       AddNotifier(async (message: ConnectionEvent, text?: string, source?: string) => {
            if (message == ConnectionEvent.WebRTCConnectionClosed) 
@@ -146,7 +152,7 @@ export default function Home () {
        })
 
        SetupConnection().catch(error => {
-           TurnOnStatus(error);
+           TurnOnAlert(error);
        })
     }, []);
 
@@ -207,6 +213,8 @@ export default function Home () {
             console.log(`error play audio ${JSON.stringify(e)}`)
         }
     }
+
+
     return (
         <Body>
             <RemoteVideo
