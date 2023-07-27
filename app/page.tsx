@@ -8,18 +8,18 @@ import {
     TurnOnConfirm,
     TurnOnStatus,
 } from "../components/popup/popup";
-import { Metrics, RemoteDesktopClient } from "../core/src/app";
+import { Metrics, RemoteDesktopClient } from "../core/app";
 import { useSearchParams } from "next/navigation";
 import {
     AddNotifier,
     ConnectionEvent,
     LogConnectionEvent,
-} from "../core/src/utils/log";
+} from "../core/utils/log";
 import { WebRTCControl } from "../components/control/control";
 import {
 	getPlatform,
 	Platform,
-} from "../core/src/utils/platform";
+} from "../core/utils/platform";
 import SbCore from "../supabase";
 import { Modal } from "@mui/material";
 import { IconHorizontalPhone } from "../public/assets/svg/svg_cpn";

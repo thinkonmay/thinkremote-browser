@@ -2,7 +2,7 @@
 
 import { SupabaseClient, User } from "@supabase/supabase-js";
 import { createBrowserSupabaseClient } from '@supabase/auth-helpers-nextjs'
-import { SignalingConfig } from "../core/src/signaling/config";
+import { SignalingConfig } from "../core/signaling/config";
 
 export type SbFunction = 'worker_session_create' | 'worker_session_deactivate' | 'worker_profile_fetch' | 'session_authenticate' 
 export const createBrowserClient = () => createBrowserSupabaseClient()

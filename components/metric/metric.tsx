@@ -18,7 +18,7 @@ import {
 import { Line } from 'react-chartjs-2';
 import { Value } from 'sass';
 import { blue } from '@mui/material/colors';
-import { Platform } from '../../core/src/utils/platform';
+import { Platform } from '../../core/utils/platform';
 
 export interface Data{
 	key: number,

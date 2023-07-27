@@ -8,8 +8,8 @@ import KeyboardIcon from '@mui/icons-material/Keyboard';
 import { List, SpeedDial, SpeedDialAction } from "@mui/material";
 import ListIcon from '@mui/icons-material/List';
 import React, { useEffect, useState, useLayoutEffect, createContext } from "react"; // we need this to make JSX compile
-import { Platform } from "../../core/src/utils/platform";
-import { requestFullscreen } from "../../core/src/utils/screen";
+import { Platform } from "../../core/utils/platform";
+import { requestFullscreen } from "../../core/utils/screen";
 import { AskSelectBitrate, TurnOnClipboard } from "../popup/popup";
 import { VirtualGamepad } from "../virtGamepad/virtGamepad";
 import { VirtualMouse } from "../virtMouse/virtMouse";

@@ -1,5 +1,5 @@
 import Swal from "sweetalert2";
-import { Soundcard, Monitor, } from "../../core/src/models/devices.model";
+import { Soundcard, Monitor, } from "../../core/models/devices.model";
 
 let have_swal : 'confirm' | 'popup' | 'none' = "none";
 
