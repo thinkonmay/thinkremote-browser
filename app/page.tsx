@@ -72,6 +72,20 @@ export default function Home () {
 
     const [Platform,setPlatform] = useState<Platform>(null);
 
+
+    useEffect(()=>{
+        const interval = setInterval(() => {
+
+            if (videoConnectivity == 'connected'){
+                //PingCallback()
+            }
+        },15000)
+
+        return () =>{
+            clearInterval(interval)
+        }
+    }, [videoConnectivity])
+    
     const SetupConnection = async () => {
         localStorage.setItem("reference",ref)
             
@@ -81,16 +95,14 @@ export default function Home () {
             
         if(ref == null) 
             return
-
+         
+        setVideoConnectivity('started')
         const result = await core.AuthenticateSession(ref,user_ref)
         if (result instanceof Error) 
             throw result
 
         const {Email ,SignalingConfig ,WebRTCConfig,PingCallback} = result
-        setInterval(() => {
-            if (videoConnectivity == 'connected')
-                PingCallback()
-        },14000)
+     
 
         await LogConnectionEvent(ConnectionEvent.ApplicationStarted,`hi ${Email}`)
         client = new RemoteDesktopClient(
