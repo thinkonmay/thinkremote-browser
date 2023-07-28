@@ -14,7 +14,9 @@ import { useSearchParams } from "next/navigation";
 import {
     AddNotifier,
     ConnectionEvent,
+    Log,
     LogConnectionEvent,
+    LogLevel,
 } from "../core/utils/log";
 import { WebRTCControl } from "../components/control/control";
 import {
@@ -136,18 +138,20 @@ export default function Home () {
 
     useEffect(() => {
         AddNotifier(async (message: ConnectionEvent, text?: string, source?: string) => {
-           if (message == ConnectionEvent.WebRTCConnectionClosed) 
-               await source == "audio" ? setAudioConnectivity("closed") : setVideoConnectivity("closed")
-           if (message == ConnectionEvent.WebRTCConnectionDoneChecking) 
-               await source == "audio" ? setAudioConnectivity("connected") : setVideoConnectivity("connected")
-           if (message == ConnectionEvent.WebRTCConnectionChecking) 
-               await source == "audio" ? setAudioConnectivity("connecting") : setVideoConnectivity("connecting")
+            if (message == ConnectionEvent.WebRTCConnectionClosed) 
+                await source == "audio" ? setAudioConnectivity("closed") : setVideoConnectivity("closed")
+            if (message == ConnectionEvent.WebRTCConnectionDoneChecking) 
+                await source == "audio" ? setAudioConnectivity("connected") : setVideoConnectivity("connected")
+            if (message == ConnectionEvent.WebRTCConnectionChecking) 
+                await source == "audio" ? setAudioConnectivity("connecting") : setVideoConnectivity("connecting")
 
-           if (message == ConnectionEvent.ApplicationStarted) {
-               await TurnOnConfirm(message,text)
-               setAudioConnectivity("started") 
-               setVideoConnectivity("started")
-           }
+            if (message == ConnectionEvent.ApplicationStarted) {
+                await TurnOnConfirm(message,text)
+                setAudioConnectivity("started") 
+                setVideoConnectivity("started")
+            }
+
+            Log(LogLevel.Infor,`${message} ${text ?? ""} ${source ?? ""}`)
        })
 
         setPlatform(old => { 
