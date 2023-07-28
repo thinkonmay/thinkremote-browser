@@ -26,8 +26,13 @@ import { Modal } from "@mui/material";
 import { IconHorizontalPhone } from "../public/assets/svg/svg_cpn";
 import Metric  from "../components/metric/metric";
 import { AudioMetrics, NetworkMetrics, VideoMetrics } from "../core/qos/models";
+import { VideoWrapper } from "../core/pipeline/sink/video/wrapper";
+import { AudioWrapper } from "../core/pipeline/sink/audio/wrapper";
 
 let client : RemoteDesktopClient = null
+let callback : () => Promise<void> = async () => {};
+let video : VideoWrapper = null
+let audio : AudioWrapper = null
 
 type ConnectStatus = 'not started' | 'started' | 'connecting' | 'connected' | 'closed'
 export default function Home () {
@@ -70,16 +75,13 @@ export default function Home () {
 
 
     useEffect(()=>{
-        const interval = setInterval(() => {
-
-            if (videoConnectivity == 'connected'){
-                //PingCallback()
-            }
-        },15000)
-
-        return () =>{
-            clearInterval(interval)
-        }
+        const interval = setInterval(async () => {
+            if (videoConnectivity == 'connected')
+                await callback()
+            else
+                console.log(`video is not connected, avoid ping`)
+        },14 * 1000)
+        return () =>{ clearInterval(interval) }
     }, [videoConnectivity])
     
     const SetupConnection = async () => {
@@ -95,14 +97,13 @@ export default function Home () {
             throw result
 
         const {Email ,SignalingConfig ,WebRTCConfig,PingCallback} = result
-     
-
+        callback = PingCallback
         await LogConnectionEvent(ConnectionEvent.ApplicationStarted,`hi ${Email}`)
         client = new RemoteDesktopClient(
             SignalingConfig,
             {...WebRTCConfig,iceTransportPolicy: turn ? "relay" : "all"},
-            remoteVideo.current, 
-            remoteAudio.current,   
+            video, 
+            audio,   
             Platform,no_video)
         
         client.HandleMetrics = async (metrics: Metrics) => {
@@ -156,6 +157,8 @@ export default function Home () {
                return platform as Platform
        })
 
+        video = new VideoWrapper(remoteVideo.current)
+        audio = new AudioWrapper(remoteAudio.current)
         SetupConnection().catch(error => {
            TurnOnAlert(error);
        })
@@ -210,13 +213,9 @@ export default function Home () {
         client?.hid?.PasteClipboard()
     }
     const audioCallback = async() => {
-        try { 
-            client?.ResetAudio()
-            await remoteAudio.current.play() 
-            await remoteVideo.current.play() 
-        } catch (e) {
-            console.log(`error play audio ${JSON.stringify(e)}`)
-        }
+        client?.ResetAudio()
+        await video.play() 
+        await audio.play() 
     }
 
 
