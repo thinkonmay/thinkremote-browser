@@ -43,24 +43,14 @@ const SupabaseFuncInvoke = async (funcName: SbFunction, options: FunctionInvokeO
 	try {
 		const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 		const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-
-		const supabase = createBrowserClient()
-		const session = await supabase.auth.getSession()
-
-		if (session.error != null)
-			return { data: null, error: session.error.message }
-
-		if (!session.data?.session?.access_token)
-			return { data: null, error: 'Invalid Access Token, please reload and try again.' }
-
 		const response = await fetch(
 			`${supabaseUrl}/functions/v1/${funcName}`,
 			{
 				...options,
 				headers: {
 					"Content-Type": "application/json",
-					Authorization: `Bearer ${supabaseAnonKey}`,
-					Access_token: session.data?.session?.access_token,
+					"Authorization": `Bearer ${supabaseAnonKey}`,
+					...options.headers,
 				},
 			},
 		);
@@ -94,11 +84,11 @@ export default class SbCore {
 	}
 
 	public async LoginWithGoogle() {
+		console.log(process.env.NEXT_PUBLIC_REDIRECT_TO)
 		await this.supabase.auth.signInWithOAuth({
 			provider: "google",
 			options: {
-				redirectTo:'https://remote.thinkmay.net',
-				// redirectTo: 'http://localhost:3000',
+				redirectTo:  process.env.NEXT_PUBLIC_REDIRECT_TO ?? 'https://remote.thinkmay.net',
 				queryParams: {
 					access_type: "offline",
 					prompt: "consent",
@@ -132,23 +122,19 @@ export default class SbCore {
 			return new Error(session.error.message)
 
 		const headers = uref == undefined ?
-			{ "access_token": session.data?.session?.access_token } :
-			{ "uref": uref }
-		const body = JSON.stringify({ reference: ref })
-		const options: FunctionInvokeOptions = {
-			headers,
-			body,
+			{ access_token: session.data?.session?.access_token } :
+			{ uref: uref }
+
+		if (headers.access_token == undefined && headers.uref == undefined)
+			return new Error('no authentication method available')
+		else if (ref == undefined || ref == null || ref == "null")
+			return new Error('Reference not provided')
+
+		const { data, error } = await SupabaseFuncInvoke('session_authenticate', {
+			headers : headers,
+			body : JSON.stringify({ reference: ref }),
 			method: 'POST',
-
-		}
-		const { data, error } = await SupabaseFuncInvoke('session_authenticate', options)
-
-		//const { data, error } = await this.supabase.functions.invoke<AuthSessionResp>("session_authenticate" as SbFunction, {
-		//	headers: headers,
-		//	body: body,
-		//	method: 'POST',
-		//})
-
+		})
 		if (error != null)
 			return new Error(error)
 

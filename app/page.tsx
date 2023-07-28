@@ -41,18 +41,14 @@ export default function Home () {
         bandwidth                         : number     
         buffer                            : number
     }[]>([])
-    // confirm before close
     useEffect(()=>{
-        window.onbeforeunload = function (e) {
+        window.onbeforeunload = (e: BeforeUnloadEvent) => {
+            const text = 'Are you sure (｡◕‿‿◕｡)'
+            client.hid.ResetKeyStuck()
             e = e || window.event;
-        
-            // For IE and Firefox prior to version 4
-            if (e) {
-                e.returnValue = 'Any string';
-            }
-        
-            // For Safari
-            return 'Any string';
+            if (e)
+                e.returnValue = text
+            return text;
         };
     },[])
     const remoteVideo = useRef<HTMLVideoElement>(null);
@@ -87,16 +83,13 @@ export default function Home () {
     }, [videoConnectivity])
     
     const SetupConnection = async () => {
+        if(ref == null || ref == 'null') 
+            throw new Error(`invalid URL, please check again (｡◕‿‿◕｡)`)
+
         localStorage.setItem("reference",ref)
-            
         const core = new SbCore()
         if (!await core.Authenticated() && user_ref == undefined) 
                 await core.LoginWithGoogle()
-            
-        if(ref == null) 
-            return
-         
-        setVideoConnectivity('started')
         const result = await core.AuthenticateSession(ref,user_ref)
         if (result instanceof Error) 
             throw result
@@ -141,7 +134,7 @@ export default function Home () {
     }
 
     useEffect(() => {
-      AddNotifier(async (message: ConnectionEvent, text?: string, source?: string) => {
+        AddNotifier(async (message: ConnectionEvent, text?: string, source?: string) => {
            if (message == ConnectionEvent.WebRTCConnectionClosed) 
                await source == "audio" ? setAudioConnectivity("closed") : setVideoConnectivity("closed")
            if (message == ConnectionEvent.WebRTCConnectionDoneChecking) 
@@ -156,14 +149,14 @@ export default function Home () {
            }
        })
 
-       setPlatform(old => { 
+        setPlatform(old => { 
            if (platform == null) 
                return getPlatform() 
            else 
                return platform as Platform
        })
 
-       SetupConnection().catch(error => {
+        SetupConnection().catch(error => {
            TurnOnAlert(error);
        })
     }, []);
