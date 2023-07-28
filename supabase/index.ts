@@ -84,11 +84,11 @@ export default class SbCore {
 	}
 
 	public async LoginWithGoogle() {
+		console.log(process.env.NEXT_PUBLIC_REDIRECT_TO)
 		await this.supabase.auth.signInWithOAuth({
 			provider: "google",
 			options: {
-				redirectTo:'https://remote.thinkmay.net',
-				// redirectTo: 'http://localhost:3000',
+				redirectTo:  process.env.NEXT_PUBLIC_REDIRECT_TO ?? 'https://remote.thinkmay.net',
 				queryParams: {
 					access_type: "offline",
 					prompt: "consent",
@@ -127,13 +127,14 @@ export default class SbCore {
 
 		if (headers.access_token == undefined && headers.uref == undefined)
 			return new Error('no authentication method available')
+		else if (ref == undefined || ref == null || ref == "null")
+			return new Error('Reference not provided')
 
 		const { data, error } = await SupabaseFuncInvoke('session_authenticate', {
 			headers : headers,
 			body : JSON.stringify({ reference: ref }),
 			method: 'POST',
 		})
-
 		if (error != null)
 			return new Error(error)
 

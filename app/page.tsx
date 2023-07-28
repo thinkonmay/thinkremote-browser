@@ -69,14 +69,13 @@ export default function Home () {
     const [Platform,setPlatform] = useState<Platform>(null);
 
     const SetupConnection = async () => {
+        if(ref == null || ref == 'null') 
+            throw new Error(`invalid URL, please check again (｡◕‿‿◕｡)`)
+
         localStorage.setItem("reference",ref)
-            
         const core = new SbCore()
         if (!await core.Authenticated() && user_ref == undefined) 
                 await core.LoginWithGoogle()
-            
-        if(ref == null) 
-            return
 
         const result = await core.AuthenticateSession(ref,user_ref)
         if (result instanceof Error) 
