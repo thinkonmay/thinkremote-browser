@@ -46,6 +46,9 @@ export default function Home () {
         bandwidth                         : number     
         buffer                            : number
     }[]>([])
+
+    const [sessionId, setSessionId] = useState('')
+    
     useEffect(()=>{
         window.onbeforeunload = (e: BeforeUnloadEvent) => {
             const text = 'Are you sure (｡◕‿‿◕｡)'
@@ -56,6 +59,8 @@ export default function Home () {
             return text;
         };
     },[])
+
+
     const remoteVideo = useRef<HTMLVideoElement>(null);
     const remoteAudio = useRef<HTMLAudioElement>(null);
 
@@ -73,7 +78,6 @@ export default function Home () {
 
     const [Platform,setPlatform] = useState<Platform>(null);
 
-
     useEffect(()=>{
         const interval = setInterval(async () => {
             if (videoConnectivity == 'connected')
@@ -83,6 +87,30 @@ export default function Home () {
         },14 * 1000)
         return () =>{ clearInterval(interval) }
     }, [videoConnectivity])
+
+    useEffect(()=>{
+        let interval
+        if(!sessionId) return
+        interval = setInterval(async () => {
+            try {
+                const supabase = new SbCore()
+                const result = await supabase.FetchWorkerStatus(sessionId)
+                if(result.length == 0){
+                    throw 'worker session terminated'
+                }
+                if(result[0]?.is_ping_worker_account == false)
+                    throw 'worker terminated'
+                if(result[0]?.is_ping_worker_session == false)
+                    throw 'worker session fail to start'
+            } catch (error) {
+                clearInterval(interval)
+                TurnOnAlert(error);
+            }
+            
+        },14 * 1000)
+
+        return () =>{ clearInterval(interval) }
+    }, [sessionId])
     
     const SetupConnection = async () => {
         if(ref == null || ref == 'null') 
@@ -96,7 +124,8 @@ export default function Home () {
         if (result instanceof Error) 
             throw result
 
-        const {Email ,SignalingConfig ,WebRTCConfig,PingCallback} = result
+        const {Email ,SignalingConfig ,WebRTCConfig,PingCallback, SessionId} = result
+        setSessionId(SessionId)
         callback = PingCallback
         await LogConnectionEvent(ConnectionEvent.ApplicationStarted,`hi ${Email}`)
         client = new RemoteDesktopClient(
