@@ -17,6 +17,12 @@ export type AuthSessionResp = {
 		dataURL: string
 	}
 }
+
+export type WorkerStatus = {
+	worker_profile_id: string
+	is_ping_worker_account: boolean
+	is_ping_worker_session: boolean
+}
 type FunctionInvokeOptions = {
 	/**
 	 * Object representing the headers to send with the request.
@@ -116,6 +122,7 @@ export default class SbCore {
 		SignalingConfig: SignalingConfig
 		WebRTCConfig: RTCConfiguration
 		PingCallback: () => Promise<void>
+		FetchCallback: () => Promise<WorkerStatus[]>
 	} | Error> {
 		const session = await this.supabase.auth.getSession()
 		if (session.error != null && uref == undefined)
@@ -148,11 +155,27 @@ export default class SbCore {
 			}
 		}
 
+		const FetchWorkerStatus = async () : Promise<WorkerStatus[]> => {
+			const session = await this.supabase.auth.getSession()
+			if (session.error != null)
+				throw new Error(session.error.message)
+
+			const status = await this.supabase.rpc(`fetch_worker_status`, {
+				session_id: data.id
+			})
+
+			if (status.error != null) 
+				throw `unable to fetch ${status.error.message}`
+
+			return status.data
+		}
+
 		return {
 			Email: data.email,
 			SignalingConfig: data.signaling,
 			WebRTCConfig: data.webrtc,
 			PingCallback: pingFunc,
+			FetchCallback: FetchWorkerStatus
 		}
 	}
 }

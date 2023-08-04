@@ -21,7 +21,7 @@ import {
 	getPlatform,
 	Platform,
 } from "../core/utils/platform";
-import SbCore from "../supabase";
+import SbCore, { WorkerStatus } from "../supabase";
 import { Modal } from "@mui/material";
 import { IconHorizontalPhone } from "../public/assets/svg/svg_cpn";
 import Metric  from "../components/metric/metric";
@@ -30,7 +30,8 @@ import { VideoWrapper } from "../core/pipeline/sink/video/wrapper";
 import { AudioWrapper } from "../core/pipeline/sink/audio/wrapper";
 
 let client : RemoteDesktopClient = null
-let callback : () => Promise<void> = async () => {};
+let callback       : () => Promise<void> = async () => {};
+let fetch_callback : () => Promise<WorkerStatus[]> = async () => {return[]};
 let video : VideoWrapper = null
 let audio : AudioWrapper = null
 
@@ -83,7 +84,7 @@ export default function Home () {
         },14 * 1000)
         return () =>{ clearInterval(interval) }
     }, [videoConnectivity])
-    
+
     const SetupConnection = async () => {
         if(ref == null || ref == 'null') 
             throw new Error(`invalid URL, please check again (｡◕‿‿◕｡)`)
@@ -96,8 +97,9 @@ export default function Home () {
         if (result instanceof Error) 
             throw result
 
-        const {Email ,SignalingConfig ,WebRTCConfig,PingCallback} = result
+        const {Email ,SignalingConfig ,WebRTCConfig,PingCallback,FetchCallback} = result
         callback = PingCallback
+        fetch_callback = FetchCallback
         await LogConnectionEvent(ConnectionEvent.ApplicationStarted,`hi ${Email}`)
         client = new RemoteDesktopClient(
             SignalingConfig,
@@ -132,6 +134,18 @@ export default function Home () {
         }
         client.HandleMetricRaw = async (data: NetworkMetrics | VideoMetrics | AudioMetrics) => {
         }
+
+        setInterval(async () => { // TODO
+            const result = await fetch_callback()
+            const data = result.at(0)
+
+            if(data == undefined)
+                console.log('worker session terminated')
+            else if(data.is_ping_worker_account)
+                console.log('worker terminated')
+            else if(data.is_ping_worker_session)
+                console.log('worker session fail to start')
+        },30 * 1000)
     }
 
     useEffect(() => {
