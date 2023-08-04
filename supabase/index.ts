@@ -79,7 +79,6 @@ const SupabaseFuncInvoke = async (funcName: SbFunction, options: FunctionInvokeO
 };
 export default class SbCore {
 	private supabase: SupabaseClient;
-
 	constructor() {
 		this.supabase = createBrowserClient()
 	}
@@ -89,7 +88,7 @@ export default class SbCore {
 		await this.supabase.auth.signInWithOAuth({
 			provider: "google",
 			options: {
-				redirectTo: process.env.NEXT_PUBLIC_REDIRECT_TO ?? 'https://remote.thinkmay.net',
+				redirectTo:  process.env.NEXT_PUBLIC_REDIRECT_TO ?? 'https://remote.thinkmay.net',
 				queryParams: {
 					access_type: "offline",
 					prompt: "consent",
@@ -117,7 +116,6 @@ export default class SbCore {
 		SignalingConfig: SignalingConfig
 		WebRTCConfig: RTCConfiguration
 		PingCallback: () => Promise<void>
-		SessionId: string
 	} | Error> {
 		const session = await this.supabase.auth.getSession()
 		if (session.error != null && uref == undefined)
@@ -133,8 +131,8 @@ export default class SbCore {
 			return new Error('Reference not provided')
 
 		const { data, error } = await SupabaseFuncInvoke('session_authenticate', {
-			headers: headers,
-			body: JSON.stringify({ reference: ref }),
+			headers : headers,
+			body : JSON.stringify({ reference: ref }),
 			method: 'POST',
 		})
 		if (error != null)
@@ -155,33 +153,8 @@ export default class SbCore {
 			SignalingConfig: data.signaling,
 			WebRTCConfig: data.webrtc,
 			PingCallback: pingFunc,
-			SessionId: data.id
 		}
-	}
-
-	public async FetchWorkerStatus(sessionId: string): Promise<WorkerStatus[]> {
-		const session = await this.supabase.auth.getSession()
-		if (session.error != null)
-			throw new Error(session.error.message)
-		if (!sessionId)
-			throw new Error('invalid session id')
-
-		const { data, error } = await this.supabase.rpc(`fetch_worker_status`, {
-			session_id: sessionId
-		})
-
-		if (error != null) {
-			throw `unable to fetch ${error.message}`
-		}
-
-		return data
 	}
 }
 
 
-interface WorkerStatus {
-	worker_profile_id: string
-	gpu: any
-	is_ping_worker_account: boolean
-	is_ping_worker_session: boolean
-}
