@@ -41,6 +41,10 @@ type ConnectStatus = 'not started' | 'started' | 'connecting' | 'connected' | 'c
 export default function Home () {
     const [videoConnectivity,setVideoConnectivity] = useState<ConnectStatus>('not started');
     const [audioConnectivity,setAudioConnectivity] = useState<ConnectStatus>('not started');
+    const got_stuck = () => { 
+        return (videoConnectivity == 'started'   && audioConnectivity == 'connected') || 
+               (videoConnectivity == 'connected' && audioConnectivity == 'started')
+    }
     const [metrics,setMetrics] = useState<{
         index                             : number
         receivefps                        : number
@@ -79,7 +83,12 @@ export default function Home () {
 
     useEffect(()=>{
         const interval = setInterval(async () => {
-            if (videoConnectivity == 'connected')
+            if (got_stuck()) {
+                setTimeout(() => {
+                    if (got_stuck()) 
+                        client?.HardReset()                    
+                },10 * 1000) // hard reset afeter 10 sec
+            } else if (videoConnectivity == 'connected')
                 await callback()
             else
                 console.log(`video is not connected, avoid ping`)
