@@ -43,7 +43,8 @@ export default function Home () {
     const [audioConnectivity,setAudioConnectivity] = useState<ConnectStatus>('not started');
     const got_stuck = () => { 
         return (videoConnectivity == 'started'   && audioConnectivity == 'connected') || 
-               (videoConnectivity == 'connected' && audioConnectivity == 'started')
+               (videoConnectivity == 'connected' && audioConnectivity == 'started' ||
+               (videoConnectivity == 'started' && audioConnectivity == 'started'))
     }
     const [metrics,setMetrics] = useState<{
         index                             : number
@@ -77,6 +78,7 @@ export default function Home () {
     const platform   = searchParams.get('platform'); 
     const turn       = searchParams.get('turn') == "true";
     const no_video   = searchParams.get('phonepad') == "true";
+    const no_mic     = searchParams.get('mutemic') == "true";
 
     const [Platform,setPlatform] = useState<Platform>(null);
 
@@ -117,7 +119,10 @@ export default function Home () {
             {...WebRTCConfig,iceTransportPolicy: turn ? "relay" : "all"},
             video, 
             audio,   
-            Platform,no_video)
+            Platform,
+            no_video,
+            no_mic
+        )
         
         client.HandleMetrics = async (metrics: Metrics) => {
             switch (metrics.type) {
