@@ -41,6 +41,10 @@ type ConnectStatus = 'not started' | 'started' | 'connecting' | 'connected' | 'c
 export default function Home () {
     const [videoConnectivity,setVideoConnectivity] = useState<ConnectStatus>('not started');
     const [audioConnectivity,setAudioConnectivity] = useState<ConnectStatus>('not started');
+    const got_stuck = () => { 
+        return (videoConnectivity == 'started'   && audioConnectivity == 'connected') || 
+               (videoConnectivity == 'connected' && audioConnectivity == 'started')
+    }
     const [metrics,setMetrics] = useState<{
         index                             : number
         receivefps                        : number
@@ -79,7 +83,12 @@ export default function Home () {
 
     useEffect(()=>{
         const interval = setInterval(async () => {
-            if (videoConnectivity == 'connected')
+            if (got_stuck()) {
+                setTimeout(() => {
+                    if (got_stuck()) 
+                        client?.HardReset()                    
+                },10 * 1000) // hard reset afeter 10 sec
+            } else if (videoConnectivity == 'connected')
                 await callback()
             else
                 console.log(`video is not connected, avoid ping`)
@@ -113,19 +122,14 @@ export default function Home () {
         client.HandleMetrics = async (metrics: Metrics) => {
             switch (metrics.type) {
                 case 'VIDEO':
-                    const dat : any[] = []
-                    for (let index = 0; index < metrics.decodefps.length; index++) {
-                        const element = metrics.decodefps[index];
-                        dat.push({
-                            index: index,
-                            receivefps : metrics.receivefps[index],
-                            decodefps  : metrics.decodefps[index],
-                            packetloss : metrics.packetloss[index],
-                            bandwidth  : metrics.bandwidth[index],
-                            buffer     : metrics.buffer[index],
-                        })
-                    }
-                    setMetrics(dat)
+                    setMetrics(metrics.decodefps.map((val,index) => { return {
+                        index: index,
+                        receivefps : metrics.receivefps[index],
+                        decodefps  : metrics.decodefps[index],
+                        packetloss : metrics.packetloss[index],
+                        bandwidth  : metrics.bandwidth[index],
+                        buffer     : metrics.buffer[index],
+                    }}))
                 case 'FRAME_LOSS':
                     console.log("frame loss occur")
                     break;
@@ -141,12 +145,15 @@ export default function Home () {
             const result = await fetch_callback()
             const data = result.at(0)
 
-            if(data == undefined)
-                console.log('worker session terminated')
-            else if(data.is_ping_worker_account)
-                console.log('worker terminated')
-            else if(data.is_ping_worker_session)
-                console.log('worker session fail to start')
+            if(data == undefined) {
+                await TurnOnAlert('worker session terminated')
+                return
+            }
+
+            if(!data.is_ping_worker_account)
+                await TurnOnAlert('worker terminated')
+            if(!data.is_ping_worker_session)
+                await TurnOnAlert('worker session fail to start')
         },30 * 1000)
     }
 
