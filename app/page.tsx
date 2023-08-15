@@ -157,8 +157,6 @@ export default function Home () {
 
             if(!data.is_ping_worker_account)
                 await TurnOnAlert('worker terminated')
-            if(!data.is_ping_worker_session)
-                await TurnOnAlert('worker session fail to start')
         },30 * 1000)
     }
 
