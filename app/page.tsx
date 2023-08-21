@@ -23,7 +23,7 @@ import {
 	getPlatform,
 	Platform,
 } from "../core/utils/platform";
-import SbCore from "../supabase";
+import SbCore, { WorkerStatus } from "../supabase";
 import { Modal } from "@mui/material";
 import { IconHorizontalPhone } from "../public/assets/svg/svg_cpn";
 import Metric  from "../components/metric/metric";
@@ -32,7 +32,8 @@ import { VideoWrapper } from "../core/pipeline/sink/video/wrapper";
 import { AudioWrapper } from "../core/pipeline/sink/audio/wrapper";
 
 let client : RemoteDesktopClient = null
-let callback : () => Promise<void> = async () => {};
+let callback       : () => Promise<void> = async () => {};
+let fetch_callback : () => Promise<WorkerStatus[]> = async () => {return[]};
 let video : VideoWrapper = null
 let audio : AudioWrapper = null
 
@@ -40,6 +41,11 @@ type ConnectStatus = 'not started' | 'started' | 'connecting' | 'connected' | 'c
 export default function Home () {
     const [videoConnectivity,setVideoConnectivity] = useState<ConnectStatus>('not started');
     const [audioConnectivity,setAudioConnectivity] = useState<ConnectStatus>('not started');
+    const got_stuck = () => { 
+        return (videoConnectivity == 'started'   && audioConnectivity == 'connected') || 
+               (videoConnectivity == 'connected' && audioConnectivity == 'started' ||
+               (videoConnectivity == 'started' && audioConnectivity == 'started'))
+    }
     const [metrics,setMetrics] = useState<{
         index                             : number
         receivefps                        : number
@@ -72,20 +78,26 @@ export default function Home () {
     const platform   = searchParams.get('platform'); 
     const turn       = searchParams.get('turn') == "true";
     const no_video   = searchParams.get('phonepad') == "true";
+    const no_mic     = searchParams.get('mutemic') == "true";
 
     const [Platform,setPlatform] = useState<Platform>(null);
 
 
     useEffect(()=>{
         const interval = setInterval(async () => {
-            if (videoConnectivity == 'connected')
+            if (got_stuck()) {
+                setTimeout(() => {
+                    if (got_stuck()) 
+                        client?.HardReset()                    
+                },10 * 1000) // hard reset afeter 10 sec
+            } else if (videoConnectivity == 'connected')
                 await callback()
             else
                 console.log(`video is not connected, avoid ping`)
         },14 * 1000)
         return () =>{ clearInterval(interval) }
     }, [videoConnectivity])
-    
+
     const SetupConnection = async () => {
         if(ref == null || ref == 'null') 
             throw new Error(`invalid URL, please check again (｡◕‿‿◕｡)`)
@@ -98,32 +110,31 @@ export default function Home () {
         if (result instanceof Error) 
             throw result
 
-        const {Email ,SignalingConfig ,WebRTCConfig,PingCallback} = result
+        const {Email ,SignalingConfig ,WebRTCConfig,PingCallback,FetchCallback} = result
         callback = PingCallback
+        fetch_callback = FetchCallback
         await LogConnectionEvent(ConnectionEvent.ApplicationStarted,`hi ${Email}`)
         client = new RemoteDesktopClient(
             SignalingConfig,
             {...WebRTCConfig,iceTransportPolicy: turn ? "relay" : "all"},
             video, 
             audio,   
-            Platform,no_video)
+            Platform,
+            no_video,
+            no_mic
+        )
         
         client.HandleMetrics = async (metrics: Metrics) => {
             switch (metrics.type) {
                 case 'VIDEO':
-                    const dat : any[] = []
-                    for (let index = 0; index < metrics.decodefps.length; index++) {
-                        const element = metrics.decodefps[index];
-                        dat.push({
-                            index: index,
-                            receivefps : metrics.receivefps[index],
-                            decodefps  : metrics.decodefps[index],
-                            packetloss : metrics.packetloss[index],
-                            bandwidth  : metrics.bandwidth[index],
-                            buffer     : metrics.buffer[index],
-                        })
-                    }
-                    setMetrics(dat)
+                    setMetrics(metrics.decodefps.map((val,index) => { return {
+                        index: index,
+                        receivefps : metrics.receivefps[index],
+                        decodefps  : metrics.decodefps[index],
+                        packetloss : metrics.packetloss[index],
+                        bandwidth  : metrics.bandwidth[index],
+                        buffer     : metrics.buffer[index],
+                    }}))
                 case 'FRAME_LOSS':
                     console.log("frame loss occur")
                     break;
@@ -134,6 +145,19 @@ export default function Home () {
         }
         client.HandleMetricRaw = async (data: NetworkMetrics | VideoMetrics | AudioMetrics) => {
         }
+
+        setInterval(async () => { // TODO
+            const result = await fetch_callback()
+            const data = result.at(0)
+
+            if(data == undefined) {
+                await TurnOnAlert('worker session terminated')
+                return
+            }
+
+            if(!data.is_ping_worker_account)
+                await TurnOnAlert('worker terminated')
+        },30 * 1000)
     }
 
     useEffect(() => {
