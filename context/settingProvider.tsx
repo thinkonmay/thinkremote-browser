@@ -16,6 +16,8 @@ interface IGamePadValue {
 	rbRt: number
 	lbLt: number
 	subBtn: number
+	ls: number
+	rs: number
 
 }
 
@@ -30,6 +32,8 @@ const initialSetting: ISettingState = {
 		rbRt: 1,
 		lbLt: 1,
 		subBtn: 1,
+		ls: 1,
+		rs: 1,
 	},
 	virtMouse:{}
 };
@@ -67,13 +71,14 @@ const reducer = (state: ISettingState, action: IAction) => {
 let initialData: ISettingState 
 if (typeof window !== 'undefined') {
 	// Perform localStorage action
-	initialData = JSON.parse(localStorage.getItem('settingData')) ?? initialSetting
+	initialData = JSON.parse(localStorage.getItem('settingData1')) ?? initialSetting
 }
 
 function SettingProvider({ children }: { children: React.ReactNode }) {
 	const [state, dispatch] = React.useReducer(reducer, initialData)
 	const saveDataLocal = React.useCallback(() => {
-		localStorage.setItem('settingData', JSON.stringify(state))
+		localStorage.setItem('settingData1', JSON.stringify(state))
+		localStorage.removeItem("settingData");
 	}, [state])
 	
 	
