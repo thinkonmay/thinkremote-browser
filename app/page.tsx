@@ -43,9 +43,8 @@ export default function Home () {
     const [videoConnectivity,setVideoConnectivity] = useState<ConnectStatus>('not started');
     const [audioConnectivity,setAudioConnectivity] = useState<ConnectStatus>('not started');
     const got_stuck = () => { 
-        return (videoConnectivity == 'started'   && audioConnectivity == 'connected') || 
-               (videoConnectivity == 'connected' && audioConnectivity == 'started' ||
-               (videoConnectivity == 'started' && audioConnectivity == 'started'))
+        return (['started','closed'].includes(videoConnectivity)  && audioConnectivity == 'connected') || 
+               (['started','closed'].includes(audioConnectivity)  && videoConnectivity == 'connected')
     }
     const [metrics,setMetrics] = useState<{
         index                             : number
