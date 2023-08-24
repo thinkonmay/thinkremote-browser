@@ -31,6 +31,7 @@ import { AudioMetrics, NetworkMetrics, VideoMetrics } from "../core/qos/models";
 import { VideoWrapper } from "../core/pipeline/sink/video/wrapper";
 import { AudioWrapper } from "../core/pipeline/sink/audio/wrapper";
 
+const reset_interval = 7 * 1000
 let client : RemoteDesktopClient = null
 let callback       : () => Promise<void> = async () => {};
 let fetch_callback : () => Promise<WorkerStatus[]> = async () => {return[]};
@@ -89,7 +90,7 @@ export default function Home () {
                 setTimeout(() => {
                     if (got_stuck()) 
                         client?.HardReset()                    
-                },3 * 1000) // hard reset afeter 10 sec
+                },reset_interval) // hard reset afeter 10 sec
             } else if (videoConnectivity == 'connected')
                 await callback()
             else
