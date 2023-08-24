@@ -51,17 +51,13 @@ interface IAction {
 const reducer = (state: ISettingState, action: IAction) => {
 	const { data } = action
 	switch (action.type) {
-		case "INIT": {
+		case "INIT": 
 			return data
-		}
-		case "UPDATE": {
+		case "UPDATE": 
 			const newData = { ...state}
 			const {	name, value, type	} = data
 			newData[type][name] = value
 			return newData
-			
-		}
-
 		default:
 			return state;
 	}
