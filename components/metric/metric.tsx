@@ -203,6 +203,7 @@ const slideOutAnimation = keyframes`
 const Container = styled.div`
 	display: flex;
 	position: fixed;
+	z-index: 3;
 	top: 0px;
 	right: 0;
 
