@@ -315,6 +315,7 @@ export default function Home () {
 
 const RemoteVideo = styled.video`
     position: absolute;
+    z-index: 1;
     top: 0px;
     right: 0px;
     bottom: 0px;
@@ -326,6 +327,7 @@ const RemoteVideo = styled.video`
     max-width: 100%;
 `;
 const Body = styled.div`
+    position: relative;
     width: 100vw;
     height: 100vh;
     padding: 0;
