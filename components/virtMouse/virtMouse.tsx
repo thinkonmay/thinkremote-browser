@@ -199,7 +199,7 @@ export const VirtualMouse = (param: {
 
 
     return (
-        <div>
+        <>
             {param.draggable == "static" || param.draggable == "draggable" ? (
                 <ContainerVirtMouse>
                     <MouseGroup
@@ -214,13 +214,15 @@ export const VirtualMouse = (param: {
                     />
                 </ContainerVirtMouse>
             ) : null}
-        </div>
+        </>
     );
 };
 
 const ContainerVirtMouse = styled.div`
     display: flex;
     align-items: center;
+    z-index: 2;
+    position: relative;
 `;
 const WrapperDrag = styled.div`
     max-width: max-content;

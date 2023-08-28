@@ -241,9 +241,3 @@ export const WebRTCControl = (input: {
 };
 
 
-
-const App = styled.div`
-    touch-action: none;
-    position: relative;
-    z-index: 2;
-`;
