@@ -159,7 +159,12 @@ export const WebRTCControl = (input: {
 				action: () => {
 					setModalSettingOpen(true)
 				},
-			}])
+			},{
+				icon: <Fullscreen />,
+				name: "Enter fullscreen",
+				action: () => { requestFullscreen() }
+			}
+		])
 		} else {
 			setactions([{
 				icon: <VideoSettingsOutlinedIcon />,
@@ -197,9 +202,7 @@ export const WebRTCControl = (input: {
 	}
 	return (
 		<ConTrolContext.Provider value={contextValue}>
-			<
-                
-			>
+			<>
 				<div
 					className="containerDrag"
 					style={{ maxWidth: 'max-content', maxHeight: 'max-content' }}
