@@ -328,6 +328,7 @@ const RemoteVideo = styled.video`
 `;
 const Body = styled.div`
     position: relative;
+    touch-action: none;
     width: 100vw;
     height: 100vh;
     padding: 0;

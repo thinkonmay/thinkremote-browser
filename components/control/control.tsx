@@ -203,6 +203,11 @@ export const WebRTCControl = (input: {
 				<div
 					className="containerDrag"
 					style={{ maxWidth: 'max-content', maxHeight: 'max-content' }}
+					onContextMenu=	{e => e.preventDefault()}
+					onMouseUp=		{e => e.preventDefault()}
+					onMouseDown=	{e => e.preventDefault()}
+					onKeyUp=		{e => e.preventDefault()}
+					onKeyDown=		{e => e.preventDefault()}
 				>
 					{
 						input.platform === 'mobile' ?
