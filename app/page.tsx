@@ -267,6 +267,7 @@ export default function Home () {
                 muted
                 playsInline
                 loop
+                id='videoElm'
             ></RemoteVideo>
             <WebRTCControl 
                 platform={Platform} 
