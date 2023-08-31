@@ -74,12 +74,13 @@ export default function Home () {
     }
 
     const searchParams = useSearchParams();
-    const user_ref   = searchParams.get('uref') ?? undefined
-    const ref        = searchParams.get('ref')  ?? ref_local 
-    const platform   = searchParams.get('platform'); 
-    const turn       = searchParams.get('turn') == "true";
-    const no_video   = searchParams.get('phonepad') == "true";
-    const no_mic     = searchParams.get('mutemic') == "true";
+    const user_ref     = searchParams.get('uref') ?? undefined
+    const ref          = searchParams.get('ref')  ?? ref_local 
+    const platform     = searchParams.get('platform'); 
+    const turn         = searchParams.get('turn') == "true";
+    const no_video     = searchParams.get('phonepad') == "true";
+    const low_bitrate  = searchParams.get('low_bitrate') == "true";
+    const no_mic       = searchParams.get('mutemic') == "true";
 
     const [Platform,setPlatform] = useState<Platform>(null);
 
@@ -106,7 +107,7 @@ export default function Home () {
         localStorage.setItem("reference",ref)
         const core = new SbCore()
         if (!await core.Authenticated() && user_ref == undefined) 
-                await core.LoginWithGoogle()
+            await core.LoginWithGoogle()
         const result = await core.AuthenticateSession(ref,user_ref)
         if (result instanceof Error) 
             throw result
@@ -179,6 +180,8 @@ export default function Home () {
                 source == "audio" ? setAudioConnectivity("connected") : setVideoConnectivity("connected")
             if (message == ConnectionEvent.WebRTCConnectionChecking) 
                 source == "audio" ? setAudioConnectivity("connecting") : setVideoConnectivity("connecting")
+            if (message == ConnectionEvent.WebRTCConnectionDoneChecking && source == "video"  && low_bitrate) 
+                client.ChangeBitrate(1000)
 
             if (message == ConnectionEvent.ApplicationStarted) {
                 await TurnOnConfirm(message,text)
