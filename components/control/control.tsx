@@ -170,27 +170,17 @@ export const WebRTCControl = (input: {
 				icon: <VideoSettingsOutlinedIcon />,
 				name: "Bitrate",
 				action: async () => {
-					try {
-						let bitrate = await AskSelectBitrate();
-						if (bitrate < 500) {
-							return;
-						}
-						console.log(`bitrate is change to ${bitrate}`);
-						await input.bitrate_callback(bitrate);
-					} catch { }
+					let bitrate = await AskSelectBitrate();
+					if ((20000 < bitrate) || (bitrate < 500)) 
+						return;
+					
+					console.log(`bitrate is change to ${bitrate}`);
+					await input.bitrate_callback(bitrate);
 				},
 			}, {
 				icon: <Fullscreen />,
 				name: "Enter fullscreen",
 				action: () => { requestFullscreen() }
-			}, {
-				icon: <VolumeUp />,
-				name: "If your audio is muted",
-				action: () => { input.audioCallback() },
-			}, {
-				icon: <KeyboardIcon />,
-				name: "If some of your key is stuck",
-				action: () => { input.keystuckCallback() },
 			}])
 		}
 	}, [input.platform])

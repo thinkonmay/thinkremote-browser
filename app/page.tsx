@@ -37,7 +37,8 @@ let callback       : () => Promise<void> = async () => {};
 let fetch_callback : () => Promise<WorkerStatus[]> = async () => {return[]};
 let video : VideoWrapper = null
 let audio : AudioWrapper = null
-let clipboard : string = ""
+let clipboard : string  = ""
+let pointer   : boolean = false
 
 type ConnectStatus = 'not started' | 'started' | 'connecting' | 'connected' | 'closed'
 export default function Home () {
@@ -79,9 +80,16 @@ export default function Home () {
             .catch(() => { // not in focus zone
                 client?.hid?.ResetKeyStuck()
             })
-        },1000)
 
-        return () => { clearInterval(clipboardLoop) }
+            const _pointer = document.fullscreenElement != null
+            if (pointer != _pointer) {
+                client?.PointerVisible(_pointer)
+                pointer = _pointer
+            }
+        },100)
+        return () => { 
+            clearInterval(clipboardLoop) 
+        }
     },[])
     const remoteVideo = useRef<HTMLVideoElement>(null);
     const remoteAudio = useRef<HTMLAudioElement>(null);
@@ -94,13 +102,14 @@ export default function Home () {
     const searchParams = useSearchParams();
     const user_ref     = searchParams.get('uref') ?? undefined
     const ref          = searchParams.get('ref')  ?? ref_local 
-    const platform     = searchParams.get('platform'); 
+    const Platform     = searchParams.get('platform'); 
     const turn         = searchParams.get('turn') == "true";
     const no_video     = searchParams.get('phonepad') == "true";
     const low_bitrate  = searchParams.get('low_bitrate') == "true";
     const no_mic       = searchParams.get('mutemic') == "true";
+    const no_hid       = searchParams.get('viewonly') == "true";
 
-    const [Platform,setPlatform] = useState<Platform>(null);
+    const [platform,setPlatform] = useState<Platform>(null);
 
 
     useEffect(()=>{
@@ -135,13 +144,17 @@ export default function Home () {
         fetch_callback = FetchCallback
         await LogConnectionEvent(ConnectionEvent.ApplicationStarted,`hi ${Email}`)
         client = new RemoteDesktopClient(
-            SignalingConfig,
-            {...WebRTCConfig,iceTransportPolicy: turn ? "relay" : "all"},
             video, 
             audio,   
-            Platform,
-            no_video,
-            no_mic
+            SignalingConfig,
+            WebRTCConfig,
+            {
+                turn,
+                platform,
+                no_video,
+                no_mic,
+                no_hid
+            }
         )
         
         client.HandleMetrics = async (metrics: Metrics) => {
@@ -211,11 +224,11 @@ export default function Home () {
        })
 
         setPlatform(old => { 
-           if (platform == null) 
+           if (Platform == null) 
                return getPlatform() 
            else 
-               return platform as Platform
-       })
+               return Platform as Platform
+        })
 
         video = new VideoWrapper(remoteVideo.current)
         audio = new AudioWrapper(remoteAudio.current)
@@ -226,7 +239,7 @@ export default function Home () {
 
 	const [isModalOpen, setModalOpen] = useState(false)
 	const checkHorizontal = (width: number,height:number) => {
-        if (Platform == 'mobile') 
+        if (platform == 'mobile') 
             setModalOpen(width < height)
 	}
     useEffect(() => {
@@ -240,7 +253,7 @@ export default function Home () {
                 checkHorizontal(window.innerWidth, window.innerHeight)
             })
 		}
-    }, [Platform]);
+    }, [platform]);
 
 
     const toggleMouseTouchCallback=async function(enable: boolean) { 
@@ -274,8 +287,6 @@ export default function Home () {
     }
     const audioCallback = async() => {
         client?.ResetAudio()
-        await video.play() 
-        await audio.play() 
     }
 
 
@@ -291,7 +302,7 @@ export default function Home () {
                 id='videoElm'
             ></RemoteVideo>
             <WebRTCControl 
-                platform={Platform} 
+                platform={platform} 
                 toggle_mouse_touch_callback={toggleMouseTouchCallback}
                 bitrate_callback={bitrateCallback}
                 GamepadACallback={GamepadACallback}
@@ -329,7 +340,7 @@ export default function Home () {
                 packetLoss={metrics.map(x => { return {key: x.index, value: x.packetloss} })}
                 bandwidth={metrics.map(x => { return {key: x.index, value: x.bandwidth} })}
                 buffer={metrics.map(x => { return {key: x.index, value: x.buffer} })}
-                platform={Platform}
+                platform={platform}
             />
         </Body>
     );
@@ -347,6 +358,7 @@ const RemoteVideo = styled.video`
     height: 100%;
     max-height: 100%;
     max-width: 100%;
+    object-fit: contain;
 `;
 const Body = styled.div`
     position: relative;
