@@ -37,6 +37,7 @@ let callback       : () => Promise<void> = async () => {};
 let fetch_callback : () => Promise<WorkerStatus[]> = async () => {return[]};
 let video : VideoWrapper = null
 let audio : AudioWrapper = null
+let clipboard : string = ""
 
 type ConnectStatus = 'not started' | 'started' | 'connecting' | 'connected' | 'closed'
 export default function Home () {
@@ -64,6 +65,24 @@ export default function Home () {
                 e.returnValue = text
             return text;
         };
+
+
+        const clipboardLoop = setInterval(() => {
+            navigator.clipboard.readText()
+            .then(_clipboard => {
+                if (_clipboard == clipboard) 
+                    return
+                    
+                console.log('hi')
+                client?.hid?.SetClipboard(_clipboard)
+                clipboard = _clipboard
+            })
+            .catch(() => { // not in focus zone
+                client?.hid?.ResetKeyStuck()
+            })
+        },1000)
+
+        return () => { clearInterval(clipboardLoop) }
     },[])
     const remoteVideo = useRef<HTMLVideoElement>(null);
     const remoteAudio = useRef<HTMLAudioElement>(null);
