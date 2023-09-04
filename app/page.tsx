@@ -73,7 +73,6 @@ export default function Home () {
                 if (_clipboard == clipboard) 
                     return
                     
-                console.log('hi')
                 client?.hid?.SetClipboard(_clipboard)
                 clipboard = _clipboard
             })
