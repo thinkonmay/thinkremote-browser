@@ -30,6 +30,7 @@ import Metric  from "../components/metric/metric";
 import { AudioMetrics, NetworkMetrics, VideoMetrics } from "../core/qos/models";
 import { VideoWrapper } from "../core/pipeline/sink/video/wrapper";
 import { AudioWrapper } from "../core/pipeline/sink/audio/wrapper";
+import { VIDEO_ELEMENT_ID } from "../core/utils/screen";
 
 const reset_interval = 7 * 1000
 let client : RemoteDesktopClient = null
@@ -108,6 +109,7 @@ export default function Home () {
     const low_bitrate  = searchParams.get('low_bitrate') == "true";
     const no_mic       = searchParams.get('mutemic') == "true";
     const no_hid       = searchParams.get('viewonly') == "true";
+    const video_contain    = searchParams.get('video_contain') == 'true'
 
     const [platform,setPlatform] = useState<Platform>(null);
 
@@ -235,6 +237,13 @@ export default function Home () {
         SetupConnection().catch(error => {
            TurnOnAlert(error);
        })
+
+    //   Check video contain
+    
+       const videoElm = document.getElementById(VIDEO_ELEMENT_ID)
+       if(video_contain) {
+        videoElm.classList.add('videoContain')
+       }
     }, []);
 
 	const [isModalOpen, setModalOpen] = useState(false)
@@ -299,7 +308,7 @@ export default function Home () {
                 muted
                 playsInline
                 loop
-                id='videoElm'
+                id={VIDEO_ELEMENT_ID}
             ></RemoteVideo>
             <WebRTCControl 
                 platform={platform} 

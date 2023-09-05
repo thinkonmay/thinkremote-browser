@@ -36,3 +36,7 @@ a {
 .fillVideoIos{
     object-fit: fill !important;
 }
+
+.videoContain{
+    object-fit: fill !important;
+}
