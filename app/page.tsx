@@ -30,7 +30,6 @@ import Metric  from "../components/metric/metric";
 import { AudioMetrics, NetworkMetrics, VideoMetrics } from "../core/qos/models";
 import { VideoWrapper } from "../core/pipeline/sink/video/wrapper";
 import { AudioWrapper } from "../core/pipeline/sink/audio/wrapper";
-import { VIDEO_ELEMENT_ID } from "../core/utils/screen";
 
 const reset_interval = 7 * 1000
 let client : RemoteDesktopClient = null
@@ -69,7 +68,7 @@ export default function Home () {
         };
 
 
-        const clipboardLoop = setInterval(() => {
+        const handleState = () => {
             navigator.clipboard.readText()
             .then(_clipboard => {
                 if (_clipboard == clipboard) 
@@ -82,15 +81,23 @@ export default function Home () {
                 client?.hid?.ResetKeyStuck()
             })
 
-            const _pointer = document.fullscreenElement != null
-            if (pointer != _pointer) {
-                client?.PointerVisible(_pointer)
-                pointer = _pointer
+            const fullscreen = document.fullscreenElement != null
+            if (pointer != fullscreen) {
+                client?.PointerVisible(view_pointer ? true : fullscreen)
+                pointer = fullscreen
             }
-        },100)
-        return () => { 
-            clearInterval(clipboardLoop) 
+
+            // remoteVideo.current.style.cursor = 'none'
+            remoteVideo.current.style.objectFit = 
+                !  fullscreen 
+                ?  "contain"
+                :  no_stretch 
+                ?  "contain"
+                :  "fill"
         }
+
+        const UIStateLoop = setInterval(handleState,100)
+        return () => { clearInterval(UIStateLoop) }
     },[])
     const remoteVideo = useRef<HTMLVideoElement>(null);
     const remoteAudio = useRef<HTMLAudioElement>(null);
@@ -109,7 +116,8 @@ export default function Home () {
     const low_bitrate  = searchParams.get('low_bitrate') == "true";
     const no_mic       = searchParams.get('mutemic') == "true";
     const no_hid       = searchParams.get('viewonly') == "true";
-    const video_contain    = searchParams.get('video_contain') == 'true'
+    const no_stretch   = searchParams.get('no_stretch') == 'true'
+    const view_pointer = searchParams.get('pointer') == 'visible'
 
     const [platform,setPlatform] = useState<Platform>(null);
 
@@ -234,16 +242,7 @@ export default function Home () {
 
         video = new VideoWrapper(remoteVideo.current)
         audio = new AudioWrapper(remoteAudio.current)
-        SetupConnection().catch(error => {
-           TurnOnAlert(error);
-       })
-
-    //   Check video contain
-    
-       const videoElm = document.getElementById(VIDEO_ELEMENT_ID)
-       if(video_contain) {
-        videoElm.classList.add('videoContain')
-       }
+        SetupConnection() .catch(TurnOnAlert)
     }, []);
 
 	const [isModalOpen, setModalOpen] = useState(false)
@@ -308,7 +307,6 @@ export default function Home () {
                 muted
                 playsInline
                 loop
-                id={VIDEO_ELEMENT_ID}
             ></RemoteVideo>
             <WebRTCControl 
                 platform={platform} 
@@ -321,6 +319,7 @@ export default function Home () {
                 keystuckCallback={keystuckCallback}
                 audioCallback={audioCallback}
                 clipboardSetCallback={clipboardSetCallback}
+                video={remoteVideo.current}
             ></WebRTCControl>
             <audio
                 ref={remoteAudio}
@@ -367,7 +366,6 @@ const RemoteVideo = styled.video`
     height: 100%;
     max-height: 100%;
     max-width: 100%;
-    object-fit: contain;
 `;
 const Body = styled.div`
     position: relative;

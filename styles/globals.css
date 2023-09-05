@@ -33,10 +33,3 @@ a {
     height: 100%;
 } */
 
-.fillVideoIos{
-    object-fit: fill !important;
-}
-
-.videoContain{
-    object-fit: fill !important;
-}
