@@ -166,22 +166,27 @@ export default function Home () {
 
 
     useEffect(()=>{
-        const got_stuck = () => { 
+        const got_stuck_one = () => { 
             return (['started','closed'].includes(videoConnectivity)  && audioConnectivity == 'connected') || 
                    (['started','closed'].includes(audioConnectivity)  && videoConnectivity == 'connected')
         }
+        const got_stuck_both = () => { 
+            return (['started','closed'].includes(videoConnectivity)  && 
+                    ['started','closed'].includes(audioConnectivity))
+        }
 
         const check_connection = () => {
-            if (got_stuck()) {
-                console.log('stuck condition after 10s, hard reset')
+            if (got_stuck_one()) {
                 client?.HardReset()                    
                 SetupWebRTC()
+            } else if (got_stuck_both()) {
+                client?.HardReset()                    
             }
         }
 
-        if (got_stuck()) {
-            console.log('stuck condition happended, retry after 10s')
-            const interval = setTimeout(check_connection,10 * 1000)
+        if (got_stuck_one() || got_stuck_both()) {
+            console.log('stuck condition happended, retry after 5s')
+            const interval = setTimeout(check_connection,5 * 1000)
             return () =>{ clearTimeout(interval) }
         } else if (videoConnectivity == 'connected') {
             const interval = setInterval(callback,14 * 1000)
