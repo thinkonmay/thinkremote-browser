@@ -31,7 +31,6 @@ import { AudioMetrics, NetworkMetrics, VideoMetrics } from "../core/qos/models";
 import { VideoWrapper } from "../core/pipeline/sink/video/wrapper";
 import { AudioWrapper } from "../core/pipeline/sink/audio/wrapper";
 
-const reset_interval = 7 * 1000
 let client : RemoteDesktopClient = null
 let callback       : () => Promise<void> = async () => {};
 let fetch_callback : () => Promise<WorkerStatus[]> = async () => {return[]};
@@ -125,19 +124,20 @@ export default function Home () {
         }
 
         const check_connection = () => {
-            if (got_stuck()) 
-                setTimeout(() => { if (got_stuck()) 
-                    client?.HardReset()                    
-                },reset_interval) // hard reset afeter 10 sec
-            else if (videoConnectivity == 'connected')
-                callback()
-            else
-                console.log(`video is not connected, avoid ping`)
+            if (got_stuck()) {
+                console.log('stuck condition after 10s, hard reset')
+                client?.HardReset()                    
+            }
         }
 
-        check_connection()
-        const interval = setInterval(check_connection,14 * 1000)
-        return () =>{ clearInterval(interval) }
+        if (got_stuck()) {
+            console.log('stuck condition happended, retry after 10s')
+            const interval = setTimeout(check_connection,10 * 1000)
+            return () =>{ clearTimeout(interval) }
+        } else if (videoConnectivity == 'connected') {
+            const interval = setInterval(callback,14 * 1000)
+            return () =>{ clearInterval(interval) }
+        }
     }, [videoConnectivity,audioConnectivity])
 
     const SetupConnection = async () => {
