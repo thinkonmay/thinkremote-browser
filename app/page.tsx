@@ -45,10 +45,6 @@ export default function Home () {
     const [connectionPath,setConnectionPath] = useState<any[]>([]);
     const [videoConnectivity,setVideoConnectivity] = useState<ConnectStatus>('not started');
     const [audioConnectivity,setAudioConnectivity] = useState<ConnectStatus>('not started');
-    const got_stuck = () => { 
-        return (['started','closed'].includes(videoConnectivity)  && audioConnectivity == 'connected') || 
-               (['started','closed'].includes(audioConnectivity)  && videoConnectivity == 'connected')
-    }
     const [metrics,setMetrics] = useState<{
         index                             : number
         receivefps                        : number
@@ -112,7 +108,7 @@ export default function Home () {
     const ref          = searchParams.get('ref')  ?? ref_local 
     const Platform     = searchParams.get('platform'); 
     const turn         = searchParams.get('turn') == "true";
-    const no_video     = searchParams.get('phonepad') == "true";
+    const no_video     = searchParams.get('no_video') == "true";
     const low_bitrate  = searchParams.get('low_bitrate') == "true";
     const no_mic       = searchParams.get('mutemic') == "true";
     const no_hid       = searchParams.get('viewonly') == "true";
@@ -123,19 +119,26 @@ export default function Home () {
 
 
     useEffect(()=>{
-        const interval = setInterval(async () => {
-            if (got_stuck()) {
-                setTimeout(() => {
-                    if (got_stuck()) 
-                        client?.HardReset()                    
+        const got_stuck = () => { 
+            return (['started','closed'].includes(videoConnectivity)  && audioConnectivity == 'connected') || 
+                   (['started','closed'].includes(audioConnectivity)  && videoConnectivity == 'connected')
+        }
+
+        const check_connection = () => {
+            if (got_stuck()) 
+                setTimeout(() => { if (got_stuck()) 
+                    client?.HardReset()                    
                 },reset_interval) // hard reset afeter 10 sec
-            } else if (videoConnectivity == 'connected')
-                await callback()
+            else if (videoConnectivity == 'connected')
+                callback()
             else
                 console.log(`video is not connected, avoid ping`)
-        },14 * 1000)
+        }
+
+        check_connection()
+        const interval = setInterval(check_connection,14 * 1000)
         return () =>{ clearInterval(interval) }
-    }, [videoConnectivity])
+    }, [videoConnectivity,audioConnectivity])
 
     const SetupConnection = async () => {
         if(ref == null || ref == 'null') 
