@@ -20,6 +20,7 @@ import {
 } from "../core/utils/log";
 import { WebRTCControl } from "../components/control/control";
 import {
+    getBrowser,
 	getPlatform,
 	Platform,
 } from "../core/utils/platform";
@@ -31,6 +32,16 @@ import { AudioMetrics, NetworkMetrics, VideoMetrics } from "../core/qos/models";
 import { VideoWrapper } from "../core/pipeline/sink/video/wrapper";
 import { AudioWrapper } from "../core/pipeline/sink/audio/wrapper";
 
+
+type StatsView = {
+    index                             : number
+    receivefps                        : number
+    decodefps                         : number
+    packetloss                        : number     
+    bandwidth                         : number     
+    buffer                            : number
+}
+
 let client : RemoteDesktopClient = null
 let callback       : () => Promise<void> = async () => {};
 let fetch_callback : () => Promise<WorkerStatus[]> = async () => {return[]};
@@ -39,23 +50,66 @@ let audio : AudioWrapper = null
 let clipboard : string  = ""
 let pointer   : boolean = false
 
+
+
 type ConnectStatus = 'not started' | 'started' | 'connecting' | 'connected' | 'closed'
-export default function Home () {
-    const [connectionPath,setConnectionPath] = useState<any[]>([]);
+export default function Home () {    
+    let ref_local        = ''
+    if (typeof window !== 'undefined')
+        ref_local        = localStorage.getItem("reference")
+
+
+    const searchParams = useSearchParams();
+    const user_ref     = searchParams.get('uref') ?? undefined
+    const ref          = searchParams.get('ref')  ?? ref_local 
+    const Platform     = searchParams.get('platform'); 
+    const turn         = searchParams.get('turn') == "true";
+    const no_video     = searchParams.get('no_video') == "true";
+    const low_bitrate  = searchParams.get('low_bitrate') == "true";
+    const no_mic       = searchParams.get('mutemic') == "true";
+    const no_hid       = searchParams.get('viewonly') == "true";
+    const no_stretch   = searchParams.get('no_stretch') == 'true'
+    const view_pointer = searchParams.get('pointer') == 'visible'
+
+
+    const [connectionPath,setConnectionPath]       = useState<any[]>([]);
     const [videoConnectivity,setVideoConnectivity] = useState<ConnectStatus>('not started');
     const [audioConnectivity,setAudioConnectivity] = useState<ConnectStatus>('not started');
-    const [metrics,setMetrics] = useState<{
-        index                             : number
-        receivefps                        : number
-        decodefps                         : number
-        packetloss                        : number     
-        bandwidth                         : number     
-        buffer                            : number
-    }[]>([])
+    const [metrics,setMetrics]                     = useState<StatsView[]>([])
+    const remoteVideo                              = useRef<HTMLVideoElement>(null);
+    const remoteAudio                              = useRef<HTMLAudioElement>(null);
+
+    const [platform,setPlatform] = useState<Platform>(null);
+ 	const [isModalOpen, setModalOpen] = useState(false)
+	const checkHorizontal = (width: number,height:number) => {
+        if (platform == 'mobile') 
+            setModalOpen(width < height)
+	}    
+    useEffect(() => {
+		checkHorizontal(window.innerWidth,window.innerHeight)
+        window.addEventListener('resize', (e: UIEvent) => {
+            checkHorizontal(window.innerWidth, window.innerHeight)
+		})
+
+		return () => { 
+            window.removeEventListener('resize', (e: UIEvent) => { 
+                checkHorizontal(window.innerWidth, window.innerHeight)
+            })
+		}
+    }, [platform]);
+
+
+
+
+
     useEffect(()=>{
         window.onbeforeunload = (e: BeforeUnloadEvent) => {
+            client?.hid?.ResetKeyStuck()
+            client?.Close()
+
+            localStorage.setItem('signaling','{}')
+            localStorage.setItem('webrtc'   ,'{}')
             const text = 'Are you sure (｡◕‿‿◕｡)'
-            client.hid.ResetKeyStuck()
             e = e || window.event;
             if (e)
                 e.returnValue = text
@@ -77,10 +131,7 @@ export default function Home () {
             })
 
             const fullscreen = document.fullscreenElement != null
-            if (pointer != fullscreen) {
-                client?.PointerVisible(view_pointer ? true : fullscreen)
-                pointer = fullscreen
-            }
+            const havingPtrLock = document.pointerLockElement != null
 
             // remoteVideo.current.style.cursor = 'none'
             remoteVideo.current.style.objectFit = 
@@ -89,32 +140,29 @@ export default function Home () {
                 :  no_stretch 
                 ?  "contain"
                 :  "fill"
+
+            if (pointer != fullscreen) {
+                client?.PointerVisible(view_pointer ? true : fullscreen)
+                pointer = fullscreen
+            }
+
+            if ((fullscreen && !havingPtrLock ) && getBrowser() != 'Safari')
+                remoteVideo.current.requestPointerLock();
+            else if ((!fullscreen && havingPtrLock) && getBrowser() != 'Safari') 
+                document.exitPointerLock();
         }
 
         const UIStateLoop = setInterval(handleState,100)
         return () => { clearInterval(UIStateLoop) }
     },[])
-    const remoteVideo = useRef<HTMLVideoElement>(null);
-    const remoteAudio = useRef<HTMLAudioElement>(null);
 
-    let ref_local        = ''
-    if (typeof window !== 'undefined') {
-        ref_local        = localStorage.getItem("reference")
-    }
 
-    const searchParams = useSearchParams();
-    const user_ref     = searchParams.get('uref') ?? undefined
-    const ref          = searchParams.get('ref')  ?? ref_local 
-    const Platform     = searchParams.get('platform'); 
-    const turn         = searchParams.get('turn') == "true";
-    const no_video     = searchParams.get('no_video') == "true";
-    const low_bitrate  = searchParams.get('low_bitrate') == "true";
-    const no_mic       = searchParams.get('mutemic') == "true";
-    const no_hid       = searchParams.get('viewonly') == "true";
-    const no_stretch   = searchParams.get('no_stretch') == 'true'
-    const view_pointer = searchParams.get('pointer') == 'visible'
 
-    const [platform,setPlatform] = useState<Platform>(null);
+
+
+
+
+
 
 
     useEffect(()=>{
@@ -127,6 +175,7 @@ export default function Home () {
             if (got_stuck()) {
                 console.log('stuck condition after 10s, hard reset')
                 client?.HardReset()                    
+                SetupWebRTC()
             }
         }
 
@@ -141,7 +190,9 @@ export default function Home () {
     }, [videoConnectivity,audioConnectivity])
 
     const SetupConnection = async () => {
-        if(ref == null || ref == 'null') 
+        if (videoConnectivity != 'not started' && audioConnectivity != 'not started')
+            return
+        else if(ref == null || ref == 'null') 
             throw new Error(`invalid URL, please check again (｡◕‿‿◕｡)`)
 
         localStorage.setItem("reference",ref)
@@ -156,12 +207,20 @@ export default function Home () {
         callback = PingCallback
         fetch_callback = FetchCallback
         await LogConnectionEvent(ConnectionEvent.ApplicationStarted,`hi ${Email}`)
-        client = new RemoteDesktopClient(
-            video, 
-            audio,   
-            SignalingConfig,
-            WebRTCConfig,
-            {
+
+
+        localStorage.setItem("signaling",JSON.stringify(SignalingConfig))
+        localStorage.setItem("webrtc",JSON.stringify(WebRTCConfig))
+    }
+
+
+    const SetupWebRTC = () => {
+        if (client != null) 
+            client.Close()
+            
+        client = new RemoteDesktopClient( video, audio,   
+            JSON.parse(localStorage.getItem('signaling')),
+            JSON.parse(localStorage.getItem('webrtc')), {
                 turn,
                 platform,
                 no_video,
@@ -201,19 +260,6 @@ export default function Home () {
                     return old
                 })
         }
-
-        setInterval(async () => { // TODO
-            const result = await fetch_callback()
-            const data = result.at(0)
-
-            if(data == undefined) {
-                await TurnOnAlert('worker session terminated')
-                return
-            }
-
-            if(!data.is_ping_worker_account)
-                await TurnOnAlert('worker terminated')
-        },30 * 1000)
     }
 
     useEffect(() => {
@@ -245,26 +291,27 @@ export default function Home () {
 
         video = new VideoWrapper(remoteVideo.current)
         audio = new AudioWrapper(remoteAudio.current)
-        SetupConnection() .catch(TurnOnAlert)
+        SetupConnection() 
+            .catch(TurnOnAlert)
+            .then(async () => {
+                SetupWebRTC()
+                setInterval(async () => { // TODO
+                    const result = await fetch_callback()
+                    const data = result.at(0)
+
+                    if(data == undefined) 
+                        return
+                    else if(!data.is_ping_worker_account)
+                        await TurnOnAlert('worker terminated')
+                },30 * 1000)
+            })
     }, []);
 
-	const [isModalOpen, setModalOpen] = useState(false)
-	const checkHorizontal = (width: number,height:number) => {
-        if (platform == 'mobile') 
-            setModalOpen(width < height)
-	}
-    useEffect(() => {
-		checkHorizontal(window.innerWidth,window.innerHeight)
-        window.addEventListener('resize', (e: UIEvent) => {
-            checkHorizontal(window.innerWidth, window.innerHeight)
-		})
 
-		return () => { 
-            window.removeEventListener('resize', (e: UIEvent) => { 
-                checkHorizontal(window.innerWidth, window.innerHeight)
-            })
-		}
-    }, [platform]);
+
+
+
+
 
 
     const toggleMouseTouchCallback=async function(enable: boolean) { 
@@ -297,7 +344,8 @@ export default function Home () {
         client?.hid?.PasteClipboard()
     }
     const audioCallback = async() => {
-        client?.ResetAudio()
+        // client?.ResetAudio()
+        SetupWebRTC()
     }
 
 

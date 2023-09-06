@@ -1,6 +1,6 @@
 "use client"
 
-import { Fullscreen, Key, VolumeUp } from "@mui/icons-material";
+import { Fullscreen, LockReset, } from "@mui/icons-material";
 import SportsEsportsOutlinedIcon from '@mui/icons-material/SportsEsportsOutlined';
 import MouseOutlinedIcon from '@mui/icons-material/MouseOutlined';
 import VideoSettingsOutlinedIcon from '@mui/icons-material/VideoSettingsOutlined';
@@ -154,6 +154,10 @@ export const WebRTCControl = (input: {
 				icon: <Fullscreen />,
 				name: "Enter fullscreen",
 				action: requestFullscreen
+			},{
+				icon: <LockReset/>,
+				name: "Reset",
+				action: input.audioCallback 
 			}
 		])
 		} else {
@@ -172,6 +176,10 @@ export const WebRTCControl = (input: {
 				icon: <Fullscreen />,
 				name: "Enter fullscreen",
 				action: requestFullscreen
+			},{
+				icon: <LockReset/>,
+				name: "Reset",
+				action: input.audioCallback 
 			}])
 		}
 	}, [input.platform])
