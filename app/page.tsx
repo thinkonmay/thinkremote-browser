@@ -348,8 +348,8 @@ export default function Home () {
         client?.hid?.SetClipboard(val)
         client?.hid?.PasteClipboard()
     }
-    const audioCallback = async() => {
-        // client?.ResetAudio()
+    const resetConnection = async() => {
+        await client?.ResetAudio()
         SetupWebRTC()
     }
 
@@ -373,7 +373,7 @@ export default function Home () {
                 MouseMoveCallback={MouseMoveCallback}
                 MouseButtonCallback={MouseButtonCallback}
                 keystuckCallback={keystuckCallback}
-                audioCallback={audioCallback}
+                audioCallback={resetConnection}
                 clipboardSetCallback={clipboardSetCallback}
                 video={remoteVideo.current}
             ></WebRTCControl>
