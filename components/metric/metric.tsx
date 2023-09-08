@@ -71,6 +71,7 @@ const DesktopMetric = (props: {
 		packetLoss: Data[]
 		bandwidth: Data[]
 		buffer: Data[]
+		path : any[]
 	}) => {
 	const data = [{
 		labels: props.receiveFPS.map(item => item.key),
@@ -86,17 +87,9 @@ const DesktopMetric = (props: {
 				backgroundColor: "#fff",
 		}],
 	}, {
-		labels: props.packetLoss.map(item => item.key),
-		datasets: [{
-			label: 'packetloss',
-			data: props.packetLoss.map((item)=>item.value),
-			borderColor: 'rgb(255, 99, 132)',
-			backgroundColor: 'rgba(255, 99, 132, 0.5)',
-		}],
-	}, {
 		labels: props.bandwidth.map(item => item.key),
 		datasets: [{
-			label: 'bandwidth',
+			label: 'bandwidth (kbps)',
 			data: props.bandwidth.map((item)=>item.value),
 			borderColor: 'rgb(255, 99, 132)',
 			backgroundColor: 'rgba(255, 99, 132, 0.5)',
@@ -104,16 +97,28 @@ const DesktopMetric = (props: {
 	}, {
 		labels: props.buffer.map(item => item.key),
 		datasets: [{
-			label: 'buffered frame',
+			label: 'buffer (frame)',
 			data: props.buffer.map((item)=>item.value),
 			borderColor: 'rgb(255, 99, 132)',
 			backgroundColor: 'rgba(255, 99, 132, 0.5)',
 		}],
 	}]
 
+	if (!props.packetLoss.every(val => val.value == 0))
+		data.push({
+		labels: props.packetLoss.map(item => item.key),
+		datasets: [{
+			label: 'packetloss',
+			data: props.packetLoss.map((item)=>item.value),
+			borderColor: 'rgb(255, 99, 132)',
+			backgroundColor: 'rgba(255, 99, 132, 0.5)',
+		}],
+	})
+
 	return (
 		<React.Fragment>
-			{ data.map((val,key) => { return <Line key={key} options={options} data={val} /> }) }
+			{ data.map((val,key) => <Line key={key} options={options} data={val} />) }
+			{ props.path?.map((val,key) => <Text key={key}>Address: {'\n'} {val.local} {'\n'} {val.remote}</Text>)}
 		</React.Fragment>
 	);
 }
@@ -125,6 +130,7 @@ const Metric = (props: {
 		packetLoss: Data[]
 		bandwidth: Data[]
 		buffer: Data[]
+		path: any[]
 		videoConnect: 'loading' | 'connect' | 'disconnect' | string
 		audioConnect: 'loading' | 'connect' | 'disconnect' | string
 		platform: Platform
@@ -155,6 +161,7 @@ const Metric = (props: {
 					{
 						props.platform === 'desktop'
 							? <DesktopMetric
+								path={props.path}
 								bandwidth={props.bandwidth}
 								buffer={props.buffer}
 								decodeFPS={props.decodeFPS}
@@ -196,6 +203,7 @@ const slideOutAnimation = keyframes`
 const Container = styled.div`
 	display: flex;
 	position: fixed;
+	z-index: 3;
 	top: 0px;
 	right: 0;
 

@@ -1,24 +1,20 @@
 "use client"
 
-import { Fullscreen, Key, VolumeUp } from "@mui/icons-material";
+import { Fullscreen, LockReset, } from "@mui/icons-material";
 import SportsEsportsOutlinedIcon from '@mui/icons-material/SportsEsportsOutlined';
 import MouseOutlinedIcon from '@mui/icons-material/MouseOutlined';
 import VideoSettingsOutlinedIcon from '@mui/icons-material/VideoSettingsOutlined';
 import KeyboardIcon from '@mui/icons-material/Keyboard';
-import { List, SpeedDial, SpeedDialAction } from "@mui/material";
-import ListIcon from '@mui/icons-material/List';
-import React, { useEffect, useState, useLayoutEffect, createContext } from "react"; // we need this to make JSX compile
+import React, { useEffect, useState, createContext } from "react"; // we need this to make JSX compile
 import { Platform } from "../../core/utils/platform";
 import { requestFullscreen } from "../../core/utils/screen";
 import { AskSelectBitrate, TurnOnClipboard } from "../popup/popup";
 import { VirtualGamepad } from "../virtGamepad/virtGamepad";
 import { VirtualMouse } from "../virtMouse/virtMouse";
-import Draggable, { DraggableData, DraggableEvent } from "react-draggable";
 import MobileControl from "./mobileControl";
 import SettingsIcon from '@mui/icons-material/Settings';
 import DesktopControl from "./desktopControl";
 import Setting from "../setting/setting";
-import styled from "styled-components";
 
 
 export type ButtonMode = "static" | "draggable" | "disable";
@@ -41,7 +37,8 @@ export const WebRTCControl = (input: {
 
 	bitrate_callback: (bitrate: number) => Promise<void>,
 	toggle_mouse_touch_callback: (enable: boolean) => Promise<void>,
-	platform: Platform
+	platform: Platform,
+	video: HTMLVideoElement
 }) => {
 	const [enableVGamepad, setenableVGamepad] = useState<ButtonMode>("disable");
 	const [enableVMouse, setenableVMouse] = useState<ButtonMode>("disable");
@@ -143,10 +140,6 @@ export const WebRTCControl = (input: {
 
 				},
 			}, {
-				icon: <VolumeUp />,
-				name: "If your audio is muted",
-				action: () => { input.audioCallback() },
-			}, {
 				icon: <KeyboardIcon />,
 				name: "Write to clipboard",
 				action: async () => {
@@ -156,36 +149,37 @@ export const WebRTCControl = (input: {
 			}, {
 				icon: <SettingsIcon />,
 				name: "Setting",
-				action: () => {
-					setModalSettingOpen(true)
-				},
-			}])
+				action: () => { setModalSettingOpen(true) },
+			},{
+				icon: <Fullscreen />,
+				name: "Enter fullscreen",
+				action: requestFullscreen
+			},{
+				icon: <LockReset/>,
+				name: "Reset",
+				action: input.audioCallback 
+			}
+		])
 		} else {
 			setactions([{
 				icon: <VideoSettingsOutlinedIcon />,
 				name: "Bitrate",
 				action: async () => {
-					try {
-						let bitrate = await AskSelectBitrate();
-						if (bitrate < 500) {
-							return;
-						}
-						console.log(`bitrate is change to ${bitrate}`);
-						await input.bitrate_callback(bitrate);
-					} catch { }
+					let bitrate = await AskSelectBitrate();
+					if ((20000 < bitrate) || (bitrate < 500)) 
+						return;
+					
+					console.log(`bitrate is change to ${bitrate}`);
+					await input.bitrate_callback(bitrate);
 				},
 			}, {
 				icon: <Fullscreen />,
 				name: "Enter fullscreen",
-				action: () => { requestFullscreen() }
-			}, {
-				icon: <VolumeUp />,
-				name: "If your audio is muted",
-				action: () => { input.audioCallback() },
-			}, {
-				icon: <KeyboardIcon />,
-				name: "If some of your key is stuck",
-				action: () => { input.keystuckCallback() },
+				action: requestFullscreen
+			},{
+				icon: <LockReset/>,
+				name: "Reset",
+				action: input.audioCallback 
 			}])
 		}
 	}, [input.platform])
@@ -197,16 +191,15 @@ export const WebRTCControl = (input: {
 	}
 	return (
 		<ConTrolContext.Provider value={contextValue}>
-			<App
-                onContextMenu=	{e => e.preventDefault()}
-                onMouseUp=		{e => e.preventDefault()}
-                onMouseDown=	{e => e.preventDefault()}
-                onKeyUp=		{e => e.preventDefault()}
-                onKeyDown=		{e => e.preventDefault()}
-			>
+			<>
 				<div
 					className="containerDrag"
 					style={{ maxWidth: 'max-content', maxHeight: 'max-content' }}
+					onContextMenu=	{e => e.preventDefault()}
+					onMouseUp=		{e => e.preventDefault()}
+					onMouseDown=	{e => e.preventDefault()}
+					onKeyUp=		{e => e.preventDefault()}
+					onKeyDown=		{e => e.preventDefault()}
 				>
 					{
 						input.platform === 'mobile' ?
@@ -239,16 +232,9 @@ export const WebRTCControl = (input: {
 					isOpen={isModalSettingOpen}
 					closeModal={() => { setModalSettingOpen(false) }}
 				/>
-			</App>
+			</>
 		</ConTrolContext.Provider >
 	);
 };
 
 
-
-const App = styled.div`
-    touch-action: none;
-    position: relative;
-    width: 100vw;
-    height: 100vh;
-`;
