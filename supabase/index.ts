@@ -108,7 +108,12 @@ export default class SbCore {
 	}
 
 	public async Authenticated(): Promise<boolean> {
-		return (await this.supabase.auth.getSession()).data.session != null
+		if ((await this.supabase.auth.getSession()).data.session == null)
+			return false
+		else if ((await this.getUserInfor()) instanceof Error)
+			return false
+		else 
+			return true
 	}
 
 	public async getUserInfor(): Promise<User | Error> {
