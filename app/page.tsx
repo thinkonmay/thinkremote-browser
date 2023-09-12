@@ -21,6 +21,7 @@ import {
 import { WebRTCControl } from "../components/control/control";
 import {
     getBrowser,
+	getOS,
 	getPlatform,
 	Platform,
 } from "../core/utils/platform";
@@ -137,6 +138,9 @@ export default function Home () {
                 client?.hid?.ResetKeyStuck()
             })
 
+            if(getOS() == 'iOS' || getBrowser() == 'Safari') 
+                return 
+            
             const fullscreen = document.fullscreenElement != null
             const havingPtrLock = document.pointerLockElement != null
 
