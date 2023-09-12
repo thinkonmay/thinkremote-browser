@@ -32,6 +32,7 @@ import Metric  from "../components/metric/metric";
 import { AudioMetrics, NetworkMetrics, VideoMetrics } from "../core/qos/models";
 import { VideoWrapper } from "../core/pipeline/sink/video/wrapper";
 import { AudioWrapper } from "../core/pipeline/sink/audio/wrapper";
+import { formatError } from "../utils/formatError";
 
 
 type StatsView = {
@@ -216,8 +217,7 @@ export default function Home () {
         if (!await core.Authenticated() && user_ref == undefined) 
             await core.LoginWithGoogle()
         const result = await core.AuthenticateSession(ref,user_ref)
-        if (result instanceof Error) 
-            throw result
+        
 
         const {Email ,SignalingConfig ,WebRTCConfig,PingCallback,FetchCallback} = result
         callback = PingCallback
@@ -308,7 +308,10 @@ export default function Home () {
         video = new VideoWrapper(remoteVideo.current)
         audio = new AudioWrapper(remoteAudio.current)
         SetupConnection() 
-            .catch(TurnOnAlert)
+            .catch((err)=>{
+                    const errMsg = formatError(err)
+                    TurnOnAlert(errMsg)
+            })
             .then(async () => {
                 SetupWebRTC()
                 setInterval(async () => { // TODO
