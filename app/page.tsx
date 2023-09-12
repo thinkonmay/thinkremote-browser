@@ -79,8 +79,9 @@ export default function Home () {
     const remoteVideo                              = useRef<HTMLVideoElement>(null);
     const remoteAudio                              = useRef<HTMLAudioElement>(null);
 
-    const [platform,setPlatform] = useState<Platform>(null);
- 	const [isModalOpen, setModalOpen] = useState(false)
+    const [platform,setPlatform]                   = useState<Platform>(null);
+    const [IOSFullscreen,setIOSFullscreen]         = useState<boolean>(false);
+ 	const [isModalOpen, setModalOpen]              = useState(false)
 	const checkHorizontal = (width: number,height:number) => {
         if (platform == 'mobile') 
             setModalOpen(width < height)
@@ -97,6 +98,12 @@ export default function Home () {
             })
 		}
     }, [platform]);
+    useEffect(() => {
+        remoteVideo.current.style.objectFit = 
+            IOSFullscreen
+            ?  "fill"
+            :  "contain"
+    }, [IOSFullscreen]);
 
 
 
@@ -319,6 +326,9 @@ export default function Home () {
 
 
 
+    const fullscreenCallback = async function () {
+        setIOSFullscreen(old => !old)
+    }
     const toggleMouseTouchCallback=async function(enable: boolean) { 
         client?.hid?.DisableTouch(!enable);
         client?.hid?.DisableMouse(!enable);
@@ -368,13 +378,14 @@ export default function Home () {
                 platform={platform} 
                 toggle_mouse_touch_callback={toggleMouseTouchCallback}
                 bitrate_callback={bitrateCallback}
-                GamepadACallback={GamepadACallback}
-                GamepadBCallback={GamepadBCallback}
-                MouseMoveCallback={MouseMoveCallback}
-                MouseButtonCallback={MouseButtonCallback}
-                keystuckCallback={keystuckCallback}
-                audioCallback={resetConnection}
-                clipboardSetCallback={clipboardSetCallback}
+                gamepad_callback_a={GamepadACallback}
+                gamepad_callback_b={GamepadBCallback}
+                mouse_move_callback={MouseMoveCallback}
+                mouse_button_callback={MouseButtonCallback}
+                keystuck_callback={keystuckCallback}
+                reset_callback={resetConnection}
+                clipboard_callback={clipboardSetCallback}
+                fullscreen_callback={fullscreenCallback}
                 video={remoteVideo.current}
             ></WebRTCControl>
             <audio

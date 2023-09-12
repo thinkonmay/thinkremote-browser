@@ -27,16 +27,18 @@ export const ConTrolContext = createContext<IControlContext | null>(null)
 
 
 export const WebRTCControl = (input: {
-	GamepadACallback: (x: number, y: number, type: 'left' | 'right') => Promise<void>,
-	GamepadBCallback: (index: number, type: 'up' | 'down') => Promise<void>,
-	MouseMoveCallback: (x: number, y: number) => Promise<void>,
-	MouseButtonCallback: (index: number, type: 'up' | 'down') => Promise<void>,
-	keystuckCallback: () => Promise<void>,
-	audioCallback: () => Promise<void>,
-	clipboardSetCallback: (val: string) => Promise<void>,
+	gamepad_callback_a: (x: number, y: number, type: 'left' | 'right') => Promise<void>,
+	gamepad_callback_b: (index: number, type: 'up' | 'down') => Promise<void>,
+	mouse_move_callback: (x: number, y: number) => Promise<void>,
+	mouse_button_callback: (index: number, type: 'up' | 'down') => Promise<void>,
+	keystuck_callback: () => Promise<void>,
+	reset_callback: () => Promise<void>,
+	clipboard_callback: (val: string) => Promise<void>,
 
 	bitrate_callback: (bitrate: number) => Promise<void>,
 	toggle_mouse_touch_callback: (enable: boolean) => Promise<void>,
+	fullscreen_callback: () => Promise<void>,
+
 	platform: Platform,
 	video: HTMLVideoElement
 }) => {
@@ -144,7 +146,7 @@ export const WebRTCControl = (input: {
 				name: "Write to clipboard",
 				action: async () => {
 					const text = await TurnOnClipboard()
-					await input.clipboardSetCallback(text)
+					await input.clipboard_callback(text)
 				},
 			}, {
 				icon: <SettingsIcon />,
@@ -153,11 +155,11 @@ export const WebRTCControl = (input: {
 			},{
 				icon: <Fullscreen />,
 				name: "Enter fullscreen",
-				action: requestFullscreen
+				action: () => {requestFullscreen(); input.fullscreen_callback()}
 			},{
 				icon: <LockReset/>,
 				name: "Reset",
-				action: input.audioCallback 
+				action: input.reset_callback 
 			}
 		])
 		} else {
@@ -175,11 +177,11 @@ export const WebRTCControl = (input: {
 			}, {
 				icon: <Fullscreen />,
 				name: "Enter fullscreen",
-				action: requestFullscreen
+				action: () => {requestFullscreen(); input.fullscreen_callback()}
 			},{
 				icon: <LockReset/>,
 				name: "Reset",
-				action: input.audioCallback 
+				action: input.reset_callback 
 			}])
 		}
 	}, [input.platform])
@@ -214,16 +216,16 @@ export const WebRTCControl = (input: {
 				</div>
 
 				<VirtualMouse
-					MouseMoveCallback={input.MouseMoveCallback}
-					MouseButtonCallback={input.MouseButtonCallback}
+					MouseMoveCallback={input.mouse_move_callback}
+					MouseButtonCallback={input.mouse_button_callback}
 					draggable={enableVMouse} />
 
 				<VirtualGamepad
 					// disable touch when dragging
 					//@ts-ignore
-					ButtonCallback={enableVGamepad =='draggable' ? () => {} : input.GamepadBCallback}
+					ButtonCallback={enableVGamepad =='draggable' ? () => {} : input.gamepad_callback_b}
 					//@ts-ignore
-					AxisCallback={enableVGamepad =='draggable' ? () => {} : input.GamepadACallback}
+					AxisCallback={enableVGamepad =='draggable' ? () => {} : input.gamepad_callback_a}
 					draggable={enableVGamepad}
 				/>
 
