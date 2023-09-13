@@ -366,7 +366,8 @@ export default function Home () {
         client?.hid?.PasteClipboard()
     }
     const resetConnection = async() => {
-        await client?.ResetAudio()
+        await client?.HardReset()                    
+
         SetupWebRTC()
     }
 
