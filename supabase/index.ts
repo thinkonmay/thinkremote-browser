@@ -128,19 +128,19 @@ export default class SbCore {
 		WebRTCConfig: RTCConfiguration
 		PingCallback: () => Promise<void>
 		FetchCallback: () => Promise<WorkerStatus[]>
-	} | Error> {
+	}> {
 		const session = await this.supabase.auth.getSession()
 		if (session.error != null && uref == undefined)
-			return new Error(session.error.message)
+			throw session.error.message
 
 		const headers = uref == undefined ?
 			{ access_token: session.data?.session?.access_token } :
 			{ uref: uref }
 
 		if (headers.access_token == undefined && headers.uref == undefined)
-			return new Error('no authentication method available')
+			throw 'no authentication method available'
 		else if (ref == undefined || ref == null || ref == "null")
-			return new Error('Reference not provided')
+			throw	'Reference not provided'
 
 		const { data, error } = await SupabaseFuncInvoke('session_authenticate', {
 			headers : headers,
@@ -148,7 +148,8 @@ export default class SbCore {
 			method: 'POST',
 		})
 		if (error != null)
-			return new Error(error)
+			throw error
+
 
 		const pingFunc = async () => {
 			const { error } = await this.supabase.rpc(`ping_session`, {
@@ -163,7 +164,7 @@ export default class SbCore {
 		const FetchWorkerStatus = async () : Promise<WorkerStatus[]> => {
 			const session = await this.supabase.auth.getSession()
 			if (session.error != null)
-				throw new Error(session.error.message)
+				throw session.error.message
 
 			const status = await this.supabase.rpc(`fetch_worker_status`, {
 				session_id: data.id

@@ -21,6 +21,7 @@ import {
 import { WebRTCControl } from "../components/control/control";
 import {
     getBrowser,
+	getOS,
 	getPlatform,
 	Platform,
 } from "../core/utils/platform";
@@ -31,6 +32,7 @@ import Metric  from "../components/metric/metric";
 import { AudioMetrics, NetworkMetrics, VideoMetrics } from "../core/qos/models";
 import { VideoWrapper } from "../core/pipeline/sink/video/wrapper";
 import { AudioWrapper } from "../core/pipeline/sink/audio/wrapper";
+import { formatError } from "../utils/formatError";
 
 
 type StatsView = {
@@ -79,8 +81,9 @@ export default function Home () {
     const remoteVideo                              = useRef<HTMLVideoElement>(null);
     const remoteAudio                              = useRef<HTMLAudioElement>(null);
 
-    const [platform,setPlatform] = useState<Platform>(null);
- 	const [isModalOpen, setModalOpen] = useState(false)
+    const [platform,setPlatform]                   = useState<Platform>(null);
+    const [IOSFullscreen,setIOSFullscreen]         = useState<boolean>(false);
+ 	const [isModalOpen, setModalOpen]              = useState(false)
 	const checkHorizontal = (width: number,height:number) => {
         if (platform == 'mobile') 
             setModalOpen(width < height)
@@ -97,6 +100,12 @@ export default function Home () {
             })
 		}
     }, [platform]);
+    useEffect(() => {
+        remoteVideo.current.style.objectFit = 
+            IOSFullscreen
+            ?  "fill"
+            :  "contain"
+    }, [IOSFullscreen]);
 
 
 
@@ -130,6 +139,9 @@ export default function Home () {
                 client?.hid?.ResetKeyStuck()
             })
 
+            if(getOS() == 'iOS' || getBrowser() == 'Safari') 
+                return 
+            
             const fullscreen = document.fullscreenElement != null
             const havingPtrLock = document.pointerLockElement != null
 
@@ -167,8 +179,9 @@ export default function Home () {
 
     useEffect(()=>{
         const got_stuck_one = () => { 
-            return (['started','closed'].includes(videoConnectivity)  && audioConnectivity == 'connected') || 
-                   (['started','closed'].includes(audioConnectivity)  && videoConnectivity == 'connected')
+            return((['started','closed'].includes(videoConnectivity)  && audioConnectivity == 'connected') || 
+                   (['started','closed'].includes(audioConnectivity)  && videoConnectivity == 'connected'))
+                   && !no_video
         }
         const got_stuck_both = () => { 
             return (['started','closed'].includes(videoConnectivity)  && 
@@ -205,8 +218,7 @@ export default function Home () {
         if (!await core.Authenticated() && user_ref == undefined) 
             await core.LoginWithGoogle()
         const result = await core.AuthenticateSession(ref,user_ref)
-        if (result instanceof Error) 
-            throw result
+        
 
         const {Email ,SignalingConfig ,WebRTCConfig,PingCallback,FetchCallback} = result
         callback = PingCallback
@@ -297,7 +309,10 @@ export default function Home () {
         video = new VideoWrapper(remoteVideo.current)
         audio = new AudioWrapper(remoteAudio.current)
         SetupConnection() 
-            .catch(TurnOnAlert)
+            .catch((err)=>{
+                    const errMsg = formatError(err)
+                    TurnOnAlert(errMsg)
+            })
             .then(async () => {
                 SetupWebRTC()
                 setInterval(async () => { // TODO
@@ -319,6 +334,9 @@ export default function Home () {
 
 
 
+    const fullscreenCallback = async function () {
+        setIOSFullscreen(old => !old)
+    }
     const toggleMouseTouchCallback=async function(enable: boolean) { 
         client?.hid?.DisableTouch(!enable);
         client?.hid?.DisableMouse(!enable);
@@ -348,8 +366,9 @@ export default function Home () {
         client?.hid?.SetClipboard(val)
         client?.hid?.PasteClipboard()
     }
-    const audioCallback = async() => {
-        // client?.ResetAudio()
+    const resetConnection = async() => {
+        await client?.HardReset()                    
+
         SetupWebRTC()
     }
 
@@ -368,13 +387,14 @@ export default function Home () {
                 platform={platform} 
                 toggle_mouse_touch_callback={toggleMouseTouchCallback}
                 bitrate_callback={bitrateCallback}
-                GamepadACallback={GamepadACallback}
-                GamepadBCallback={GamepadBCallback}
-                MouseMoveCallback={MouseMoveCallback}
-                MouseButtonCallback={MouseButtonCallback}
-                keystuckCallback={keystuckCallback}
-                audioCallback={audioCallback}
-                clipboardSetCallback={clipboardSetCallback}
+                gamepad_callback_a={GamepadACallback}
+                gamepad_callback_b={GamepadBCallback}
+                mouse_move_callback={MouseMoveCallback}
+                mouse_button_callback={MouseButtonCallback}
+                keystuck_callback={keystuckCallback}
+                reset_callback={resetConnection}
+                clipboard_callback={clipboardSetCallback}
+                fullscreen_callback={fullscreenCallback}
                 video={remoteVideo.current}
             ></WebRTCControl>
             <audio
