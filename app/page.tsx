@@ -179,8 +179,9 @@ export default function Home () {
 
     useEffect(()=>{
         const got_stuck_one = () => { 
-            return (['started','closed'].includes(videoConnectivity)  && audioConnectivity == 'connected') || 
-                   (['started','closed'].includes(audioConnectivity)  && videoConnectivity == 'connected')
+            return((['started','closed'].includes(videoConnectivity)  && audioConnectivity == 'connected') || 
+                   (['started','closed'].includes(audioConnectivity)  && videoConnectivity == 'connected'))
+                   && !no_video
         }
         const got_stuck_both = () => { 
             return (['started','closed'].includes(videoConnectivity)  && 
