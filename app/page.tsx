@@ -189,20 +189,17 @@ export default function Home () {
         }
 
         const check_connection = () => {
-            if (got_stuck_one()) {
-                client?.HardReset()                    
+            if (got_stuck_one() || got_stuck_both()) {
                 SetupWebRTC()
-            } else if (got_stuck_both()) {
-                client?.HardReset()                    
             }
         }
 
         if (got_stuck_one() || got_stuck_both()) {
             console.log('stuck condition happended, retry after 5s')
-            const interval = setTimeout(check_connection,5 * 1000)
+            const interval = setTimeout(check_connection, 7 * 1000)
             return () =>{ clearTimeout(interval) }
         } else if (videoConnectivity == 'connected') {
-            const interval = setInterval(callback,14 * 1000)
+            const interval = setInterval(callback, 12 * 1000)
             return () =>{ clearInterval(interval) }
         }
     }, [videoConnectivity,audioConnectivity])
@@ -367,8 +364,7 @@ export default function Home () {
         client?.hid?.PasteClipboard()
     }
     const resetConnection = async() => {
-        await client?.HardReset()                    
-
+        client?.HardReset()                    
         SetupWebRTC()
     }
 
@@ -418,13 +414,13 @@ export default function Home () {
             <Metric
             	videoConnect={videoConnectivity}
 	            audioConnect={audioConnectivity}
-                path={connectionPath}
-                decodeFPS={metrics.map(x => { return {key: x.index, value: x.decodefps} })}
-                receiveFPS={metrics.map(x => { return {key: x.index, value: x.receivefps} })}
-                packetLoss={metrics.map(x => { return {key: x.index, value: x.packetloss} })}
-                bandwidth={metrics.map(x => { return {key: x.index, value: x.bandwidth} })}
-                buffer={metrics.map(x => { return {key: x.index, value: x.buffer} })}
-                platform={platform}
+                decodeFPS   ={metrics.map(x => { return {key: x.index, value: x.decodefps} })}
+                receiveFPS  ={metrics.map(x => { return {key: x.index, value: x.receivefps} })}
+                packetLoss  ={metrics.map(x => { return {key: x.index, value: x.packetloss} })}
+                bandwidth   ={metrics.map(x => { return {key: x.index, value: x.bandwidth} })}
+                buffer      ={metrics.map(x => { return {key: x.index, value: x.buffer} })}
+                path        ={connectionPath}
+                platform    ={platform}
             />
         </Body>
     );
