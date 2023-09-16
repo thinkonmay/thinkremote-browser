@@ -34,30 +34,42 @@ const MouseLeft = styled(DefaultButton)`
 	color: white;
     border: 2px solid currentColor;
 `;
+const EnterButton = styled(DefaultButton)`
+    bottom: 0;
+    right: 50%;
+    transform: translate(150%, 0%);
+	color: white;
+    border: 2px solid currentColor;
+`;
 
 
-interface Props {
-    onTouch: (e: React.TouchEvent, type: "up" | "down", index: number) => void;
-    size?: number;
+
+export function MouseButtonGroup({ onTouch,onEnter, size }: {
+    onTouch: (type: "up" | "down", index: number ) => void;
+    onEnter: (type: "up" | "down") => void;
     className?: string;
-}
-
-export function LR(props: Props) {
-    const { onTouch, size } = props;
+    size?: number;
+}) {
     return (
         <Container size={size}>
             <MouseRight
-                onTouchStart={(e: React.TouchEvent) => onTouch(e, "down", 2)}
-                onTouchEnd={(e: React.TouchEvent) => onTouch(e, "up", 2)}
+                onTouchStart={()  => onTouch("down" , 2)}
+                onTouchEnd=  {()  => onTouch("up"   , 2)}
             >
                 Right
             </MouseRight>
             <MouseLeft
-                onTouchStart={(e: React.TouchEvent) => onTouch(e, "down", 0)}
-                onTouchEnd={(e: React.TouchEvent) => onTouch(e, "up", 0)}
+                onTouchStart={()  => onTouch("down" , 0)}
+                onTouchEnd=  {()  => onTouch("up"   , 0)}
             >
                 Left
             </MouseLeft>
+            <EnterButton
+                onTouchStart={()  => onEnter("down"  )}
+                onTouchEnd=  {()  => onEnter("up"    )}
+            >
+                Enter
+            </EnterButton>
         </Container>
     );
 }

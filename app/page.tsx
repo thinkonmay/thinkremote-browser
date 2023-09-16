@@ -33,6 +33,7 @@ import { AudioMetrics, NetworkMetrics, VideoMetrics } from "../core/qos/models";
 import { VideoWrapper } from "../core/pipeline/sink/video/wrapper";
 import { AudioWrapper } from "../core/pipeline/sink/audio/wrapper";
 import { formatError } from "../utils/formatError";
+import { EventCode } from "../core/models/keys.model";
 
 
 type StatsView = {
@@ -189,9 +190,8 @@ export default function Home () {
         }
 
         const check_connection = () => {
-            if (got_stuck_one() || got_stuck_both()) {
+            if (got_stuck_one() || got_stuck_both()) 
                 SetupWebRTC()
-            }
         }
 
         if (got_stuck_one() || got_stuck_both()) {
@@ -359,26 +359,17 @@ export default function Home () {
     const keystuckCallback= async function (): Promise<void> {
         client?.hid?.ResetKeyStuck();
     }
-    const clipboardSetCallback= async function (val: string): Promise<void> {
-        client?.hid?.SetClipboard(val)
-        client?.hid?.PasteClipboard()
-    }
     const resetConnection = async() => {
         client?.HardReset()                    
         SetupWebRTC()
+    }
+    const keyboardCallback = async(val,action: "up" | "down") => {
+        client?.hid?.TriggerKey(action == "up" ? EventCode.KeyUp : EventCode.KeyDown,val)
     }
 
 
     return (
         <Body>
-            <RemoteVideo
-                ref={remoteVideo}
-                src={platform == 'desktop' ? video_desktop : video_desktop}
-                autoPlay
-                muted
-                playsInline
-                loop
-            ></RemoteVideo>
             <WebRTCControl 
                 platform={platform} 
                 toggle_mouse_touch_callback={toggleMouseTouchCallback}
@@ -389,10 +380,18 @@ export default function Home () {
                 mouse_button_callback={MouseButtonCallback}
                 keystuck_callback={keystuckCallback}
                 reset_callback={resetConnection}
-                clipboard_callback={clipboardSetCallback}
                 fullscreen_callback={fullscreenCallback}
+                keyboard_callback={keyboardCallback}
                 video={remoteVideo.current}
             ></WebRTCControl>
+            <RemoteVideo
+                ref={remoteVideo}
+                src={no_video ? null : platform == 'desktop' ? video_desktop : video_desktop}
+                autoPlay
+                muted
+                playsInline
+                loop
+            ></RemoteVideo>
             <audio
                 ref={remoteAudio}
                 autoPlay={true}

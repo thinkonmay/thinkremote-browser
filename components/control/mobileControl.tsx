@@ -86,22 +86,21 @@ interface Action {
 	action: () => void,
 }
 interface Props {
+	isClose: boolean
+	handleOpen: () => void
+
 	actions: Action[],
 	isShowBtn: boolean
+
 	onOkey: () => Promise<void>
 	onDefault: () => Promise<void>
+
+
 }
 
-function MobileControl(props: Props) {
-	const { actions, isShowBtn, onOkey, onDefault } = props
-	const [isOpen, setOpen] = React.useState(false)
-
-	const handleOpen = () => {
-		setOpen(!isOpen)
-	}
-	
+function MobileControl({ isClose, handleOpen, actions, isShowBtn, onOkey, onDefault }: Props) {
 	return (
-		<Container className={isOpen ? 'slide-out' : 'slide-in'}>
+		<Container className={!isClose ? 'slide-out' : 'slide-in'}>
 
 			<WrapperContent >
 				{
@@ -121,7 +120,7 @@ function MobileControl(props: Props) {
 			</WrapperContent>
 			<Button onClick={handleOpen}>
 				{
-					isOpen 
+					!isClose 
 					? <IoIosArrowForward color="white" style={{fontSize:20}}/> 
 					: <IoIosArrowBack color="white"    style={{fontSize:20}} />
 				}

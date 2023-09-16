@@ -8,8 +8,14 @@ import {
     Joystick,
 } from "react-joystick-component/build/lib/Joystick";
 import { ButtonMode, ConTrolContext } from "../control/control";
+import { MouseButtonGroup } from "./mouse/mouse";
 
-import { LR } from "./mouse/mouse";
+
+
+
+
+const defaultMouseGroupValue = { x: 25, y: 140 }
+const defaultJoyStickValue   = { x: 160, y: 25 }
 
 export const JoyStick = (param: {
     draggable: ButtonMode;
@@ -58,35 +64,31 @@ export const JoyStick = (param: {
     );
 };
 
-interface ButtonGroupProps {
+
+const MouseGroup = (param: {
     draggable: Partial<ButtonMode>;
     AxisCallback: (x: number, y: number) => Promise<void>;
     ButtonCallback: (index: number, type: "up" | "down") => Promise<void>;
-}
-const defaultMouseGroupValue = { x: 25, y: 140 }
-const defaultJoyStickValue = { x: 160, y: 25 }
+    KeyboardCallback: (code: string, type: "up" | "down") => Promise<void>;
+}) => {
 
-const MouseGroup = (param: ButtonGroupProps) => {
     const [posBtn, setPosBtn] = useState(defaultMouseGroupValue);
     const [isPending, startTransition] = useTransition()
-
     const { isSetVMouseDefaultValue } = useContext(ConTrolContext);
 
     useLayoutEffect(() => {
-        let cache = localStorage.getItem(`mouse_group_pos`);
-
+        const cache = localStorage.getItem(`mouse_group_pos`);
         if (cache === null) {
             setPosBtn(defaultMouseGroupValue)
             return;
         }
-        const { x, y } = JSON.parse(
-            cache
-        );
-        if(x === null || x ===null){
+
+        const { x, y } = JSON.parse(cache);
+
+        if (x == null || x == null)
             setPosBtn(defaultMouseGroupValue)
-            return
-        }
-        setPosBtn({ x: x, y: y });
+        else 
+            setPosBtn({ x: x, y: y });
     }, []);
 
     const handleDrag = (e: DraggableEvent, data: DraggableData) => {
@@ -104,12 +106,12 @@ const MouseGroup = (param: ButtonGroupProps) => {
         })
     };
 
-     //reset default value
-     useEffect(() => {
+
+    //reset default value
+    useEffect(() => {
         if (isSetVMouseDefaultValue === true) {
             setPosBtn(defaultMouseGroupValue)
             localStorage.setItem(`mouse_group_pos`, JSON.stringify(defaultMouseGroupValue));
-
         }
     }, [isSetVMouseDefaultValue])
     return (
@@ -120,18 +122,23 @@ const MouseGroup = (param: ButtonGroupProps) => {
             onDrag={handleDrag}
         >
             <WrapperDrag>
-                <LR
+                <MouseButtonGroup
                     size={90}
-                    onTouch={(e: React.TouchEvent, type, index) => {
-                        param.ButtonCallback(index, type);
-                    }}
-                ></LR>
-                {/* <JoyStick moveCallback={param.AxisCallback} draggable={param.draggable}></JoyStick>  */}
+                    onTouch={(type, index) => param.ButtonCallback(index, type)}
+                    onEnter={type          => param.KeyboardCallback("Enter", type)}
+                ></MouseButtonGroup>
             </WrapperDrag>
         </Draggable>
     );
 };
-const JoyStickBtn = (param: ButtonGroupProps) => {
+
+
+
+const JoyStickBtn = (param: {
+    draggable: Partial<ButtonMode>;
+    AxisCallback: (x: number, y: number) => Promise<void>;
+    ButtonCallback: (index: number, type: "up" | "down") => Promise<void>;
+}) => {
     const [posBtn, setPosBtn] = useState(defaultJoyStickValue);
     const { isSetVMouseDefaultValue } = useContext(ConTrolContext);
     const [isPending, startTransition] = useTransition()
@@ -195,6 +202,7 @@ export const VirtualMouse = (param: {
     draggable: ButtonMode;
     MouseMoveCallback: (move_x: number, move_y: number) => Promise<void>;
     MouseButtonCallback: (index: number, type: "up" | "down") => Promise<void>;
+    KeyboardCallback: (code: string, type: "up" | "down") => Promise<void>;
 }) => {
 
 
@@ -205,6 +213,7 @@ export const VirtualMouse = (param: {
                     <MouseGroup
                         AxisCallback={param.MouseMoveCallback}
                         ButtonCallback={param.MouseButtonCallback}
+                        KeyboardCallback={param.KeyboardCallback}
                         draggable={param.draggable}
                     />
                     <JoyStickBtn
