@@ -188,8 +188,11 @@ export const WebRTCControl = (input: {
 				icon: <KeyboardIcon />,
 				name: "Write to clipboard",
 				action: () => { 
-					setClipboard(true) 
-					setOpenControl(false)
+					setClipboard(old => {
+						if (old) 
+							setOpenControl(false)
+						return !old
+					}) 
 				},
 			},
 		fullscreen : {
@@ -219,7 +222,7 @@ export const WebRTCControl = (input: {
 
 	useEffect(() => {
 		if (input.platform == 'mobile')
-			setactions([button.reset,button.bitrate,button.vmouse,button.vgamepad,button.setting,button.keyboard,button.fullscreen])
+			setactions([button.reset,button.bitrate,button.vgamepad,button.setting,button.keyboard,button.fullscreen])
 		else 
 			setactions([button.reset,button.bitrate,button.fullscreen])
 	}, [input.platform])
