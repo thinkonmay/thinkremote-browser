@@ -75,10 +75,6 @@ const ButtonIcon = styled.button`
 	width: 45px;
 	height: 100%;
 	font-weight: 500;
-	:active{
-		background: black;
-		color: white;
-	}
 `
 interface Action {
 	icon: React.ReactNode,

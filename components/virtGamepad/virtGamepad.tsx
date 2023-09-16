@@ -2,11 +2,6 @@
 import React, { useRef, useState, useEffect, useLayoutEffect, useTransition, useContext } from "react"; // we need this to make JSX compile
 import Draggable, { DraggableData, DraggableEvent } from "react-draggable";
 import styled from "styled-components";
-import {
-    IJoystickUpdateEvent,
-    Joystick,
-} from "react-joystick-component/build/lib/Joystick";
-
 import { ButtonMode, ConTrolContext } from "../control/control";
 import { YBXA } from "./gamepad/y_b_x_a";
 import DPad from "./gamepad/d_pad";
@@ -14,6 +9,7 @@ import { LeftFuncButton, RightFuncButton } from "./gamepad/func_button";
 import { useSetting } from "../../context/settingProvider";
 import ArrowLeftIcon from '@mui/icons-material/ArrowLeft';
 import ArrowRightIcon from '@mui/icons-material/ArrowRight';
+import { JoyStick } from "../joystick/joystick";
 const BUTTON_SIZE = 50
 const JOYSTICK_SIZE = 100
 
@@ -53,45 +49,6 @@ export const VirtualGamepad = (props: {
     );
 };
 
-export const JoyStick = (param: {
-    draggable: ButtonMode;
-    moveCallback: (x: number, y: number) => Promise<void>;
-    className: string;
-    size: number,
-}) => {
-
-    const { draggable, moveCallback, className, size = 100 } = param
-    const [enableJT, setenableJT] = useState<boolean>(false);
-
-    const move = (event: IJoystickUpdateEvent) => {
-        if (event.type == "move") {
-            if (!enableJT) {
-                moveCallback(0, 0);
-                return;
-            }
-            moveCallback(event.x, -event.y);
-        } else if (event.type == "stop") {
-            setenableJT(false);
-            moveCallback(0, 0);
-        } else if (event.type == "start") {
-            setenableJT(true);
-        }
-    };
-
-    return (
-        <WrapperJoyStick className={className}>
-            <Joystick
-                start={move}
-                stop={move}
-                move={move}
-                size={size}
-                baseColor="rgba(0, 0, 0, 0.1)"
-                stickColor="rgba(255, 255, 255, 0.52"
-                disabled={draggable === 'draggable'}
-            />
-        </WrapperJoyStick>
-    );
-};
 interface Coordinates {
     x: number;
     y: number
@@ -261,9 +218,7 @@ export const ButtonGroupRight = (props: ButtonGroupProps) => {
             >
                 <WrapperDraggable id="joystick">
                     <JoyStickRight
-                        moveCallback={(x: number, y: number) =>
-                            props.AxisCallback(x, y, "right")
-                        }
+                        moveCallback={(x, y) => props.AxisCallback(x, y, "right") }
                         draggable={props.draggable}
                         size={JOYSTICK_SIZE * rightJt}
                     />
@@ -292,9 +247,6 @@ const Rs = styled.button`
      /* depened on Container */
     width: ${props => props.size + 'px'};
     height: ${props => props.size + 'px'};
-    :active {
-        background-color: rgb(97 76 76 / 15%);;
-    }
     color: #C3B5B5;
     border: 1px solid currentColor;
     border-radius: 50%;
@@ -308,9 +260,6 @@ const Rs = styled.button`
 const Ls = styled.button`
     width: ${props => props.size + 'px'};
     height: ${props => props.size + 'px'};
-    :active {
-        background-color: rgb(97 76 76 / 15%);;
-    }
     color: #C3B5B5;
     border: 1px solid currentColor;
     border-radius: 50%;
@@ -453,10 +402,7 @@ export const ButtonGroupLeft = (props: ButtonGroupProps) => {
                     id="joystick"
                 >
                     <JoyStickLeft
-                        moveCallback={async (x: number, y: number) => {
-                            props.AxisCallback(x, y, "left");
-                            return;
-                        }}
+                        moveCallback={(x,y) => props.AxisCallback(x, y, "left")}
                         draggable={props.draggable}
                         size={JOYSTICK_SIZE * leftJt}
                     />
@@ -520,9 +466,6 @@ const CssDefaultCenterBtn = styled.button`
     display: flex;
     align-items: center;
     justify-content: center;
-    :active {
-        background-color: rgb(97 76 76 / 15%);;
-    }
 `;
 const SelectBtn = styled(CssDefaultCenterBtn)`
     /*position: absolute;

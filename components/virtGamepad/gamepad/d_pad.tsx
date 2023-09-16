@@ -16,9 +16,6 @@ const DefaultButton = styled.button`
      /* depened on Container */
      width: inherit;
     height: inherit;
-    :active {
-        background-color: rgb(97 76 76 / 15%);;
-    }
     color: #C3B5B5;
     border: 1px solid currentColor;
     border-radius: 50%;

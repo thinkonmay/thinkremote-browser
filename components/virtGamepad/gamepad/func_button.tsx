@@ -24,9 +24,6 @@ const DefaultFuncBtn = styled.button`
     border: 1px solid #C3B5B5;
     border-radius: 50%;
     background-color: transparent;
-    :active {
-        background-color: rgba(0, 0, 0, 0.05);
-    }
     -webkit-user-select: none;
     -ms-user-select: none; 
     user-select: none;
