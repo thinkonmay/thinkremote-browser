@@ -224,20 +224,6 @@ export const ButtonGroupRight = (props: ButtonGroupProps) => {
             </Draggable>
             <Draggable
                 disabled={props.draggable != "draggable"}
-                position={{ x: posBtn?.joystick?.x, y: posBtn?.joystick?.y }}
-                onStop={handleStop}
-                onDrag={handleDrag}
-            >
-                <WrapperDraggable id="joystick">
-                    <JoyStickRight
-                        moveCallback={(x, y) => props.AxisCallback(x, y, "right") }
-                        draggable={props.draggable}
-                        size={JOYSTICK_SIZE * rightJt}
-                    />
-                </WrapperDraggable>
-            </Draggable>
-            <Draggable
-                disabled={props.draggable != "draggable"}
                 position={{ x: posBtn?.rs?.x, y: posBtn?.rs?.y }}
                 onStop={handleStop}
                 onDrag={handleDrag}
@@ -418,22 +404,6 @@ export const ButtonGroupLeft = (props: ButtonGroupProps) => {
             </Draggable>
             <Draggable
                 disabled={props.draggable != "draggable"}
-                position={{ x: posBtn?.joystick?.x, y: posBtn?.joystick?.y }}
-                onStop={handleStop}
-                onDrag={handleDrag}
-            >
-                <WrapperDraggable
-                    id="joystick"
-                >
-                    <JoyStickLeft
-                        moveCallback={(x,y) => props.AxisCallback(x, y, "left")}
-                        draggable={props.draggable}
-                        size={JOYSTICK_SIZE * leftJt}
-                    />
-                </WrapperDraggable>
-            </Draggable>
-            <Draggable
-                disabled={props.draggable != "draggable"}
                 position={{ x: posBtn?.ls?.x, y: posBtn?.ls?.y }}
                 onStop={handleStop}
                 onDrag={handleDrag}
@@ -500,19 +470,6 @@ const StartBtn = styled(CssDefaultCenterBtn)`
     /*position: absolute;
     top: 50%;
     left: 10px;*/
-`;
-
-const JoyStickRight = styled(JoyStick)`
-    /*position: absolute;
-    opacity: 0.3;
-    bottom: 10%;
-    right: 50%;*/
-`;
-const JoyStickLeft = styled(JoyStick)`
-    /*position: absolute;
-    opacity: 0.3;
-    top: 50%;
-    right: 50%;*/
 `;
 
 const ContainerSubButton = styled.div`

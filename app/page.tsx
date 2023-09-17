@@ -336,9 +336,8 @@ export default function Home () {
     const fullscreenCallback = async function () {
         setIOSFullscreen(old => !old)
     }
-    const toggleMouseTouchCallback=async function(enable: boolean) { 
-        client?.hid?.DisableTouch(!enable);
-        client?.hid?.DisableMouse(!enable);
+    const touchModeCallback=async function(mode: 'trackpad' | 'gamepad' | 'mouse' | 'none') { 
+        client?.hid?.setTouchMode(mode)
     } 
     const bitrateCallback= async function (bitrate: number) { 
         client?.ChangeBitrate(bitrate);
@@ -378,7 +377,7 @@ export default function Home () {
         <Body>
             <WebRTCControl 
                 platform={platform} 
-                enable_touch={toggleMouseTouchCallback}
+                touch_mode_callback={touchModeCallback}
                 bitrate_callback={bitrateCallback}
                 gamepad_callback_a={GamepadACallback}
                 gamepad_callback_b={GamepadBCallback}

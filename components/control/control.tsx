@@ -24,7 +24,7 @@ export const ConTrolContext = createContext<{
 
 
 export const WebRTCControl = (input: {
-	enable_touch					: (enable: boolean) 									=> Promise<void>,
+	touch_mode_callback				: (mode: 'trackpad' | 'gamepad' | 'mouse' | 'none') 	=> Promise<void>,
 	gamepad_callback_a				: (x: number, y: number, 	type: 'left' | 'right') 	=> Promise<void>,
 	gamepad_callback_b				: (index: number, 			type: 'up' | 'down') 		=> Promise<void>,
 	mouse_button_callback			: (index: number, 			type: 'up' | 'down') 		=> Promise<void>,
@@ -87,7 +87,17 @@ export const WebRTCControl = (input: {
 	},[Clipboard])
 
 	useEffect(() => {
-		input.enable_touch(enableVGamepad != 'draggable');
+		switch (enableVGamepad) {
+			case 'disable':
+				input.touch_mode_callback('trackpad')
+				break;
+			case 'static':
+				input.touch_mode_callback('gamepad')
+				break;
+			case 'draggable':
+				input.touch_mode_callback('none')
+				break;
+		}
 	}, [enableVGamepad])
 
 	useEffect(() => {
