@@ -2,15 +2,13 @@
 
 import { Fullscreen, LockReset, } from "@mui/icons-material";
 import SportsEsportsOutlinedIcon from '@mui/icons-material/SportsEsportsOutlined';
-import MouseOutlinedIcon from '@mui/icons-material/MouseOutlined';
 import VideoSettingsOutlinedIcon from '@mui/icons-material/VideoSettingsOutlined';
 import KeyboardIcon from '@mui/icons-material/Keyboard';
 import React, { useEffect, useState, createContext, useRef } from "react"; // we need this to make JSX compile
 import { Platform } from "../../core/utils/platform";
 import { requestFullscreen } from "../../core/utils/screen";
-import { AskSelectBitrate, TurnOnClipboard } from "../popup/popup";
+import { AskSelectBitrate } from "../popup/popup";
 import { VirtualGamepad } from "../virtGamepad/virtGamepad";
-import { VirtualMouse } from "../virtMouse/virtMouse";
 import MobileControl from "./mobileControl";
 import SettingsIcon from '@mui/icons-material/Settings';
 import DesktopControl from "./desktopControl";
@@ -20,21 +18,19 @@ import { useShift } from "../../utils/formatChar";
 
 export type ButtonMode = "static" | "draggable" | "disable";
 
-interface IControlContext {
-	isSetVGamePadDefaultValue:boolean
-	isSetVMouseDefaultValue:boolean
-}
-export const ConTrolContext = createContext<IControlContext | null>(null)
+export const ConTrolContext = createContext<{
+	DefaultPosition:boolean
+}| null>(null)
 
 
 export const WebRTCControl = (input: {
+	enable_touch		: (enable: boolean) 									=> Promise<void>,
 	gamepad_callback_a				: (x: number, y: number, 	type: 'left' | 'right') 	=> Promise<void>,
 	gamepad_callback_b				: (index: number, 			type: 'up' | 'down') 		=> Promise<void>,
 	mouse_button_callback			: (index: number, 			type: 'up' | 'down') 		=> Promise<void>,
 	keyboard_callback				: (key: string, 			type: 'up' | 'down') 		=> Promise<void>,
 	mouse_move_callback				: (x: number, y: number) 								=> Promise<void>,
 	bitrate_callback				: (bitrate: number) 									=> Promise<void>,
-	toggle_mouse_touch_callback		: (enable: boolean) 									=> Promise<void>,
 
 	keystuck_callback				: () => Promise<void>,
 	reset_callback					: () => Promise<void>,
@@ -43,17 +39,15 @@ export const WebRTCControl = (input: {
 	platform						: Platform,
 	video							: HTMLVideoElement
 }) => {
-	const [enableVGamepad, setenableVGamepad] = useState<ButtonMode>("disable");
-	const [enableVMouse  , setenableVMouse]   = useState<ButtonMode>("disable");
+	const [enableVGamepad, setenableVGamepad] 		= useState<ButtonMode>("disable");
 	const [isModalSettingOpen, setModalSettingOpen] = useState(false)
-	const [actions, setactions] = useState<any[]>([]);
+	const [actions, setactions] 					= useState<any[]>([]);
+	const [TextValue,setTextValue]       			= useState<string[]>([]);
+	const [OldTextValue,setOldTextValue] 			= useState<string[]>([]);
+	const [OpenControl, setOpenControl]  			= useState<boolean>(false)
 
-	const [TextValue,setTextValue]       = useState<string[]>([]);
-	const [OldTextValue,setOldTextValue] = useState<string[]>([]);
-	const [OpenControl, setOpenControl]  = useState<boolean>(false)
-
-	const [Clipboard,setClipboard] = useState<boolean>(false);
-    const inputRef = useRef<HTMLInputElement>(null);
+	const [Clipboard,setClipboard] 					= useState<boolean>(false);
+    const inputRef 									= useRef<HTMLInputElement>(null);
 
 	useEffect(() => {
 		if (TextValue.length > OldTextValue.length) {
@@ -89,54 +83,17 @@ export const WebRTCControl = (input: {
 		const interval = setInterval(read,50)
 		return () => {clearInterval(interval)}
 	},[Clipboard])
+
 	useEffect(() => {
-		let enable = (enableVGamepad == 'disable') && (enableVMouse   == 'disable')
-		if( enableVGamepad == 'draggable' || enableVMouse =='draggable'){
-			enable = false
-		}
-		input.toggle_mouse_touch_callback(enable);
-		
-	}, [enableVGamepad, enableVMouse])
+		input.enable_touch(enableVGamepad != 'draggable');
+	}, [enableVGamepad])
 
-	const handleDraggable = (type: 'VGamePad' | 'VMouse', value: boolean) => {
-
-		setModalSettingOpen(false)
-		if (type === 'VGamePad') {
-			setenableVGamepad("draggable")
-			setenableVMouse("disable")
-
-		} else if (type === 'VMouse') {
-			setenableVMouse("draggable")
-			setenableVGamepad("disable")
-		}
-
-	}
-
-
-	const [defaultPos, setDefaultPos] = useState()
-	const [tempPos, setTempPos] = useState()
-	const [isSetVGamePadDefaultValue, setVGamePadDefaultValue] = useState(false)
-	const [isSetVMouseDefaultValue, setVMouseDefaultValue] = useState(false)
-
-	const handleOkeyDragValue = async () => {
-		if (enableVGamepad === 'draggable') 
-			setenableVGamepad('static')
-		else if (enableVMouse === 'draggable') 
-			setenableVMouse('static')
-	}
-
-	const handleSetDeafaultDragValue = async () => {
-		if(enableVGamepad ==='draggable')
-			setVGamePadDefaultValue(true)
-		else if(enableVMouse ==='draggable')
-			setVMouseDefaultValue(true)
-	}
-
-	//reset per/click default
-	useEffect(()=>{
-		setVGamePadDefaultValue(false)
-		setVMouseDefaultValue(false)
-	}, [isSetVGamePadDefaultValue, isSetVMouseDefaultValue])
+	useEffect(() => {
+		if (input.platform == 'mobile')
+			setactions([button.reset,button.bitrate,button.vgamepad,button.setting,button.keyboard,button.fullscreen])
+		else 
+			setactions([button.reset,button.bitrate,button.fullscreen])
+	}, [input.platform])
 
 	const button = {
 		bitrate : {
@@ -155,7 +112,6 @@ export const WebRTCControl = (input: {
 				icon: <SportsEsportsOutlinedIcon />,
 				name: "Edit VGamepad",
 				action: () => {
-					setenableVMouse('disable')
 					setenableVGamepad((prev) => {
 						setOpenControl(false)
 						switch (prev) {
@@ -167,23 +123,6 @@ export const WebRTCControl = (input: {
 					});
 				},
 			},
-		vmouse : {
-				icon: <MouseOutlinedIcon />,
-				name: "Enable VMouse",
-				action: () => {
-					setenableVGamepad('disable')
-					setenableVMouse((prev) => {
-						setOpenControl(false)
-						switch (prev) {
-							case "disable":
-								return "static";
-							case "static":
-								return "disable";
-						}
-					});
-
-				},
-			},
 		keyboard : {
 				icon: <KeyboardIcon />,
 				name: "Write to clipboard",
@@ -191,6 +130,7 @@ export const WebRTCControl = (input: {
 					setClipboard(old => {
 						if (old) 
 							setOpenControl(false)
+
 						return !old
 					}) 
 				},
@@ -220,16 +160,16 @@ export const WebRTCControl = (input: {
 
 
 
-	useEffect(() => {
-		if (input.platform == 'mobile')
-			setactions([button.reset,button.bitrate,button.vgamepad,button.setting,button.keyboard,button.fullscreen])
-		else 
-			setactions([button.reset,button.bitrate,button.fullscreen])
-	}, [input.platform])
 
+
+
+	const [DefaultPosition, setDefaultPosition] = useState(false)
+	useEffect(()=>{ // disable default position after 2 second
+		setTimeout(() => setDefaultPosition(false),2000)
+	}, [DefaultPosition])
 
 	return (
-		<ConTrolContext.Provider value={{ isSetVGamePadDefaultValue, isSetVMouseDefaultValue }}>
+		<ConTrolContext.Provider value={{ DefaultPosition }}>
 			<>
 				<div
 					className="containerDrag"
@@ -245,10 +185,22 @@ export const WebRTCControl = (input: {
 					?  <MobileControl
 						isClose={OpenControl}
 						handleOpen={() =>  setOpenControl(old => !old) }
+
+						isShowBtn={enableVGamepad === 'draggable'}
+						onOkey={async () => {
+							if (enableVGamepad != 'draggable') 
+								return
+
+							setenableVGamepad('static')
+						}}
+						onDefault={async () => {
+							if(enableVGamepad !='draggable')
+								return
+							
+							setDefaultPosition(true)
+						}}
+
 						actions={actions}
-						isShowBtn={enableVGamepad === 'draggable' || enableVMouse === 'draggable'}
-						onOkey={handleOkeyDragValue}
-						onDefault={handleSetDeafaultDragValue}
 					/> 
 					: <DesktopControl 
 						actions={actions} 
@@ -256,11 +208,7 @@ export const WebRTCControl = (input: {
 				}
 				</div>
 
-				<VirtualMouse
-					MouseMoveCallback={input.mouse_move_callback}
-					MouseButtonCallback={input.mouse_button_callback}
-					KeyboardCallback={input.keyboard_callback}
-					draggable={enableVMouse} />
+
 
 				<VirtualGamepad
 					ButtonCallback={enableVGamepad =='draggable' 
@@ -273,9 +221,12 @@ export const WebRTCControl = (input: {
 				/>
 
 				<Setting
-					onDraggable={handleDraggable}
+					onDraggable={() => {
+						setModalSettingOpen(false)
+						setenableVGamepad("draggable")
+					}}
 					isOpen={isModalSettingOpen}
-					closeModal={() => { setModalSettingOpen(false) }}
+					closeModal={() => setModalSettingOpen(false) }
 				/>
 
 				<input 

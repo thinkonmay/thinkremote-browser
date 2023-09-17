@@ -73,7 +73,7 @@ const defaultButtonGroupRightValue = {
 export const ButtonGroupRight = (props: ButtonGroupProps) => {
     const { settingValue } = useSetting()
     const [isPending, startTransition] = useTransition()
-    const { isSetVGamePadDefaultValue } = useContext(ConTrolContext);
+    const { DefaultPosition } = useContext(ConTrolContext);
 
 
     const {
@@ -143,20 +143,32 @@ export const ButtonGroupRight = (props: ButtonGroupProps) => {
 
     //reset default value
     useEffect(() => {
-        if (isSetVGamePadDefaultValue === true) {
-            const deviceWidth = window.innerWidth
-            const deviceHeight = window.innerHeight
-            const defaultPos = {
-                ybxa: { x: deviceWidth * defaultButtonGroupRightValue.ybxa.x, y: deviceHeight * defaultButtonGroupRightValue.ybxa.y },
-                joystick: { x: deviceWidth * defaultButtonGroupRightValue.joystick.x, y: deviceHeight * defaultButtonGroupRightValue.joystick.y },
-                funcBtn: { x: deviceWidth * defaultButtonGroupRightValue.funcBtn.x, y: deviceHeight * defaultButtonGroupRightValue.funcBtn.y },
-                subBtn: { x: deviceWidth * defaultButtonGroupRightValue.subBtn.x, y: deviceHeight * defaultButtonGroupRightValue.subBtn.y },
-            }
-            setPosBtn(defaultPos)
-            localStorage.setItem(`right_group_pos1`, JSON.stringify(defaultPos));
+        if (!DefaultPosition) 
+            return
 
+        const deviceWidth = window.innerWidth
+        const deviceHeight = window.innerHeight
+        const defaultPos = {
+            ybxa        : { 
+                x: deviceWidth * defaultButtonGroupRightValue.ybxa.x, 
+                y: deviceHeight * defaultButtonGroupRightValue.ybxa.y 
+            },
+            joystick    : { 
+                x: deviceWidth * defaultButtonGroupRightValue.joystick.x, 
+                y: deviceHeight * defaultButtonGroupRightValue.joystick.y 
+            },
+            funcBtn     : { 
+                x: deviceWidth * defaultButtonGroupRightValue.funcBtn.x, 
+                y: deviceHeight * defaultButtonGroupRightValue.funcBtn.y 
+            },
+            subBtn      : { 
+                x: deviceWidth * defaultButtonGroupRightValue.subBtn.x, 
+                y: deviceHeight * defaultButtonGroupRightValue.subBtn.y 
+            },
         }
-    }, [isSetVGamePadDefaultValue])
+        setPosBtn(defaultPos)
+        localStorage.setItem(`right_group_pos1`, JSON.stringify(defaultPos));
+    }, [DefaultPosition])
     return (
         <>
             <Draggable
@@ -279,7 +291,7 @@ const defaultButtonGroupLeftValue = {
 export const ButtonGroupLeft = (props: ButtonGroupProps) => {
     const { settingValue } = useSetting()
     const [isPending, startTransition] = useTransition()
-    const { isSetVGamePadDefaultValue } = useContext(ConTrolContext);
+    const { DefaultPosition } = useContext(ConTrolContext);
 
     const {
         leftJt,
@@ -344,20 +356,32 @@ export const ButtonGroupLeft = (props: ButtonGroupProps) => {
 
     //reset default value
     useEffect(() => {
-        if (isSetVGamePadDefaultValue === true) {
-            const deviceWidth = window.innerWidth
-            const deviceHeight = window.innerHeight
-            const defaultPos = {
-                dpad: { x: deviceWidth * defaultButtonGroupLeftValue.dpad.x, y: deviceHeight * defaultButtonGroupLeftValue.dpad.y },
-                joystick: { x: deviceWidth * defaultButtonGroupLeftValue.joystick.x, y: deviceHeight * defaultButtonGroupLeftValue.joystick.y },
-                funcBtn: { x: deviceWidth * defaultButtonGroupLeftValue.funcBtn.x, y: deviceHeight * defaultButtonGroupLeftValue.funcBtn.y },
-                ls: { x: deviceWidth * defaultButtonGroupLeftValue.ls.x, y: deviceHeight * defaultButtonGroupLeftValue.ls.y },
-            }
-            setPosBtn(defaultPos)
-            localStorage.setItem(`left_group_pos1`, JSON.stringify(defaultPos));
+        if (!DefaultPosition) 
+            return
 
+        const deviceWidth = window.innerWidth
+        const deviceHeight = window.innerHeight
+        const defaultPos = {
+            dpad: { 
+                x: deviceWidth * defaultButtonGroupLeftValue.dpad.x, 
+                y: deviceHeight * defaultButtonGroupLeftValue.dpad.y 
+            },
+            joystick: { 
+                x: deviceWidth * defaultButtonGroupLeftValue.joystick.x, 
+                y: deviceHeight * defaultButtonGroupLeftValue.joystick.y 
+            },
+            funcBtn: { 
+                x: deviceWidth * defaultButtonGroupLeftValue.funcBtn.x, 
+                y: deviceHeight * defaultButtonGroupLeftValue.funcBtn.y 
+            },
+            ls: { 
+                x: deviceWidth * defaultButtonGroupLeftValue.ls.x, 
+                y: deviceHeight * defaultButtonGroupLeftValue.ls.y 
+            },
         }
-    }, [isSetVGamePadDefaultValue])
+        setPosBtn(defaultPos)
+        localStorage.setItem(`left_group_pos1`, JSON.stringify(defaultPos));
+    }, [DefaultPosition])
     return (
         <>
             <Draggable

@@ -372,7 +372,7 @@ export default function Home () {
         <Body>
             <WebRTCControl 
                 platform={platform} 
-                toggle_mouse_touch_callback={toggleMouseTouchCallback}
+                enable_touch={toggleMouseTouchCallback}
                 bitrate_callback={bitrateCallback}
                 gamepad_callback_a={GamepadACallback}
                 gamepad_callback_b={GamepadBCallback}
