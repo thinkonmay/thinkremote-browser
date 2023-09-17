@@ -88,7 +88,7 @@ function Joystickinternal({
                 borderRadius: `${baseSize / 2}px`,
 
                 background: "#000",
-                opacity: "0.3",
+                opacity: "0.5",
 
             }}
             >
@@ -110,7 +110,7 @@ function Joystickinternal({
                     border: 'none',
                     flexShrink: 0,
                     touchAction: 'none',
-                    opacity: "0.3",
+                    opacity: "0.5",
                 }}
             />
         </div>
