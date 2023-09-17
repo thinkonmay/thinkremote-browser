@@ -56,23 +56,23 @@ function Joystickinternal({
         move(0,0)
     },[enable])
 
-    const pointerMove = (e: PointerEvent) => {
-        const base  =  baseRef.current.getBoundingClientRect()
-        setPos({
-            x: e.clientX - (base.x + AbsRad),
-            y: e.clientY - (base.y + AbsRad)
-        })
-    }
-    const pointerUp   =() => {
-        window.removeEventListener("pointermove",pointerMove)
-        window.removeEventListener("pointerup"  ,pointerUp)
-        setenable(false)
-    }
-    const onPointer = () => {
-        window.addEventListener("pointermove",pointerMove)
-        window.addEventListener("pointerup"  ,pointerUp)
-        setenable(true)
-    }
+    // const pointerMove = (e: PointerEvent) => {
+    //     const base  =  baseRef.current.getBoundingClientRect()
+    //     setPos({
+    //         x: e.clientX - (base.x + AbsRad),
+    //         y: e.clientY - (base.y + AbsRad)
+    //     })
+    // }
+    // const pointerUp   =() => {
+    //     window.removeEventListener("pointermove",pointerMove)
+    //     window.removeEventListener("pointerup"  ,pointerUp)
+    //     setenable(false)
+    // }
+    // const onPointer = () => {
+    //     window.addEventListener("pointermove",pointerMove)
+    //     window.addEventListener("pointerup"  ,pointerUp)
+    //     setenable(true)
+    // }
 
 
     return (
@@ -95,7 +95,7 @@ function Joystickinternal({
 
             <button 
                 ref={stickRef}
-                onPointerDown={onPointer}
+                // onPointerDown={onPointer}
                 style={{
                     background: "hwb(360 51% 76%)",
                     cursor: "move",

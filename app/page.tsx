@@ -162,7 +162,7 @@ export default function Home () {
             }
 
             if ((fullscreen && !havingPtrLock ) && getBrowser() != 'Safari')
-                remoteVideo.current.requestPointerLock();
+                try {remoteVideo.current.requestPointerLock()}catch(e){}
             else if ((!fullscreen && havingPtrLock) && getBrowser() != 'Safari') 
                 document.exitPointerLock();
         }
