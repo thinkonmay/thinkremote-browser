@@ -369,7 +369,7 @@ export default function Home () {
         client?.hid?.TriggerKey(action == "up" ? EventCode.KeyUp : EventCode.KeyDown,val)
     }
     const gamepadQR = async() => {
-        setQRShow(`https://remote.thinkmay.net/?ref=${localStorage.getItem("reference")}&no_video=true&show_gamepad=true`)
+        setQRShow(`https://remote.thinkmay.net/?ref=${localStorage.getItem("reference")}&no_video=true&show_gamepad=true&turn=${turn ? "true" : "false"}`)
         setTimeout(() => setQRShow(null),5000)
     }
 
