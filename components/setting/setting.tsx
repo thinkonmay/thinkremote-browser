@@ -1,6 +1,5 @@
 import { IconButton, Modal, Slider, ThemeProvider, createTheme } from '@mui/material'
 import React, { startTransition, useLayoutEffect } from 'react'
-import { Joystick } from 'react-joystick-component'
 import styled from 'styled-components'
 import CloseIcon from '@mui/icons-material/Close';
 import { useSetting } from '../../context/settingProvider';
