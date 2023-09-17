@@ -24,7 +24,7 @@ export const ConTrolContext = createContext<{
 
 
 export const WebRTCControl = (input: {
-	enable_touch		: (enable: boolean) 									=> Promise<void>,
+	enable_touch					: (enable: boolean) 									=> Promise<void>,
 	gamepad_callback_a				: (x: number, y: number, 	type: 'left' | 'right') 	=> Promise<void>,
 	gamepad_callback_b				: (index: number, 			type: 'up' | 'down') 		=> Promise<void>,
 	mouse_button_callback			: (index: number, 			type: 'up' | 'down') 		=> Promise<void>,
@@ -32,14 +32,16 @@ export const WebRTCControl = (input: {
 	mouse_move_callback				: (x: number, y: number) 								=> Promise<void>,
 	bitrate_callback				: (bitrate: number) 									=> Promise<void>,
 
+	gamepad_qr					    : () => Promise<void>,
 	keystuck_callback				: () => Promise<void>,
 	reset_callback					: () => Promise<void>,
 	fullscreen_callback				: () => Promise<void>,
 
+	show_gamepad					: boolean,
 	platform						: Platform,
 	video							: HTMLVideoElement
 }) => {
-	const [enableVGamepad, setenableVGamepad] 		= useState<ButtonMode>("disable");
+	const [enableVGamepad, setenableVGamepad] 		= useState<ButtonMode>((input.platform == "mobile" && input.show_gamepad) ? "static" : "disable");
 	const [isModalSettingOpen, setModalSettingOpen] = useState(false)
 	const [actions, setactions] 					= useState<any[]>([]);
 	const [TextValue,setTextValue]       			= useState<string[]>([]);
@@ -92,7 +94,7 @@ export const WebRTCControl = (input: {
 		if (input.platform == 'mobile')
 			setactions([button.reset,button.bitrate,button.vgamepad,button.setting,button.keyboard,button.fullscreen])
 		else 
-			setactions([button.reset,button.bitrate,button.fullscreen])
+			setactions([button.reset,button.bitrate,button.vgamepad,button.fullscreen])
 	}, [input.platform])
 
 	const button = {
@@ -110,8 +112,13 @@ export const WebRTCControl = (input: {
 		},
 		vgamepad : {
 				icon: <SportsEsportsOutlinedIcon />,
-				name: "Edit VGamepad",
+				name: "Open Gamepad",
 				action: () => {
+					if (input.platform == 'desktop') {
+						input.gamepad_qr()
+						return
+					}
+
 					setenableVGamepad((prev) => {
 						setOpenControl(false)
 						switch (prev) {

@@ -34,6 +34,7 @@ import { VideoWrapper } from "../core/pipeline/sink/video/wrapper";
 import { AudioWrapper } from "../core/pipeline/sink/audio/wrapper";
 import { formatError } from "../utils/formatError";
 import { EventCode } from "../core/models/keys.model";
+import QRCode from "react-qr-code";
 
 
 type StatsView = {
@@ -73,7 +74,7 @@ export default function Home () {
     const no_hid       = searchParams.get('viewonly') == "true";
     const no_stretch   = searchParams.get('no_stretch') == 'true'
     const view_pointer = searchParams.get('pointer') == 'visible'
-
+    const show_gamepad = searchParams.get('show_gamepad') == 'true'
 
     const [connectionPath,setConnectionPath]       = useState<any[]>([]);
     const [videoConnectivity,setVideoConnectivity] = useState<ConnectStatus>('not started');
@@ -84,10 +85,11 @@ export default function Home () {
 
     const [platform,setPlatform]                   = useState<Platform>(null);
     const [IOSFullscreen,setIOSFullscreen]         = useState<boolean>(false);
- 	const [isModalOpen, setModalOpen]              = useState(false)
+ 	const [showQR, setQRShow]                      = useState<string|null>(null)
+ 	const [warningRotate, setWarning]              = useState(false)
 	const checkHorizontal = (width: number,height:number) => {
         if (platform == 'mobile') 
-            setModalOpen(width < height)
+            setWarning(width < height)
 	}    
     useEffect(() => {
 		checkHorizontal(window.innerWidth,window.innerHeight)
@@ -366,6 +368,10 @@ export default function Home () {
     const keyboardCallback = async(val,action: "up" | "down") => {
         client?.hid?.TriggerKey(action == "up" ? EventCode.KeyUp : EventCode.KeyDown,val)
     }
+    const gamepadQR = async() => {
+        setQRShow(`https://remote.thinkmay.net/?ref=${localStorage.getItem("reference")}&no_video=true&show_gamepad=true`)
+        setTimeout(() => setQRShow(null),5000)
+    }
 
 
     return (
@@ -382,6 +388,8 @@ export default function Home () {
                 reset_callback={resetConnection}
                 fullscreen_callback={fullscreenCallback}
                 keyboard_callback={keyboardCallback}
+                gamepad_qr={gamepadQR}
+                show_gamepad={show_gamepad}
                 video={remoteVideo.current}
             ></WebRTCControl>
             <RemoteVideo
@@ -401,13 +409,15 @@ export default function Home () {
                 loop={true}
                 style={{ zIndex: -5, opacity: 0 }}
             ></audio>
-			<Modal
-				open={isModalOpen}
-			>
-				<ContentModal
-				>
+			<Modal open={warningRotate} >
+				<ContentModal >
 					<IconHorizontalPhone />
 					<TextModal>Please rotate the phone horizontally!!</TextModal>
+				</ContentModal>
+			</Modal>
+			<Modal open={showQR != null} >
+				<ContentModal >
+                    <QRCode value={showQR ?? ""}></QRCode>
 				</ContentModal>
 			</Modal>
             <Metric
