@@ -23,6 +23,7 @@ import {
     getBrowser,
 	getOS,
 	getPlatform,
+	getResolution,
 	Platform,
 } from "../core/utils/platform";
 import SbCore, { WorkerStatus } from "../supabase";
@@ -223,7 +224,20 @@ export default function Home () {
             return
         }
 
-        const result = await core.AuthenticateSession(ref,user_ref)
+        const result = await core.AuthenticateSession(ref,user_ref,{
+            platform    : getOS(), 
+            browser     : getBrowser(),
+            resolution  : getResolution(),
+            turn, 
+            no_video, 
+            low_bitrate, 
+            no_mic, 
+            no_hid, 
+            no_stretch,
+            view_pointer, 
+            show_gamepad 
+        })
+
         const {Email ,SignalingConfig ,WebRTCConfig,PingCallback,FetchCallback} = result
         callback = PingCallback
         fetch_callback = FetchCallback

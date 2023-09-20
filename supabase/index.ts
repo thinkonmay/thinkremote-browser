@@ -122,7 +122,7 @@ export default class SbCore {
 	}
 
 
-	public async AuthenticateSession(ref: string, uref?: string): Promise<{
+	public async AuthenticateSession(ref: string, uref?: string, metadata? :any): Promise<{
 		Email: string
 		SignalingConfig: SignalingConfig
 		WebRTCConfig: RTCConfiguration
@@ -144,7 +144,7 @@ export default class SbCore {
 
 		const { data, error } = await SupabaseFuncInvoke('session_authenticate', {
 			headers : headers,
-			body : JSON.stringify({ reference: ref }),
+			body : JSON.stringify({ reference: ref , ...metadata}),
 			method: 'POST',
 		})
 		if (error != null)
