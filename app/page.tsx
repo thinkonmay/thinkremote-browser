@@ -376,7 +376,7 @@ export default function Home () {
     }
     const gamepadQR = async() => {
         setQRShow(`${THIS_PAGE}/?ref=${localStorage.getItem("reference")}&no_video=true&show_gamepad=true&turn=${turn ? "true" : "false"}`)
-        setTimeout(() => setQRShow(null),5000)
+        setTimeout(() => setQRShow(null),10000)
     }
 
 
