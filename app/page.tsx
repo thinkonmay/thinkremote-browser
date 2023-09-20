@@ -10,7 +10,7 @@ import {
     TurnOnStatus,
 } from "../components/popup/popup";
 import { Metrics, RemoteDesktopClient } from "../core/app";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import {
     AddNotifier,
     ConnectionEvent,
@@ -46,6 +46,8 @@ type StatsView = {
     buffer                            : number
 }
 
+const REDIRECT_PAGE = "https://app.thinkmay.net/"
+const THIS_PAGE     = "https://remote.thinkmay.net"
 let client : RemoteDesktopClient = null
 let callback       : () => Promise<void> = async () => {};
 let fetch_callback : () => Promise<WorkerStatus[]> = async () => {return[]};
@@ -87,6 +89,8 @@ export default function Home () {
     const [IOSFullscreen,setIOSFullscreen]         = useState<boolean>(false);
  	const [showQR, setQRShow]                      = useState<string|null>(null)
  	const [warningRotate, setWarning]              = useState(false)
+    const router = useRouter();
+
 	const checkHorizontal = (width: number,height:number) => {
         if (platform == 'mobile') 
             setWarning(width < height)
@@ -214,11 +218,12 @@ export default function Home () {
 
         localStorage.setItem("reference",ref)
         const core = new SbCore()
-        if (!await core.Authenticated() && user_ref == undefined) 
+        if (!await core.Authenticated() && user_ref == undefined) {
             await core.LoginWithGoogle()
-        const result = await core.AuthenticateSession(ref,user_ref)
-        
+            return
+        }
 
+        const result = await core.AuthenticateSession(ref,user_ref)
         const {Email ,SignalingConfig ,WebRTCConfig,PingCallback,FetchCallback} = result
         callback = PingCallback
         fetch_callback = FetchCallback
@@ -309,8 +314,8 @@ export default function Home () {
         audio = new AudioWrapper(remoteAudio.current)
         SetupConnection() 
             .catch((err)=>{
-                    const errMsg = formatError(err)
-                    TurnOnAlert(errMsg)
+                TurnOnAlert(formatError((err as Error)?.message ?? ""))
+                setTimeout(() => router.push(REDIRECT_PAGE),5000)
             })
             .then(async () => {
                 SetupWebRTC()
@@ -320,8 +325,10 @@ export default function Home () {
 
                     if(data == undefined) 
                         return
-                    else if(!data.is_ping_worker_account)
+                    else if(!data.is_ping_worker_account) {
                         await TurnOnAlert('worker terminated')
+                        setTimeout(() => router.push(REDIRECT_PAGE),5000)
+                    }
                 },30 * 1000)
             })
     }, []);
@@ -368,7 +375,7 @@ export default function Home () {
         client?.hid?.TriggerKey(action == "up" ? EventCode.KeyUp : EventCode.KeyDown,val)
     }
     const gamepadQR = async() => {
-        setQRShow(`https://remote.thinkmay.net/?ref=${localStorage.getItem("reference")}&no_video=true&show_gamepad=true&turn=${turn ? "true" : "false"}`)
+        setQRShow(`${THIS_PAGE}/?ref=${localStorage.getItem("reference")}&no_video=true&show_gamepad=true&turn=${turn ? "true" : "false"}`)
         setTimeout(() => setQRShow(null),5000)
     }
 

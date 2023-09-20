@@ -131,16 +131,16 @@ export default class SbCore {
 	}> {
 		const session = await this.supabase.auth.getSession()
 		if (session.error != null && uref == undefined)
-			throw session.error.message
+			throw new Error(session.error.message)
 
 		const headers = uref == undefined ?
 			{ access_token: session.data?.session?.access_token } :
 			{ uref: uref }
 
 		if (headers.access_token == undefined && headers.uref == undefined)
-			throw 'no authentication method available'
+			throw new Error('no authentication method available')
 		else if (ref == undefined || ref == null || ref == "null")
-			throw	'Reference not provided'
+			throw	new Error('Reference not provided')
 
 		const { data, error } = await SupabaseFuncInvoke('session_authenticate', {
 			headers : headers,
@@ -148,7 +148,7 @@ export default class SbCore {
 			method: 'POST',
 		})
 		if (error != null)
-			throw error
+			throw new Error(error)
 
 
 		const pingFunc = async () => {
@@ -157,21 +157,21 @@ export default class SbCore {
 			})
 
 			if (error != null) {
-				throw `unable to ping ${error.message}`
+				throw new Error(`unable to ping ${error.message}`)
 			}
 		}
 
 		const FetchWorkerStatus = async () : Promise<WorkerStatus[]> => {
 			const session = await this.supabase.auth.getSession()
 			if (session.error != null)
-				throw session.error.message
+				throw new Error(session.error.message)
 
 			const status = await this.supabase.rpc(`fetch_worker_status`, {
 				session_id: data.id
 			})
 
 			if (status.error != null) 
-				throw `unable to fetch ${status.error.message}`
+				throw new Error(`unable to fetch ${status.error.message}`)
 
 			return status.data
 		}

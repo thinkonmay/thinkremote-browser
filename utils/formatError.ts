@@ -4,7 +4,7 @@ type ErrorFormatted =
     "database error"        |
     "unknown"       
     
-export function formatError (err = ""){
+export function formatError (err : string){
     let formated : ErrorFormatted = "unknown"
     err.includes('reference is not valid') 
         formated = "wrong reference key"
