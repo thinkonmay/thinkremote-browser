@@ -144,7 +144,7 @@ export default class SbCore {
 
 		const { data, error } = await SupabaseFuncInvoke('session_authenticate', {
 			headers : headers,
-			body : JSON.stringify({ reference: ref , ...metadata}),
+			body : JSON.stringify({ reference: ref , metadata}),
 			method: 'POST',
 		})
 		if (error != null)
