@@ -99,6 +99,7 @@ export const WebRTCControl = (input: {
 				break;
 		}
 	}, [enableVGamepad])
+	useEffect(() => setenableVGamepad(input.show_gamepad ? "static" : "disable"),[])
 
 	useEffect(() => {
 		if (input.platform == 'mobile')
@@ -106,7 +107,6 @@ export const WebRTCControl = (input: {
 		else 
 			setactions([button.reset,button.bitrate,button.vgamepad,button.fullscreen])
 
-		setenableVGamepad(input.show_gamepad ? "static" : "disable")
 	}, [input.platform])
 
 	const button = {
