@@ -41,7 +41,7 @@ export const WebRTCControl = (input: {
 	platform						: Platform,
 	video							: HTMLVideoElement
 }) => {
-	const [enableVGamepad, setenableVGamepad] 		= useState<ButtonMode>(input.show_gamepad ? "static" : "disable");
+	const [enableVGamepad, setenableVGamepad] 		= useState<ButtonMode>('disable');
 	const [isModalSettingOpen, setModalSettingOpen] = useState(false)
 	const [actions, setactions] 					= useState<any[]>([]);
 	const [TextValue,setTextValue]       			= useState<string[]>([]);
@@ -105,6 +105,8 @@ export const WebRTCControl = (input: {
 			setactions([button.reset,button.bitrate,button.vgamepad,button.setting,button.keyboard,button.fullscreen])
 		else 
 			setactions([button.reset,button.bitrate,button.vgamepad,button.fullscreen])
+
+		setenableVGamepad(input.show_gamepad ? "static" : "disable")
 	}, [input.platform])
 
 	const button = {
