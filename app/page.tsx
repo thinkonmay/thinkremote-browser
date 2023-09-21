@@ -362,7 +362,7 @@ export default function Home () {
     } 
     const bitrateCallback= async function (bitrate: number) { 
         client?.ChangeBitrate(bitrate);
-        client?.ChangeFramerate(55);
+        // client?.ChangeFramerate(55);
     } 
     const GamepadACallback=async function(x: number, y: number, type: "left" | "right"): Promise<void> {
         client?.hid?.VirtualGamepadAxis(x,y,type);
@@ -378,10 +378,8 @@ export default function Home () {
             ? client?.hid?.MouseButtonDown({button: index}) 
             : client?.hid?.MouseButtonUp({button: index})
     } 
-    const keystuckCallback= async function (): Promise<void> {
-        client?.hid?.ResetKeyStuck();
-    }
     const resetConnection = async() => {
+        client?.hid?.ResetKeyStuck();
         client?.HardReset()                    
         SetupWebRTC()
     }
@@ -404,7 +402,6 @@ export default function Home () {
                 gamepad_callback_b={GamepadBCallback}
                 mouse_move_callback={MouseMoveCallback}
                 mouse_button_callback={MouseButtonCallback}
-                keystuck_callback={keystuckCallback}
                 reset_callback={resetConnection}
                 fullscreen_callback={fullscreenCallback}
                 keyboard_callback={keyboardCallback}

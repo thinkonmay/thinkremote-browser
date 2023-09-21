@@ -33,7 +33,6 @@ export const WebRTCControl = (input: {
 	bitrate_callback				: (bitrate: number) 									=> Promise<void>,
 
 	gamepad_qr					    : () => Promise<void>,
-	keystuck_callback				: () => Promise<void>,
 	reset_callback					: () => Promise<void>,
 	fullscreen_callback				: () => Promise<void>,
 
