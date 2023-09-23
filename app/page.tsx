@@ -90,6 +90,8 @@ export default function Home () {
     const [IOSFullscreen,setIOSFullscreen]         = useState<boolean>(false);
  	const [showQR, setQRShow]                      = useState<string|null>(null)
  	const [warningRotate, setWarning]              = useState(false)
+     const shouldResetKey = useRef(true) 
+
     const router = useRouter();
 
 	const checkHorizontal = (width: number,height:number) => {
@@ -121,11 +123,6 @@ export default function Home () {
 
     useEffect(()=>{
         window.onbeforeunload = (e: BeforeUnloadEvent) => {
-            client?.hid?.ResetKeyStuck()
-            client?.Close()
-
-            localStorage.setItem('signaling','{}')
-            localStorage.setItem('webrtc'   ,'{}')
             const text = 'Are you sure (｡◕‿‿◕｡)'
             e = e || window.event;
             if (e)
@@ -137,14 +134,22 @@ export default function Home () {
         const handleState = () => {
             navigator.clipboard.readText()
             .then(_clipboard => {
+                shouldResetKey.current = true
+                
                 if (_clipboard == clipboard) 
                     return
                     
                 client?.hid?.SetClipboard(_clipboard)
                 clipboard = _clipboard
+
             })
             .catch(() => { // not in focus zone
-                client?.hid?.ResetKeyStuck()
+
+                if(shouldResetKey?.current == true){
+                    client?.hid?.ResetKeyStuck()
+                }
+                shouldResetKey.current = false
+
             })
 
             if(getOS() == 'iOS' || getBrowser() == 'Safari') 
@@ -173,7 +178,13 @@ export default function Home () {
         }
 
         const UIStateLoop = setInterval(handleState,100)
-        return () => { clearInterval(UIStateLoop) }
+        return () => { 
+            clearInterval(UIStateLoop) 
+            client?.hid?.ResetKeyStuck()
+            client?.Close()
+            localStorage.setItem('signaling','{}')
+            localStorage.setItem('webrtc'   ,'{}')
+        }
     },[])
 
 
