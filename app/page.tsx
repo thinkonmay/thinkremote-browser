@@ -90,7 +90,7 @@ export default function Home () {
     const [IOSFullscreen,setIOSFullscreen]         = useState<boolean>(false);
  	const [showQR, setQRShow]                      = useState<string|null>(null)
  	const [warningRotate, setWarning]              = useState(false)
-     const shouldResetKey = useRef(true) 
+    const shouldResetKey                           = useRef(true) 
 
     const router = useRouter();
 
@@ -135,21 +135,17 @@ export default function Home () {
             navigator.clipboard.readText()
             .then(_clipboard => {
                 shouldResetKey.current = true
-                
                 if (_clipboard == clipboard) 
                     return
                     
                 client?.hid?.SetClipboard(_clipboard)
                 clipboard = _clipboard
-
             })
             .catch(() => { // not in focus zone
-
-                if(shouldResetKey?.current == true){
+                if(shouldResetKey?.current == true)
                     client?.hid?.ResetKeyStuck()
-                }
-                shouldResetKey.current = false
 
+                shouldResetKey.current = false
             })
 
             if(getOS() == 'iOS' || getBrowser() == 'Safari') 

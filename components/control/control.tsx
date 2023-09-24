@@ -98,7 +98,7 @@ export const WebRTCControl = (input: {
 				break;
 		}
 	}, [enableVGamepad])
-	useEffect(() => setenableVGamepad(input.show_gamepad ? "static" : "disable"),[])
+	useEffect(() => { setenableVGamepad(input.show_gamepad ? "static" : "disable") },[])
 
 	useEffect(() => {
 		if (input.platform == 'mobile')
