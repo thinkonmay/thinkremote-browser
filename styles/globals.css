@@ -8,6 +8,8 @@ body {
     overflow: hidden;
     font-size: 10px;
     font-family: Roboto, sans-serif; */
+    font-size: 10px;
+    font-family: Poppins,sans-serif;
 }
 body > button {
     color: #c3b5b5;
@@ -22,6 +24,7 @@ a {
     box-sizing: border-box;
     padding: 0;
     margin: 0;
+	font-size: 1.2rem;
 }
 
 /* #__next {
@@ -29,3 +32,4 @@ a {
     width: 100%;
     height: 100%;
 } */
+

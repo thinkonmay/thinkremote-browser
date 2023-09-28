@@ -15,14 +15,14 @@ const DefaultButton = styled.button`
     /* depened on Container */
     width: inherit;
     height: inherit;
-    :active {
-        background-color: rgba(0, 0, 0, 0.05);
-    }
     color: #C3B5B5;
     border: 1px solid currentColor;
     border-radius: 50%;
     position: absolute;
     background-color: transparent;
+    -webkit-user-select: none;
+    -ms-user-select: none; 
+    user-select: none;
 `;
 
 const ButtonY = styled(DefaultButton)`
@@ -31,6 +31,7 @@ const ButtonY = styled(DefaultButton)`
 
     transform: translate(50%, -100%);
 `;
+
 const ButtonB = styled(DefaultButton)`
     bottom: 0;
     right: 50%;
@@ -87,22 +88,3 @@ export function YBXA(props: Props) {
     );
 }
 
-export function LR(props: Props) {
-    const { onTouch, size } = props;
-    return (
-        <Container size={size}>
-            <ButtonY
-                onTouchStart={(e: React.TouchEvent) => onTouch(e, "down", 2)}
-                onTouchEnd={(e: React.TouchEvent) => onTouch(e, "up", 2)}
-            >
-                Right
-            </ButtonY>
-            <ButtonB
-                onTouchStart={(e: React.TouchEvent) => onTouch(e, "down", 0)}
-                onTouchEnd={(e: React.TouchEvent) => onTouch(e, "up", 0)}
-            >
-                Left
-            </ButtonB>
-        </Container>
-    );
-}

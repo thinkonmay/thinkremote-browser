@@ -1,12 +1,10 @@
-"use client"
-
-import { Analytics } from '@vercel/analytics/react';
-import { GoogleAnalytics } from 'nextjs-google-analytics';
 import * as React from 'react';
+import SettingProvider from '../context/settingProvider';
 import StyledComponentsRegistry from '../lib/registry';
 import "../styles/globals.css"
+import GoogleAnalytics  from './googleAnalytics';
 
-function RootLayout({
+async function RootLayout({
 	children,
 }: {
 	children: React.ReactNode
@@ -24,15 +22,16 @@ function RootLayout({
 					content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"
 				></meta>
 				<link rel="icon" href="/favicon.ico" />
+				<meta httpEquiv="Cache-control" content="no-cache"></meta>
 			</head>
 			<body>
-				<GoogleAnalytics trackPageViews />
-				<Analytics />
-				<main>
-					<StyledComponentsRegistry>
+
+				<GoogleAnalytics trackPageViews></GoogleAnalytics>
+				<StyledComponentsRegistry>
+					<SettingProvider>
 						{children}
- 					</StyledComponentsRegistry>
-				</main>
+					</SettingProvider>
+				</StyledComponentsRegistry>
 			</body>
 		</html>
 	);

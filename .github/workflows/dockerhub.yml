@@ -18,12 +18,12 @@ jobs:
       uses: actions/checkout@v2
     - name: build source image
       run : |
-        docker login -u ${{ secrets.DOCKER_REPO_USER }} -p ${{ secrets.DOCKER_REPO_PASSWORD }} workstation.thinkmay.net
-        docker build -f docker/Dockerfile . -t workstation.thinkmay.net/browser-client:${{ steps.date.outputs.date }}
-        docker tag workstation.thinkmay.net/browser-client:${{ steps.date.outputs.date }} workstation.thinkmay.net/browser-client:latest
+        docker login -u ${{ secrets.DOCKER_REPO_USER }} -p ${{ secrets.DOCKER_REPO_PASSWORD }} 
+        docker build -f docker/Dockerfile . -t pigeatgarlic/browser-client:${{ steps.date.outputs.date }}
+        docker tag pigeatgarlic/browser-client:${{ steps.date.outputs.date }} pigeatgarlic/browser-client:latest
 
-        docker push workstation.thinkmay.net/browser-client:${{ steps.date.outputs.date }}
-        docker push workstation.thinkmay.net/browser-client:latest
+        docker push pigeatgarlic/browser-client:${{ steps.date.outputs.date }}
+        docker push pigeatgarlic/browser-client:latest
 
   CD:    
     runs-on: self-hosted
@@ -31,6 +31,6 @@ jobs:
     steps:
     - name: update via kubectl 
       run : |
-        docker login -u ${{ secrets.DOCKER_REPO_USER }} -p ${{ secrets.DOCKER_REPO_PASSWORD }} workstation.thinkmay.net
-        docker run workstation.thinkmay.net/kubectl -n production rollout restart deployment remote
-        docker run workstation.thinkmay.net/kubectl -n development-oneplay rollout restart deployment remote
+        docker login -u ${{ secrets.DOCKER_REPO_USER }} -p ${{ secrets.DOCKER_REPO_PASSWORD }} 
+        docker run pigeatgarlic/kubectl -n production rollout restart deployment remote
+        docker run pigeatgarlic/kubectl -n development-oneplay rollout restart deployment remote
