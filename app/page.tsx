@@ -78,6 +78,7 @@ export default function Home () {
     const no_stretch   = searchParams.get('no_stretch') == 'true'
     const view_pointer = searchParams.get('pointer') == 'visible'
     const show_gamepad = searchParams.get('show_gamepad') == 'true'
+    const vm_password  = searchParams.get('vm_password') 
 
     const [connectionPath,setConnectionPath]       = useState<any[]>([]);
     const [videoConnectivity,setVideoConnectivity] = useState<ConnectStatus>('not started');
@@ -225,6 +226,7 @@ export default function Home () {
             throw new Error(`invalid URL, please check again (｡◕‿‿◕｡)`)
 
         localStorage.setItem("reference",ref)
+        localStorage.setItem("TM_VMPASSWORD",Buffer.from(vm_password,'base64').toString())
         const core = new SbCore()
         if (!await core.Authenticated() && user_ref == undefined) {
             await core.LoginWithGoogle()
