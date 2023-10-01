@@ -103,9 +103,9 @@ export const WebRTCControl = (input: {
 
 	useEffect(() => {
 		if (input.platform == 'mobile')
-			setactions([button.reset,button.bitrate,button.vgamepad,button.setting,button.keyboard,button.fullscreen])
+			setactions([button.reset,button.bitrate,button.vgamepad,button.setting,button.keyboard,button.fullscreen,button.password])
 		else 
-			setactions([button.reset,button.bitrate,button.vgamepad,button.fullscreen])
+			setactions([button.reset,button.bitrate,button.vgamepad,button.fullscreen,button.password])
 
 	}, [input.platform])
 
