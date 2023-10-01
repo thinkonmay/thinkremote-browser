@@ -153,6 +153,15 @@ export const WebRTCControl = (input: {
 					}) 
 				},
 			},
+		password : {
+				icon: <KeyboardIcon />,
+				name: "Paste Window password",
+				action: () => { 
+					const password = localStorage.getItem("TM_VMPASSWORD")
+					setOldTextValue([])
+					setTextValue(password.split(""))
+				},
+			},
 		fullscreen : {
 				icon: <Fullscreen />,
 				name: "Enter fullscreen",
