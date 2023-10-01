@@ -78,6 +78,8 @@ export default function Home () {
     const no_stretch   = searchParams.get('no_stretch') == 'true'
     const view_pointer = searchParams.get('pointer') == 'visible'
     const show_gamepad = searchParams.get('show_gamepad') == 'true'
+    let   vm_password  = "unknown"
+    try { vm_password  = atob(searchParams.get('vm_password') ?? "dW5rbm93bg==") } catch { }
 
     const [connectionPath,setConnectionPath]       = useState<any[]>([]);
     const [videoConnectivity,setVideoConnectivity] = useState<ConnectStatus>('not started');
@@ -403,6 +405,7 @@ export default function Home () {
         <Body>
             <WebRTCControl 
                 platform={platform} 
+                vm_password={vm_password}
                 touch_mode_callback={touchModeCallback}
                 bitrate_callback={bitrateCallback}
                 gamepad_callback_a={GamepadACallback}
