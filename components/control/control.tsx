@@ -37,6 +37,7 @@ export const WebRTCControl = (input: {
 	fullscreen_callback				: () => Promise<void>,
 
 	show_gamepad					: boolean,
+	vm_password						: string,
 	platform						: Platform,
 	video							: HTMLVideoElement
 }) => {
@@ -157,9 +158,8 @@ export const WebRTCControl = (input: {
 				icon: <KeyboardIcon />,
 				name: "Paste Window password",
 				action: () => { 
-					const password = localStorage.getItem("TM_VMPASSWORD")
 					setOldTextValue([])
-					setTextValue(password.split(""))
+					setTextValue(input.vm_password.split(""))
 				},
 			},
 		fullscreen : {
