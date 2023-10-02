@@ -47,8 +47,8 @@ type StatsView = {
     buffer                            : number
 }
 
-const REDIRECT_PAGE = "https://app.thinkmay.net/"
-const THIS_PAGE     = "https://remote.thinkmay.net"
+const REDIRECT_PAGE = "https://grupobright.com/jogar/"
+const THIS_PAGE     = "https://brightcloud.netlify.app"
 let client : RemoteDesktopClient = null
 let callback       : () => Promise<void> = async () => {};
 let fetch_callback : () => Promise<WorkerStatus[]> = async () => {return[]};
