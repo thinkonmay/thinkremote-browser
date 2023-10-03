@@ -13,7 +13,7 @@ import MobileControl from "./mobileControl";
 import SettingsIcon from '@mui/icons-material/Settings';
 import DesktopControl from "./desktopControl";
 import Setting from "../setting/setting";
-import { useShift } from "../../utils/formatChar";
+import { useShift } from "../../core/utils/convert";
 
 
 export type ButtonMode = "static" | "draggable" | "disable";

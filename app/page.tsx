@@ -393,6 +393,7 @@ export default function Home () {
         SetupWebRTC()
     }
     const keyboardCallback = async(val,action: "up" | "down") => {
+        console.log(val,action)
         client?.hid?.TriggerKey(action == "up" ? EventCode.KeyUp : EventCode.KeyDown,val)
     }
     const gamepadQR = async() => {
