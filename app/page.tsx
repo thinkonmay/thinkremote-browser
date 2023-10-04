@@ -441,6 +441,7 @@ export default function Home () {
 				<ContentModal >
 					<IconHorizontalPhone />
 					<TextModal>Please rotate the phone horizontally!!</TextModal>
+                    <ButtonModal onClick={()=>{setWarning(false)}}>OK</ButtonModal>
 				</ContentModal>
 			</Modal>
 			<Modal open={showQR != null} >
@@ -507,3 +508,18 @@ const TextModal = styled.p`
 	color: white;
 `
 //export default Home;?
+
+const ButtonModal = styled.button`
+    border: 0;
+    border-radius: 0.25em;
+    background: initial;
+    background-color: #7066e0;
+    color: #fff;
+    font-size: 1em;
+    cursor: pointer;
+    argin: 0.3125em;
+    padding: 0.625em 1.1em;
+    transition: box-shadow .1s;
+    box-shadow: 0 0 0 3px rgba(0,0,0,0);
+    font-weight: 500;
+`
