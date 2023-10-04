@@ -124,7 +124,7 @@ export const WebRTCControl = (input: {
 		},
 		vgamepad : {
 				icon: <SportsEsportsOutlinedIcon />,
-				name: "Open Gamepad",
+				name: "Abrir Gamepad",
 				action: () => {
 					if (input.platform == 'desktop') {
 						input.gamepad_qr()
@@ -144,7 +144,7 @@ export const WebRTCControl = (input: {
 			},
 		keyboard : {
 				icon: <KeyboardIcon />,
-				name: "Write to clipboard",
+				name: "Escrever na área de transferência",
 				action: () => { 
 					setClipboard(old => {
 						if (old) 
@@ -156,7 +156,7 @@ export const WebRTCControl = (input: {
 			},
 		password : {
 				icon: <KeyboardIcon />,
-				name: "Paste Window password",
+				name: "Colar senha do Windows",
 				action: () => { 
 					setOldTextValue([])
 					setTextValue(input.vm_password.split(""))
@@ -164,7 +164,7 @@ export const WebRTCControl = (input: {
 			},
 		fullscreen : {
 				icon: <Fullscreen />,
-				name: "Enter fullscreen",
+				name: "Tela Cheia",
 				action: () => {
 					requestFullscreen()
 					input.fullscreen_callback()
@@ -173,12 +173,12 @@ export const WebRTCControl = (input: {
 			},
 		reset : {
 				icon: <LockReset/>,
-				name: "Reset",
+				name: "Resetar",
 				action: input.reset_callback 
 			},
 		setting : {
 				icon: <SettingsIcon />,
-				name: "Setting",
+				name: "Configurações",
 				action: () => { 
 					setModalSettingOpen(true) 
 				},
