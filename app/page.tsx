@@ -62,8 +62,12 @@ let pointer   : boolean = false
 type ConnectStatus = 'not started' | 'started' | 'connecting' | 'connected' | 'closed'
 export default function Home () {    
     let ref_local        = ''
-    if (typeof window !== 'undefined')
+    let scancode_local        = ''
+    if (typeof window !== 'undefined'){
         ref_local        = localStorage.getItem("reference")
+        scancode_local        = localStorage.getItem('scancode')
+
+    }
 
 
     const searchParams = useSearchParams();
@@ -77,7 +81,7 @@ export default function Home () {
     const no_hid       = searchParams.get('viewonly') == "true";
     const no_stretch   = searchParams.get('no_stretch') == 'true'
     const view_pointer = searchParams.get('pointer') == 'visible'
-    const scancode     = searchParams.get('scancode') == 'true'
+    const scancode     = searchParams.get('scancode') ?? scancode_local
     const show_gamepad = searchParams.get('show_gamepad') == 'true'
     let   vm_password  = "unknown"
     try { vm_password  = atob(searchParams.get('vm_password') ?? "dW5rbm93bg==") } catch { }
@@ -228,6 +232,7 @@ export default function Home () {
             throw new Error(`invalid URL, please check again (｡◕‿‿◕｡)`)
 
         localStorage.setItem("reference",ref)
+        localStorage.setItem("scancode", scancode.toString() )
         const core = new SbCore()
         if (!await core.Authenticated() && user_ref == undefined) {
             await core.LoginWithGoogle()
@@ -270,7 +275,7 @@ export default function Home () {
                 platform,
                 no_video,
                 no_mic,
-                scancode,
+                scancode:scancode =='true' ,
                 no_hid
             }
         )
