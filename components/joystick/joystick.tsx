@@ -26,7 +26,7 @@ export const JoyStick = (param: {
     const [enableJT, setenableJT] = useState<boolean>(false);
 
     const move = (event: IJoystickUpdateEvent) => {
-        //return
+        return
         if (event.type == "move") {
             //if (!enableJT) {
             //    moveCallback(0, 0);
