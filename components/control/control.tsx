@@ -4,6 +4,7 @@ import { Fullscreen, LockReset, } from "@mui/icons-material";
 import SportsEsportsOutlinedIcon from '@mui/icons-material/SportsEsportsOutlined';
 import VideoSettingsOutlinedIcon from '@mui/icons-material/VideoSettingsOutlined';
 import KeyboardIcon from '@mui/icons-material/Keyboard';
+import KeyIcon from '@mui/icons-material/Key';
 import SettingsIcon from '@mui/icons-material/Settings';
 import React, { useEffect, useState, createContext, useRef } from "react"; // we need this to make JSX compile
 import { Platform } from "../../core/utils/platform";
@@ -155,7 +156,7 @@ export const WebRTCControl = (input: {
 				},
 			},
 		password : {
-				icon: <KeyboardIcon />,
+				icon: <KeyIcon />,
 				name: "Paste Window password",
 				action: () => { 
 					setOldTextValue([])
