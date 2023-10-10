@@ -36,6 +36,7 @@ import { AudioWrapper } from "../core/pipeline/sink/audio/wrapper";
 import { formatError } from "../utils/formatError";
 import { EventCode } from "../core/models/keys.model";
 import QRCode from "react-qr-code";
+import GuideLine from "../components/guideline/guideline";
 
 
 type StatsView = {
@@ -98,6 +99,7 @@ export default function Home () {
  	const [showQR, setQRShow]                      = useState<string|null>(null)
  	const [warningRotate, setWarning]              = useState(false)
     const shouldResetKey                           = useRef(true) 
+    const [isGuideModalOpen, setGuideModalOpen] = useState(true)
 
     const router = useRouter();
 
@@ -105,6 +107,14 @@ export default function Home () {
         if (platform == 'mobile') 
             setWarning(width < height)
 	}    
+
+    useLayoutEffect(()=>{
+        const isGuideModalLocal = localStorage.getItem('isGuideModalLocal')
+        if(isGuideModalLocal == 'false' || isGuideModalLocal == 'true'){
+            setGuideModalOpen(JSON.parse(isGuideModalLocal))
+        }
+    },[])
+
     useEffect(() => {
 		checkHorizontal(window.innerWidth,window.innerHeight)
         window.addEventListener('resize', (e: UIEvent) => {
@@ -467,6 +477,8 @@ export default function Home () {
                 path        ={connectionPath}
                 platform    ={platform}
             />
+            <GuideLine platform={platform} isModalOpen={isGuideModalOpen} closeModal={() => {setGuideModalOpen(false)}}/>
+
         </Body>
     );
 };
