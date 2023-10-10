@@ -4,13 +4,13 @@ import { Fullscreen, LockReset, } from "@mui/icons-material";
 import SportsEsportsOutlinedIcon from '@mui/icons-material/SportsEsportsOutlined';
 import VideoSettingsOutlinedIcon from '@mui/icons-material/VideoSettingsOutlined';
 import KeyboardIcon from '@mui/icons-material/Keyboard';
+import SettingsIcon from '@mui/icons-material/Settings';
 import React, { useEffect, useState, createContext, useRef } from "react"; // we need this to make JSX compile
 import { Platform } from "../../core/utils/platform";
 import { requestFullscreen } from "../../core/utils/screen";
 import { AskSelectBitrate } from "../popup/popup";
 import { VirtualGamepad } from "../virtGamepad/virtGamepad";
 import MobileControl from "./mobileControl";
-import SettingsIcon from '@mui/icons-material/Settings';
 import DesktopControl from "./desktopControl";
 import Setting from "../setting/setting";
 import { useShift } from "../../core/utils/convert";
