@@ -54,8 +54,9 @@ const WrapperContent = styled.div`
 	justify-content: center;
 	align-items: center;
 	margin-right: 16px;
-	background: rgb(242 232 232 / 60%);
-`
+	/*background: rgb(242 232 232 / 60%);#5fccfbab*/
+	background: #5fccfbab;
+`;
 const WrapperButton = styled.div`
     width: 100%;
 	justify-content: center;
