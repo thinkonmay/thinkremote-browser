@@ -22,7 +22,7 @@ function DesktopControl(props: Props) {
 	}	
 
     const sxSpeedDial = {
-		opacity: 0.3,
+		opacity: 0.6,
 		position: 'absolute',
 		bottom: '2%',
 		right: '2%',
