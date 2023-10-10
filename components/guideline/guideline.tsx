@@ -58,6 +58,7 @@ const Text = styled.span`
 const Title = styled.h3`
 	font-size: 18px;
 	font-bold: 600;
+	color: #222222;
 	text-align: center;
 `
 const ContainerButton = styled.div`
@@ -90,7 +91,7 @@ const ButtonGotit = styled(ResetButton)`
 	color: black;
 	
 `
-const buttons = [
+const buttonsMobile = [
 	{
 		icon: <VideoSettingsOutlinedIcon fontSize='inherit'/>,
 		name: "Tăng giảm chất lượng hình ảnh",
@@ -110,7 +111,28 @@ const buttons = [
 		name: "Thay đổi kích thước, vị trí của gamepad ảo.",
 	}
 ]
-function GuideLine({ isModalOpen, closeModal }) {
+const buttonsDesktop = [
+	{
+		icon: <LockReset fontSize='inherit'/>,
+		name: "Reset khi không lên hình hoặc mất tiếng",
+	},
+	{
+		icon: <VideoSettingsOutlinedIcon fontSize='inherit'/>,
+		name: "Tăng giảm chất lượng hình ảnh",
+
+	},
+	{
+		icon: <SportsEsportsOutlinedIcon fontSize='inherit'/>,
+		name: "Tạo QR, quét để dùng điện thoại thay thế gamepad",
+
+	},
+	{
+		icon: <Fullscreen fontSize='inherit'/>,
+		name: "Lưu ý: bắt buộc fullscreen khi chơi game",
+	}
+]
+function GuideLine({ isModalOpen, closeModal, platform }) {
+	const [buttons, setButtons] = React.useState(buttonsDesktop)
 	const handleDontShow = () => {
 		localStorage.setItem('isGuideModalLocal', 'false')
 		closeModal()
@@ -120,11 +142,18 @@ function GuideLine({ isModalOpen, closeModal }) {
 		closeModal()
 	}
 
+	React.useEffect(()=>{
+		if(platform == 'mobile'){
+			setButtons(buttonsMobile)
+			return
+		}
+		setButtons(buttonsDesktop)
 
+	},[platform])
 	return (
 		<Modal open={isModalOpen}>
 			<Container>
-				<Title>Game và app đã được tải sẵn trong ổ D</Title>
+				<Title>CHÚ Ý: Mở game trong ổ D, không lưu file ở ổ C</Title>
 				{
 					buttons.map(btn => (
 						<Content>
@@ -138,8 +167,8 @@ function GuideLine({ isModalOpen, closeModal }) {
 				
 
 				<ContainerButton style={{marginTop: 14}}>
-					<ButtonDontShow onClick={handleDontShow}>Dont show it again!</ButtonDontShow>
-					<ButtonGotit onClick={handleGotit}>Got it!</ButtonGotit>
+					<ButtonDontShow onClick={handleDontShow}>Không hiện lại</ButtonDontShow>
+					<ButtonGotit onClick={handleGotit}>Oke!</ButtonGotit>
 				</ContainerButton>
 			</Container>
 		</Modal>
