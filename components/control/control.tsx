@@ -228,6 +228,7 @@ export const WebRTCControl = (input: {
 						}}
 
 						actions={actions}
+						keyBoardCallBack = {input.keyboard_callback}
 					/> 
 					: <DesktopControl 
 						actions={actions} 

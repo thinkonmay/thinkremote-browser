@@ -30,7 +30,7 @@ const Container = styled.div`
 	top: 0;
 	left: 0;
 	
-	height: 45px;
+	height: auto;
 	animation-duration: 0.5s;
 	animation-timing-function: ease-in-out;
 	animation-fill-mode: both;
@@ -50,20 +50,33 @@ const WrapperContent = styled.div`
     width: 100%;
     height: 100%;
 	display: flex;
+	flex-direction: column;
+	justify-content: center;
 	align-items: center;
-	gap: 5px;	
 	margin-right: 16px;
 	background: rgb(242 232 232 / 60%);
-
+`
+const WrapperButton = styled.div`
+    width: 100%;
+	justify-content: center;
+    height: 45px;
+	display: flex;
+	align-items: center;
+`
+const WrapperKey = styled.div`
+    width: 100%;
+    height: 45px;
+	display: flex;
+	justify-content: center;
+	align-items: center;
 `
 const Text = styled.span`
 	color: white;
 `
 const Button = styled.button`
 	position: absolute;
-	top: -50%;
+	height:100%;
     right: -4px;
-    bottom: -50%;
 	outline: none;
 	border: none;
 	background: none;
@@ -72,9 +85,10 @@ const ButtonIcon = styled.button`
 	outline: none;
 	border: none;
 	background: none;
-	width: 45px;
+	width: auto;
+	min-width: 45px;
 	height: 100%;
-	font-weight: 500;
+	font-weight: 500;    
 `
 interface Action {
 	icon: React.ReactNode,
@@ -91,34 +105,78 @@ interface Props {
 	onOkey: () => Promise<void>
 	onDefault: () => Promise<void>
 
+	keyBoardCallBack: (key: string, type: 'up' | 'down') => Promise<void>
+
 
 }
+const listKeyBroad = [
+	{
+		name: 'Esc',
+		val: ['Esc']
+	},
+	{
+		name: 'Backspace',
+		val: ['Esc']
+	},
+	{
+		name: 'Alt + F4',
+		val: ['Alt', 'F4']
+	},
+]
+function MobileControl({ isClose, handleOpen, actions, isShowBtn, onOkey, onDefault, keyBoardCallBack }: Props) {
 
-function MobileControl({ isClose, handleOpen, actions, isShowBtn, onOkey, onDefault }: Props) {
+	const clickKey = (keys = []) => {
+		if(keys.length <= 1){
+			keyBoardCallBack(keys?.at(0), 'down')
+			keyBoardCallBack(keys?.at(0), 'up')
+			return
+		}	
+
+		keys.forEach((k, i)=>{
+			keyBoardCallBack(k, 'down')
+		})
+		keys.forEach((k, i)=>{
+			keyBoardCallBack(k, 'up')
+		})
+	}
 	return (
 		<Container className={!isClose ? 'slide-out' : 'slide-in'}>
 
 			<WrapperContent >
 				{
-					isShowBtn ? 
-					<>
-						<ButtonIcon onClick={onDefault}>Default</ButtonIcon>
-						<ButtonIcon onClick={onOkey}>Ok</ButtonIcon>
-					</> : 
-					actions.map(action => (
-						<ButtonIcon key={Math.random()} onClick={()=>{action.action()}}>
-							{action.icon}
-						</ButtonIcon>
-					))
+					isShowBtn ?
+						<>
+							<ButtonIcon onClick={onDefault}>Default</ButtonIcon>
+							<ButtonIcon onClick={onOkey}>Ok</ButtonIcon>
+						</> :
+						<>
+							<WrapperButton>
+								{actions.map(action => (
+									<ButtonIcon key={Math.random()} onClick={() => { action.action() }}>
+										{action.icon}
+									</ButtonIcon>
+								))}
+							</WrapperButton>
+							<hr style={{width: '100%'}}/>
+							<WrapperKey>
+								{
+									listKeyBroad.map(key => (
+										<ButtonIcon onClick={() => { clickKey(key.val) }}>{key.name}</ButtonIcon>
+									))
+								}
+							</WrapperKey>
+						</>
+
+
 
 				}
 
 			</WrapperContent>
 			<Button onClick={handleOpen}>
 				{
-					!isClose 
-					? <IoIosArrowForward color="white" style={{fontSize:20}}/> 
-					: <IoIosArrowBack color="white"    style={{fontSize:20}} />
+					!isClose
+						? <IoIosArrowForward color="white" style={{ fontSize: 20 }} />
+						: <IoIosArrowBack color="white" style={{ fontSize: 20 }} />
 				}
 			</Button>
 
