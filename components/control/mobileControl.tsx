@@ -67,6 +67,7 @@ const WrapperKey = styled.div`
     width: 100%;
     height: 45px;
 	display: flex;
+	gap: 8px;
 	justify-content: center;
 	align-items: center;
 `
@@ -112,11 +113,11 @@ interface Props {
 const listKeyBroad = [
 	{
 		name: 'Esc',
-		val: ['Esc']
+		val: ['Escape']
 	},
 	{
 		name: 'Backspace',
-		val: ['Esc']
+		val: ['Backspace']
 	},
 	{
 		name: 'Alt + F4',
