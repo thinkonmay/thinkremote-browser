@@ -45,15 +45,17 @@ interface Props {
 const STANDARD_VALUE = 50
 
 function Setting(props: Props) {
-	const [listBtn, setListBtn] = React.useState([{
-		name: 'Left Joystick',
-		key: 'leftJt',
-		value: 50
-	}, {
-		name: 'Right Joystick',
-		key: 'rightJt',
-		value: 50
-	}, {
+	const [listBtn, setListBtn] = React.useState([
+	//{
+	//	name: 'Left Joystick',
+	//	key: 'leftJt',
+	//	value: 50
+	//}, {
+	//	name: 'Right Joystick',
+	//	key: 'rightJt',
+	//	value: 50
+	//},
+	{
 		name: 'Dpad',
 		key: 'dpad',
 		value: 50
@@ -141,17 +143,16 @@ function Setting(props: Props) {
 				</IconButton>
 				<Content>
 					<WrapperButton>
-						<ButtonName>Draggable</ButtonName>
-						<WrapperCheckbox>
+						<ButtonName>Change gamepad Position</ButtonName>
+						<BtnChangePos onClick={()=>{ onDraggable('VGamePad', true) }}>Change</BtnChangePos>
+
+
+						{/*<WrapperCheckbox>
 							<CheckBox>
-								<label style={{fontSize: '1.5rem'}} htmlFor="checkbox1">Gamepad</label>
+								<label style={{fontSize: '1.5rem'}} htmlFor="checkbox1">Click to open</label>
 								<input style={{width: 20, height: 20}} onChange={onChangeInput} type="checkbox" name="VGamePad" id="checkbox1" />
 							</CheckBox>
-							<CheckBox>
-								<label style={{fontSize: '1.5rem'}} htmlFor="checkbox2">Mouse</label>
-								<input style={{width: 20, height: 20}} onChange={onChangeInput} type="checkbox" name="VMouse" id="checkbox2" />
-							</CheckBox>
-						</WrapperCheckbox>
+						</WrapperCheckbox>*/}
 						
 					</WrapperButton>
 					{listBtn. map(btn => (
@@ -213,6 +214,7 @@ const Title = styled.h3`
 const WrapperButton = styled.div`
 	display: flex;
 	align-items: center;
+	justify-content: space-between;
 `
 
 const ButtonName = styled.div`
@@ -227,15 +229,17 @@ const DefaultButton = styled.div`
 	outline: unset;
 	background: none;
 `
-const BtnSave = styled(DefaultButton)`
+const BtnChangePos = styled(DefaultButton)`
 	border-radius: 8px;
 	display: flex;
 	justify-content:center;
 	align-items: center;
 	background: ${SUB_COLOR};
 	color: ${MAIN_COLOR};
-	height: 46px;
-    font-size: 18px;
+	height: 32px;
+    padding: 0 8px;
+    font-size: 14px;
     font-weight: bold;
 	margin-top: auto;
 `
+
