@@ -147,10 +147,10 @@ function MobileControl({ isClose, handleOpen, actions, isShowBtn, onOkey, onDefa
 			<WrapperContent >
 				{
 					isShowBtn ?
-						<>
+						<div style={{display: 'flex', height:40}}>
 							<ButtonIcon onClick={onDefault}>Default</ButtonIcon>
 							<ButtonIcon onClick={onOkey}>Ok</ButtonIcon>
-						</> :
+						</div> :
 						<>
 							<WrapperButton>
 								{actions.map(action => (
