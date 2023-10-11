@@ -165,6 +165,10 @@ export const ButtonGroupRight = (props: ButtonGroupProps) => {
                 x: deviceWidth * defaultButtonGroupRightValue.subBtn.x, 
                 y: deviceHeight * defaultButtonGroupRightValue.subBtn.y 
             },
+            rs: { 
+                x: deviceWidth * defaultButtonGroupRightValue.rs.x, 
+                y: deviceHeight * defaultButtonGroupRightValue.rs.y 
+            },
         }
         setPosBtn(defaultPos)
         localStorage.setItem(`right_group_pos1`, JSON.stringify(defaultPos));
