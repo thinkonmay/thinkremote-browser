@@ -43,6 +43,7 @@ const VirtKeyboard: FunctionComponent<IProps> = ({
   const onKeyPress = (button: string) => {
     if (button === "Shift") {
       setLayoutName(layoutName === "default" ? "shift" : "default");
+      return
     }
     
 
@@ -53,14 +54,12 @@ const VirtKeyboard: FunctionComponent<IProps> = ({
 
     keyBoardCallBack(button, "down")
     keyBoardCallBack(button, "up")
+
     if (shift)
       keyBoardCallBack("Shift", "up")
-    //keyBoardCallBack(button, 'down')
-    //keyBoardCallBack(button, 'up')
-    //console.log(button);
-    if (button === "Enter" || button =='Close') {
+
+    if (button === "Enter" || button =='Close') 
       close()
-    }
   };
  
  
