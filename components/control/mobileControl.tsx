@@ -153,8 +153,8 @@ function MobileControl({ isClose, handleOpen, actions, isShowBtn, onOkey, onDefa
 						</div> :
 						<>
 							<WrapperButton>
-								{actions.map(action => (
-									<ButtonIcon key={Math.random()} onClick={() => { action.action() }}>
+								{actions.map((action,index) => (
+									<ButtonIcon key={index} onClick={() => { action.action() }}>
 										{action.icon}
 									</ButtonIcon>
 								))}
@@ -162,8 +162,8 @@ function MobileControl({ isClose, handleOpen, actions, isShowBtn, onOkey, onDefa
 							<hr style={{width: '100%'}}/>
 							<WrapperKey>
 								{
-									listKeyBroad.map(key => (
-										<ButtonIcon onClick={() => { clickKey(key.val) }}>{key.name}</ButtonIcon>
+									listKeyBroad.map((key,index) => (
+										<ButtonIcon key={index} onClick={() => { clickKey(key.val) }}>{key.name}</ButtonIcon>
 									))
 								}
 							</WrapperKey>

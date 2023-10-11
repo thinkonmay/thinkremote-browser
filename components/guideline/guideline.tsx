@@ -155,8 +155,10 @@ function GuideLine({ isModalOpen, closeModal, platform }) {
 			<Container>
 				<Title>CHÚ Ý: Mở game trong ổ D, không lưu file ở ổ C</Title>
 				{
-					buttons.map(btn => (
-						<Content>
+					buttons.map((btn,index) => (
+						<Content
+							key={index}
+						>
 							<ContainerIcon>
 								{btn.icon}
 							</ContainerIcon>
