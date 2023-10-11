@@ -15,6 +15,7 @@ import MobileControl from "./mobileControl";
 import DesktopControl from "./desktopControl";
 import Setting from "../setting/setting";
 import { useShift } from "../../core/utils/convert";
+import VirtKeyboard from "../virtKeyboard";
 
 
 export type ButtonMode = "static" | "draggable" | "disable";
@@ -50,56 +51,70 @@ export const WebRTCControl = (input: {
 	const [OpenControl, setOpenControl]  			= useState<boolean>(false)
 
 	const [Clipboard,setClipboard] 					= useState<boolean>(false);
+	const [isOpenKeyboard,setOpenKeyBoard] 			= useState<boolean>(false);
     const inputRef 									= useRef<HTMLInputElement>(null);
+	const keyboardRef								= useRef<HTMLInputElement>(null);
+	//useEffect(() => {
+	//	if (TextValue.length > OldTextValue.length) {
+	//		for (let index = OldTextValue.length; index < TextValue.length; index++) {
+	//			const element = TextValue[index];
+	//			const shift = useShift(element)
 
-	useEffect(() => {
-		if (TextValue.length > OldTextValue.length) {
-			for (let index = OldTextValue.length; index < TextValue.length; index++) {
-				const element = TextValue[index];
-				const shift = useShift(element)
+	//			if (shift) 
+	//				input.keyboard_callback("Shift","down")
+	//			input.keyboard_callback(element,"down")
+	//			input.keyboard_callback(element,"up")
+	//			if (shift) 
+	//				input.keyboard_callback("Shift","up")
+	//		}
+	//	} else {
+	//		for (let index = 0; index < OldTextValue.length - TextValue.length; index++) {
+	//			input.keyboard_callback("Backspace","down")
+	//			input.keyboard_callback("Backspace","up")
+	//		}
+	//	}
 
-				if (shift) 
-					input.keyboard_callback("Shift","down")
-				input.keyboard_callback(element,"down")
-				input.keyboard_callback(element,"up")
-				if (shift) 
-					input.keyboard_callback("Shift","up")
-			}
-		} else {
-			for (let index = 0; index < OldTextValue.length - TextValue.length; index++) {
-				input.keyboard_callback("Backspace","down")
-				input.keyboard_callback("Backspace","up")
-			}
-		}
+	//	setOldTextValue(TextValue)
+	//},[TextValue])
 
-		setOldTextValue(TextValue)
-	},[TextValue])
+	
+	//useEffect(() => {
+	//	if (!Clipboard) {
+	//		inputRef.current.blur()
+	//		return
+	//	}
 
-	useEffect(() => {
-		if (!Clipboard) {
-			inputRef.current.blur()
+	//	inputRef.current.focus()
+	//	const read = () => { setTextValue(inputRef.current.value.split("")) }
+	//	const interval = setInterval(read,50)
+	//	return () => {clearInterval(interval)}
+	//},[Clipboard])
+	useEffect(()=>{
+		if(isOpenKeyboard || enableVGamepad =='draggable'){
+			input.touch_mode_callback('none')
 			return
 		}
-
-		inputRef.current.focus()
-		const read = () => { setTextValue(inputRef.current.value.split("")) }
-		const interval = setInterval(read,50)
-		return () => {clearInterval(interval)}
-	},[Clipboard])
-
-	useEffect(() => {
-		switch (enableVGamepad) {
-			case 'disable':
-				input.touch_mode_callback('trackpad')
-				break;
-			case 'static':
-				input.touch_mode_callback('gamepad')
-				break;
-			case 'draggable':
-				input.touch_mode_callback('none')
-				break;
+		if(enableVGamepad =='static'){
+			input.touch_mode_callback('gamepad')
+			return
 		}
-	}, [enableVGamepad])
+		
+		input.touch_mode_callback('trackpad')
+	},[isOpenKeyboard, enableVGamepad])
+
+	//useEffect(() => {
+	//	switch (enableVGamepad) {
+	//		case 'disable':
+	//			input.touch_mode_callback('trackpad')
+	//			break;
+	//		case 'static':
+	//			input.touch_mode_callback('gamepad')
+	//			break;
+	//		case 'draggable':
+	//			input.touch_mode_callback('none')
+	//			break;
+	//	}
+	//}, [enableVGamepad])
 	useEffect(() => { setenableVGamepad(input.show_gamepad ? "static" : "disable") },[])
 
 	useEffect(() => {
@@ -131,7 +146,7 @@ export const WebRTCControl = (input: {
 						input.gamepad_qr()
 						return
 					}
-
+					setOpenKeyBoard(false)
 					setenableVGamepad((prev) => {
 						setOpenControl(false)
 						switch (prev) {
@@ -145,14 +160,16 @@ export const WebRTCControl = (input: {
 			},
 		keyboard : {
 				icon: <KeyboardIcon />,
-				name: "Write to clipboard",
+				name: "Open Keyboard",
 				action: () => { 
-					setClipboard(old => {
-						if (old) 
-							setOpenControl(false)
+					//setClipboard(old => {
+					//	if (old) 
+					//		setOpenControl(false)
 
-						return !old
-					}) 
+					//	return !old
+					//}) \
+					setenableVGamepad('disable')
+					setOpenKeyBoard(o => !o)
 				},
 			},
 		password : {
@@ -264,6 +281,12 @@ export const WebRTCControl = (input: {
 					placeholder="" 
 					onBlur={() => setClipboard(false)}
 					style={{opacity:"0"}}
+				/>
+				<VirtKeyboard 
+					isOpen={isOpenKeyboard}
+					keyBoardCallBack = {input.keyboard_callback}
+					keyboardRef={keyboardRef}
+					close={()=>{setOpenKeyBoard(false)}}
 				/>
 			</>
 		</ConTrolContext.Provider >
