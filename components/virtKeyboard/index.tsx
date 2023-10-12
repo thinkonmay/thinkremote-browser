@@ -28,7 +28,6 @@ const slideOutAnimation = keyframes`
 
 interface IProps {
   keyBoardCallBack: (key, type) => void;
-  keyboardRef: MutableRefObject<Keyboard>;
   isOpen: boolean
   close: () => void
 }
@@ -36,7 +35,6 @@ interface IProps {
 const VirtKeyboard: FunctionComponent<IProps> = ({
   isOpen,
   keyBoardCallBack,
-  keyboardRef,
   close
 }) => {
   const [layoutName, setLayoutName] = useState("default");
@@ -68,7 +66,6 @@ const VirtKeyboard: FunctionComponent<IProps> = ({
   return (
     <Container id='keyboard' className={isOpen ? 'slide-in' : 'slide-out'}>
       <Keyboard
-        keyboardRef={r => (keyboardRef.current = r)}
         layoutName={layoutName}
         onKeyPress={onKeyPress}
         onRender={() => console.log("Rendered")}

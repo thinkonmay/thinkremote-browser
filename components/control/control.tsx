@@ -53,7 +53,6 @@ export const WebRTCControl = (input: {
 	const [OpenControl, setOpenControl]  			= useState<boolean>(false)
 
 	const [isOpenKeyboard,setOpenKeyBoard] 			= useState<boolean>(false);
-	const keyboardRef								= useRef<HTMLInputElement>(null);
 	useEffect(()=>{
 		if(isOpenKeyboard || enableVGamepad =='draggable')
 			input.touch_mode_callback('none')
@@ -230,7 +229,6 @@ export const WebRTCControl = (input: {
 				<VirtKeyboard 
 					isOpen={isOpenKeyboard}
 					keyBoardCallBack = {input.keyboard_callback}
-					keyboardRef={keyboardRef}
 					close={()=>{setOpenKeyBoard(false)}}
 				/>
 			</>
