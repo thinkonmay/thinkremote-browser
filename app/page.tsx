@@ -84,7 +84,7 @@ export default function Home () {
     const scancode     = searchParams.get('scancode') ?? scancode_local
     const show_gamepad = searchParams.get('show_gamepad') == 'true'
     let   vm_password  = "unknown"
-    try { vm_password  = atob(searchParams.get('vm_password') ?? "dW5rbm93bg==") } catch { }
+    try { vm_password  = atob(atob(searchParams.get('vm_password') ?? "ZFc1cmJtOTNiZz09")) } catch { }
 
     const [connectionPath,setConnectionPath]       = useState<any[]>([]);
     const [videoConnectivity,setVideoConnectivity] = useState<ConnectStatus>('not started');
