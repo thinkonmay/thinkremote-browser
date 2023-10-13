@@ -1,6 +1,7 @@
 "use client"
 
 import { Fullscreen, LockReset, } from "@mui/icons-material";
+import HomeIcon from '@mui/icons-material/Home';
 import SportsEsportsOutlinedIcon from '@mui/icons-material/SportsEsportsOutlined';
 import VideoSettingsOutlinedIcon from '@mui/icons-material/VideoSettingsOutlined';
 import KeyboardIcon from '@mui/icons-material/Keyboard';
@@ -16,6 +17,7 @@ import DesktopControl from "./desktopControl";
 import Setting from "../setting/setting";
 import { useShift } from "../../core/utils/convert";
 import VirtKeyboard from "../virtKeyboard";
+import { useRouter, useSearchParams } from "next/navigation";
 
 
 export type ButtonMode = "static" | "draggable" | "disable";
@@ -24,6 +26,8 @@ export const ConTrolContext = createContext<{
 	DefaultPosition:boolean
 }| null>(null)
 
+
+const REDIRECT_PAGE = "https://app.thinkmay.net/"
 
 export const WebRTCControl = (input: {
 	touch_mode_callback				: (mode: 'trackpad' | 'gamepad' | 'mouse' | 'none') 	=> Promise<void>,
@@ -54,6 +58,8 @@ export const WebRTCControl = (input: {
 	const [isOpenKeyboard,setOpenKeyBoard] 			= useState<boolean>(false);
     const inputRef 									= useRef<HTMLInputElement>(null);
 	const keyboardRef								= useRef<HTMLInputElement>(null);
+    const router = useRouter();
+
 	//useEffect(() => {
 	//	if (TextValue.length > OldTextValue.length) {
 	//		for (let index = OldTextValue.length; index < TextValue.length; index++) {
@@ -89,6 +95,7 @@ export const WebRTCControl = (input: {
 	//	const interval = setInterval(read,50)
 	//	return () => {clearInterval(interval)}
 	//},[Clipboard])
+
 	useEffect(()=>{
 		if(isOpenKeyboard || enableVGamepad =='draggable'){
 			input.touch_mode_callback('none')
@@ -121,7 +128,7 @@ export const WebRTCControl = (input: {
 		if (input.platform == 'mobile')
 			setactions([button.reset,button.bitrate,button.vgamepad,button.setting,button.keyboard,button.fullscreen,button.password])
 		else 
-			setactions([button.reset,button.bitrate,button.vgamepad,button.fullscreen,button.password])
+			setactions([button.reset,button.bitrate,button.vgamepad,button.fullscreen,button.home,button.password])
 
 	}, [input.platform])
 
@@ -201,6 +208,14 @@ export const WebRTCControl = (input: {
 					setModalSettingOpen(true) 
 				},
 			}
+			,
+		home : {
+				icon: <HomeIcon />,
+				name: "Go back to Dashboard",
+				action: () => { 
+					router.push(REDIRECT_PAGE)
+				},
+			}
 	}
 
 
@@ -250,6 +265,8 @@ export const WebRTCControl = (input: {
 					/> 
 					: <DesktopControl 
 						actions={actions} 
+						keyBoardCallBack = {input.keyboard_callback}
+
 					/>
 				}
 				</div>
