@@ -121,8 +121,12 @@ const listKeyBroad = [
 		val: ['Backspace']
 	},
 	{
-		name: 'Alt + F4',
+		name: 'Alt F4',
 		val: ['Alt', 'F4']
+	},
+	{
+		name: 'Ctrl V',
+		val: ['control', 'v']
 	},
 ]
 function MobileControl({ isClose, handleOpen, actions, isShowBtn, onOkey, onDefault, keyBoardCallBack }: Props) {

@@ -7,7 +7,6 @@ import styled from "styled-components";
 import {
     TurnOnAlert,
     TurnOnConfirm,
-    TurnOnStatus,
 } from "../components/popup/popup";
 import { Metrics, RemoteDesktopClient } from "../core/app";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -36,7 +35,7 @@ import { AudioWrapper } from "../core/pipeline/sink/audio/wrapper";
 import { formatError } from "../utils/formatError";
 import { EventCode } from "../core/models/keys.model";
 import QRCode from "react-qr-code";
-import GuideLine from "../components/guideline/guideline";
+import GuideLine from "../components/custom/guideline/guideline";
 
 
 type StatsView = {
@@ -266,7 +265,7 @@ export default function Home () {
         const {Email ,SignalingConfig ,WebRTCConfig,PingCallback,FetchCallback} = result
         callback = PingCallback
         fetch_callback = FetchCallback
-        await LogConnectionEvent(ConnectionEvent.ApplicationStarted,`hi ${Email}`)
+        await LogConnectionEvent(ConnectionEvent.ApplicationStarted,`Login as ${Email}`)
 
 
         localStorage.setItem("signaling",JSON.stringify(SignalingConfig))
@@ -417,6 +416,13 @@ export default function Home () {
         setTimeout(() => setQRShow(null),10000)
     }
 
+    const Customization = ()=> {
+        return <GuideLine 
+            platform={platform} 
+            isModalOpen={isGuideModalOpen} 
+            closeModal={() => setGuideModalOpen(false)}
+        />
+    }
 
     return (
         <Body>
@@ -438,7 +444,11 @@ export default function Home () {
             ></WebRTCControl>
             <RemoteVideo
                 ref={remoteVideo}
-                src={no_video ? null : platform == 'desktop' ? video_desktop : video_desktop}
+                src={!no_video 
+                    ? platform == 'desktop' 
+                    ? video_desktop 
+                    : video_desktop
+                    : null}
                 autoPlay
                 muted
                 playsInline
@@ -476,8 +486,7 @@ export default function Home () {
                 path        ={connectionPath}
                 platform    ={platform}
             />
-            <GuideLine platform={platform} isModalOpen={isGuideModalOpen} closeModal={() => {setGuideModalOpen(false)}}/>
-
+            <Customization/>
         </Body>
     );
 };
@@ -525,8 +534,6 @@ const TextModal = styled.p`
 	font-weight: 500;
 	color: white;
 `
-//export default Home;?
-
 const ButtonModal = styled.button`
     border: 0;
     border-radius: 0.25em;
