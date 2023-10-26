@@ -210,8 +210,10 @@ export const ButtonGroupRight = (props: ButtonGroupProps) => {
             >
                 <WrapperDraggable id="joystick">
                     <JoyStick
-                         moveCallback={(x: number, y: number) =>
-                            props.AxisCallback(x, y, "right")
+                         moveCallback={async(x: number, y: number) =>{
+                            // props.AxisCallback(x, y, "right")
+                             return
+                         }
                         }
                         draggable={props.draggable}
                         size={JOYSTICK_SIZE * rightJt}
@@ -448,7 +450,7 @@ export const ButtonGroupLeft = (props: ButtonGroupProps) => {
                 >
                     <JoyStick
                         moveCallback={async (x: number, y: number) => {
-                            props.AxisCallback(x, y, "left");
+                            //props.AxisCallback(x, y, "left");
                             return;
                         }}
                         draggable={props.draggable}
