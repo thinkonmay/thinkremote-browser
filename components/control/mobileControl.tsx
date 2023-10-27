@@ -136,7 +136,7 @@ const listKeyBroad = [
 		val: ['Alt', 'F4']
 	},
 	{
-		name: 'Alt + Tab',
+		name: 'Alt Tab',
 		val: ['Alt', 'Tab']
 	},
 	{
