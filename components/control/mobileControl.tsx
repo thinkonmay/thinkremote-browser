@@ -68,7 +68,6 @@ const WrapperKey = styled.div`
     width: 100%;
     height: 45px;
 	display: flex;
-	gap: 8px;
 	justify-content: center;
 	align-items: center;
 `
@@ -88,9 +87,21 @@ const ButtonIcon = styled.button`
 	border: none;
 	background: none;
 	width: auto;
+	padding: 0 8px;
 	min-width: 45px;
 	height: 100%;
 	font-weight: 500;    
+	
+`;
+
+const BtnKey = styled(ButtonIcon)`
+	/*padding: 0 8px;*/
+	border-right: 1px solid;
+
+	&: last-child {
+		border-right: unset;
+
+	}	
 `
 interface Action {
 	icon: React.ReactNode,
@@ -172,7 +183,7 @@ function MobileControl({ isClose, handleOpen, actions, isShowBtn, onOkey, onDefa
 							<WrapperKey>
 								{
 									listKeyBroad.map((key,index) => (
-										<ButtonIcon key={index} onClick={() => { clickKey(key.val) }}>{key.name}</ButtonIcon>
+										<BtnKey key={index} onClick={() => { clickKey(key.val) }}>{key.name}</BtnKey>
 									))
 								}
 							</WrapperKey>
