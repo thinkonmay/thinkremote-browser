@@ -125,9 +125,14 @@ const listKeyBroad = [
 		val: ['Alt', 'F4']
 	},
 	{
+		name: 'Alt + Tab',
+		val: ['Alt', 'Tab']
+	},
+	{
 		name: 'Ctrl V',
 		val: ['control', 'v']
 	},
+	
 ]
 function MobileControl({ isClose, handleOpen, actions, isShowBtn, onOkey, onDefault, keyBoardCallBack }: Props) {
 
