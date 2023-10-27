@@ -89,6 +89,7 @@ export default class SbCore {
 		this.supabase = createBrowserClient()
 	}
 
+
 	public async LoginWithGoogle() {
 		console.log(process.env.NEXT_PUBLIC_REDIRECT_TO)
 		await this.supabase.auth.signInWithOAuth({
