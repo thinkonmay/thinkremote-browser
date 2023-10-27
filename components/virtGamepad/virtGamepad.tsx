@@ -207,6 +207,25 @@ export const ButtonGroupRight = (props: ButtonGroupProps) => {
             </Draggable>
             <Draggable
                 disabled={props.draggable != "draggable"}
+                position={{ x: posBtn?.joystick?.x, y: posBtn?.joystick?.y }}
+
+                onStop={handleStop}
+                onDrag={handleDrag}
+            >
+                <WrapperDraggable id="joystick">
+                    <JoyStick
+                         moveCallback={async(x: number, y: number) =>{
+                            // props.AxisCallback(x, y, "right")
+                             return
+                         }
+                        }
+                        draggable={props.draggable}
+                        size={JOYSTICK_SIZE * rightJt}
+                    />
+                </WrapperDraggable>
+            </Draggable>
+            <Draggable
+                disabled={props.draggable != "draggable"}
                 position={{ x: posBtn?.subBtn?.x, y: posBtn?.subBtn?.y }}
                 onStop={handleStop}
                 onDrag={handleDrag}
@@ -424,6 +443,25 @@ export const ButtonGroupLeft = (props: ButtonGroupProps) => {
                 </WrapperDraggable>
             </Draggable>
             {/* left */}
+            <Draggable
+                disabled={props.draggable != "draggable"}
+                position={{ x: posBtn?.joystick?.x, y: posBtn?.joystick?.y }}
+                onStop={handleStop}
+                onDrag={handleDrag}
+            >
+                <WrapperDraggable
+                    id="joystick"
+                >
+                    <JoyStick
+                        moveCallback={async (x: number, y: number) => {
+                            //props.AxisCallback(x, y, "left");
+                            return;
+                        }}
+                        draggable={props.draggable}
+                        size={JOYSTICK_SIZE * leftJt}
+                    />
+                </WrapperDraggable>
+            </Draggable>
         </>
     );
 };
