@@ -48,6 +48,7 @@
 		"react-draggable": "^4.4.5",
 		"react-hook-form": "^7.43.7",
 		"react-icons": "^4.8.0",
+		"react-joystick-component": "^6.2.1",
 		"react-qr-code": "^2.0.12",
 		"react-simple-keyboard": "^3.7.23",
 		"sass": "^1.54.0",

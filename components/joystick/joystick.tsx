@@ -1,20 +1,64 @@
 import { useEffect, useRef, useState } from "react";
+import { IJoystickUpdateEvent, Joystick } from "react-joystick-component/build/lib/Joystick";
 import { ButtonMode } from "../control/control";
+import styled from "styled-components";
 
+//export const JoyStick = (param: {
+//    draggable: ButtonMode;
+//    moveCallback: (x: number, y: number) => Promise<void>;
+//}) => {
+
+//    return (
+//        <Joystickinternal
+//            move={param.moveCallback}
+//            // disabled={param.draggable === 'draggable'}
+//        />
+//    );
+//};
 export const JoyStick = (param: {
-    draggable: ButtonMode;
+    draggable?: ButtonMode;
     moveCallback: (x: number, y: number) => Promise<void>;
+    className?: string;
+    size: number,
 }) => {
 
+    const { draggable, moveCallback, className, size = 100 } = param
+    const [enableJT, setenableJT] = useState<boolean>(false);
+
+    const move = (event: IJoystickUpdateEvent) => {
+        return
+        if (event.type == "move") {
+            //if (!enableJT) {
+            //    moveCallback(0, 0);
+            //    return;
+            //}
+            moveCallback(event.x, -event.y);
+        } else if (event.type == "stop") {
+            //setenableJT(false);
+            moveCallback(0, 0);
+        } else if (event.type == "start") {
+            //setenableJT(true);
+            moveCallback(0, 0);
+
+        }
+    };
+
     return (
-        <Joystickinternal
-            move={param.moveCallback}
-            // disabled={param.draggable === 'draggable'}
-        />
+        <WrapperJoyStick className={className}>
+            <Joystick
+                start={move}
+                stop={move}
+                move={move}
+                size={size}
+                baseColor="rgba(0, 0, 0, 0.1)"
+                stickColor="rgba(255, 255, 255, 0.52"
+                disabled={draggable === 'draggable'}
+            />
+        </WrapperJoyStick>
     );
 };
 
-
+const WrapperJoyStick = styled.div``;
 
 const baseSize = 100
 const AbsRad = baseSize / 2
