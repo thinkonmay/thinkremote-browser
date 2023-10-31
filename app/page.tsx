@@ -195,10 +195,6 @@ export default function Home () {
 
 
 
-
-
-
-
     useEffect(()=>{
         const got_stuck_one = () => { 
             return((['started','closed'].includes(videoConnectivity)  && audioConnectivity == 'connected') || 
@@ -232,7 +228,7 @@ export default function Home () {
             throw new Error(`invalid URL, please check again (｡◕‿‿◕｡)`)
 
         localStorage.setItem("reference",ref)
-        localStorage.setItem("scancode", scancode.toString() )
+        localStorage.setItem("scancode", scancode)
         const core = new SbCore()
         if (!await core.Authenticated() && user_ref == undefined) {
             await core.LoginWithGoogle()
