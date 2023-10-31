@@ -18,7 +18,7 @@ import Setting from "../setting/setting";
 import { useShift } from "../../core/utils/convert";
 import VirtKeyboard from "../virtKeyboard";
 import { useRouter, useSearchParams } from "next/navigation";
-
+import AspectRatioIcon from '@mui/icons-material/AspectRatio';
 
 export type ButtonMode = "static" | "draggable" | "disable";
 
@@ -80,8 +80,8 @@ export const WebRTCControl = (input: {
 
 	const button = {
 		display: {
-			icon: <VideoSettingsOutlinedIcon />,
-			name: "Display",
+			icon: <AspectRatioIcon />,
+			name: "Display & FPS",
 			action: input.display_callback,
 		},
 		bitrate : {
