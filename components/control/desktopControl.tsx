@@ -16,8 +16,12 @@ interface Props {
 }
 const listKeyBroad = [
 	{
-		name: 'Alt + F4',
+		name: 'Alt+F4',
 		val: ['Alt', 'F4']
+	},
+	{
+		name: 'Win+D',
+		val: ['lwin', 'd'] 
 	},
 ]
 function DesktopControl(props: Props) {
