@@ -5,6 +5,7 @@ import video_desktop from "../public/assets/videos/video_demo_desktop.mp4";
 import styled from "styled-components";
 
 import {
+    AskSelectDisplay,
     TurnOnAlert,
     TurnOnConfirm,
 } from "../components/popup/popup";
@@ -376,9 +377,17 @@ export default function Home () {
 
 
 
+    const selection = async (displays: string[]) => {
+        const result = await AskSelectDisplay(displays)
+        console.log(result)
+        if(!result) return
+        return result
+    }
 
 
-
+    const displaySelect = async function () {
+        client.SwitchDisplay(selection)
+    }
     const fullscreenCallback = async function () {
         setIOSFullscreen(old => !old)
     }
@@ -431,6 +440,7 @@ export default function Home () {
                 vm_password={vm_password}
                 touch_mode_callback={touchModeCallback}
                 bitrate_callback={bitrateCallback}
+                display_callback={displaySelect}
                 gamepad_callback_a={GamepadACallback}
                 gamepad_callback_b={GamepadBCallback}
                 mouse_move_callback={MouseMoveCallback}

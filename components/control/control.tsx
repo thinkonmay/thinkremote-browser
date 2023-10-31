@@ -18,7 +18,7 @@ import Setting from "../setting/setting";
 import { useShift } from "../../core/utils/convert";
 import VirtKeyboard from "../virtKeyboard";
 import { useRouter, useSearchParams } from "next/navigation";
-
+import AspectRatioIcon from '@mui/icons-material/AspectRatio';
 
 export type ButtonMode = "static" | "draggable" | "disable";
 
@@ -37,6 +37,7 @@ export const WebRTCControl = (input: {
 	keyboard_callback				: (key: string, 			type: 'up' | 'down') 		=> Promise<void>,
 	mouse_move_callback				: (x: number, y: number) 								=> Promise<void>,
 	bitrate_callback				: (bitrate: number) 									=> Promise<void>,
+	display_callback				: () 													=> Promise<void>,
 
 	gamepad_qr					    : () => Promise<void>,
 	reset_callback					: () => Promise<void>,
@@ -69,8 +70,8 @@ export const WebRTCControl = (input: {
 
 	useEffect(() => {
 		const actions = input.platform == 'mobile' 
-			? [button.reset,button.bitrate,button.vgamepad,button.setting,button.keyboard,button.fullscreen, button.home]
-			: [button.reset,button.bitrate,button.vgamepad,button.fullscreen, button.home]
+			? [button.reset,button.display,button.bitrate,button.vgamepad,button.setting,button.keyboard,button.fullscreen, button.home]
+			: [button.reset,button.display,button.bitrate,button.vgamepad,button.fullscreen, button.home]
 		if (input.vm_password != "unknown") 
 			actions.push(button.password)
 		
@@ -78,6 +79,11 @@ export const WebRTCControl = (input: {
 	}, [input.platform])
 
 	const button = {
+		display: {
+			icon: <AspectRatioIcon />,
+			name: "Display & FPS",
+			action: input.display_callback,
+		},
 		bitrate : {
 			icon: <VideoSettingsOutlinedIcon />,
 			name: "Bitrate",
