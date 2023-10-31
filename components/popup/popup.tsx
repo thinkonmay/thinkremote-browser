@@ -98,14 +98,14 @@ export async function AskSelectDisplay( monitors: string[]): Promise<{
 
     TurnOffStatus();
     const swalInput = {};
-    monitors.forEach(x => {
-        swalInput[x] = {}
-        swalInput[x][`${x}|1920|1080|60`] = "fullHD 60fps"
-        swalInput[x][`${x}|2560|1440|60`] = "2K 60fps"
-        swalInput[x][`${x}|3840|2160|60`] = "4K 60fps"
-        swalInput[x][`${x}|1920|1080|120`] = "fullHD 120fps"
-        swalInput[x][`${x}|2560|1440|120`] = "2K 120fps"
-        swalInput[x][`${x}|3840|2160|120`] = "4K 120fps"
+    monitors.forEach(monitor => {
+        //swalInput[x] = {}
+        swalInput[`${monitor}|1920|1080|60`] = "FullHD 60fps"
+        swalInput[`${monitor}|1920|1080|120`] = "FullHD 120fps"
+        swalInput[`${monitor}|2560|1440|60`] = "2K 60fps"
+        swalInput[`${monitor}|2560|1440|120`] = "2K 120fps"
+        swalInput[`${monitor}|3840|2160|60`] = "4K 60fps"
+        swalInput[`${monitor}|3840|2160|120`] = "4K 120fps"
     })
 
     const { value } = await Swal.fire({
@@ -117,6 +117,7 @@ export async function AskSelectDisplay( monitors: string[]): Promise<{
         inputValidator: (value) => "" ,
     });
 
+    if(!value) return
     return {
         display:              (value as string).split('|').at(0),
         width:       parseInt((value as string).split('|').at(1)),

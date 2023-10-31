@@ -380,6 +380,7 @@ export default function Home () {
     const selection = async (displays: string[]) => {
         const result = await AskSelectDisplay(displays)
         console.log(result)
+        if(!result) return
         return result
     }
 
