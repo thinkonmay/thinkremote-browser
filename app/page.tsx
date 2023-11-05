@@ -242,7 +242,7 @@ export default function Home () {
             throw new Error(`invalid URL, please check again (｡◕‿‿◕｡)`)
 
         localStorage.setItem("reference",ref)
-        localStorage.setItem("scancode", scancode.toString() )
+        localStorage.setItem("scancode", scancode)
         const core = new SbCore()
         if (!await core.Authenticated() && user_ref == undefined) {
             await core.LoginWithGoogle()
@@ -355,7 +355,7 @@ export default function Home () {
         SetupConnection() 
             .catch((err)=>{
                 TurnOnAlert(formatError((err as Error)?.message ?? ""))
-                setTimeout(() => router.push(REDIRECT_PAGE),5000)
+                //setTimeout(() => router.push(REDIRECT_PAGE),5000)
             })
             .then(async () => {
                 SetupWebRTC()
@@ -367,7 +367,7 @@ export default function Home () {
                         return
                     else if(!data.is_ping_worker_account) {
                         await TurnOnAlert('worker terminated')
-                        setTimeout(() => router.push(REDIRECT_PAGE),5000)
+                        //setTimeout(() => router.push(REDIRECT_PAGE),5000)
                     }
                 },30 * 1000)
             })
