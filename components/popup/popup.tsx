@@ -1,7 +1,6 @@
 "use client"
 import Swal from "sweetalert2";
 import 'sweetalert2/src/sweetalert2.scss'
-import { Soundcard, Monitor, } from "../../core/models/devices.model";
 
 let have_swal : 'confirm' | 'popup' | 'none' = "none";
 
@@ -89,92 +88,44 @@ export async function TurnOnClipboard(): Promise<string | null> {
     }
 }
 
-export async function AskSelectSoundcard(
-    soundcards: Array<Soundcard>
-): Promise<string> {
+
+export async function AskSelectDisplay( monitors: string[]): Promise<{
+        display:string,
+        width:number,
+        height:number,
+        framerate:number,
+    }> {
+
     TurnOffStatus();
+    const swalInput = {};
+    monitors.forEach(monitor => {
+        //swalInput[x] = {}
+        swalInput[`${monitor}|1920|1080|60`] = "FullHD 60fps"
+        swalInput[`${monitor}|1920|1080|120`] = "FullHD 120fps"
+        swalInput[`${monitor}|2560|1440|60`] = "2K 60fps"
+        swalInput[`${monitor}|2560|1440|120`] = "2K 120fps"
+        swalInput[`${monitor}|3840|2160|60`] = "4K 60fps"
+        swalInput[`${monitor}|3840|2160|120`] = "4K 120fps"
+    })
 
-    let swalInput = {};
-    soundcards.forEach((x) => {
-        if (swalInput[x.Api] == null) {
-            swalInput[x.Api] = {};
-        }
-        swalInput[x.Api][x.DeviceID] = x.Name;
-    });
-
-    const { value: DeviceID } = await Swal.fire({
-        title: "Select a soundcard device",
-        input: "select",
-        inputOptions: swalInput,
-        inputPlaceholder: "Click here",
-        showCancelButton: false,
-        inputValidator: (value) => {
-            for (var x of soundcards) {
-                if (x.Name == value) {
-                    return "";
-                }
-            }
-        },
-    });
-
-    return DeviceID;
-}
-
-export async function AskSelectDisplay(
-    monitors: Array<Monitor>
-): Promise<string> {
-    TurnOffStatus();
-    let swalInput = {};
-
-    monitors.forEach((x) => {
-        if (swalInput[x.Adapter] == null) {
-            swalInput[x.Adapter] = {};
-        }
-
-        swalInput[x.Adapter][x.MonitorHandle] = x.MonitorName;
-    });
-
-    const { value: MonitorHandle } = await Swal.fire({
+    const { value } = await Swal.fire({
         title: "Select monitor",
         input: "select",
         inputOptions: swalInput,
         inputPlaceholder: "Select monitor",
         showCancelButton: false,
-        inputValidator: (value) => {
-            for (var x of monitors) {
-                if (x.MonitorName == value) {
-                    return "";
-                }
-            }
-        },
+        inputValidator: (value) => "" ,
     });
 
-    return MonitorHandle;
+    if(!value) return
+    return {
+        display:              (value as string).split('|').at(0),
+        width:       parseInt((value as string).split('|').at(1)),
+        height:      parseInt((value as string).split('|').at(2)),
+        framerate:   parseInt((value as string).split('|').at(3)),
+    };
 }
 
-export async function AskSelectFramerate(): Promise<number> {
-    TurnOffStatus();
-    const { value: framerate } = await Swal.fire({
-        title: "Select framerate",
-        input: "select",
-        inputOptions: {
-            "30": "30fps",
-            "40": "40fps",
-            "50": "50fps",
-            "55": "55fps",
-            "60": "60fps",
-            "90": "90fps",
-            "120": "120fps",
-        },
-        inputPlaceholder: "Select framerate",
-        showCancelButton: false,
-        inputValidator: (value) => {
-            return "";
-        },
-    });
-
-    return Number.parseInt(framerate);
-}
 
 export async function AskSelectBitrate(): Promise<number> {
     TurnOffStatus();
@@ -189,9 +140,9 @@ export async function AskSelectBitrate(): Promise<number> {
             "6000": "6 mbps",
             "8000": "8 mbps",
             "10000": "10 mbps",
-            // "20000": "20 mbps",
-            // "30000": "30 mbps",
-            // "40000": "40 mbps",
+             "20000": "20 mbps",
+            //  "30000": "30 mbps",
+            //  "40000": "40 mbps",
             // "60000": "60 mbps",
             // "80000": "80 mbps",
         },

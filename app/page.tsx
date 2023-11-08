@@ -5,9 +5,9 @@ import video_desktop from "../public/assets/videos/video_demo_desktop.mp4";
 import styled from "styled-components";
 
 import {
+    AskSelectDisplay,
     TurnOnAlert,
     TurnOnConfirm,
-    TurnOnStatus,
 } from "../components/popup/popup";
 import { Metrics, RemoteDesktopClient } from "../core/app";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -36,6 +36,7 @@ import { AudioWrapper } from "../core/pipeline/sink/audio/wrapper";
 import { formatError } from "../utils/formatError";
 import { EventCode } from "../core/models/keys.model";
 import QRCode from "react-qr-code";
+import GuideLine from "../components/custom/guideline/guideline";
 
 
 type StatsView = {
@@ -84,7 +85,7 @@ export default function Home () {
     const scancode     = searchParams.get('scancode') ?? scancode_local
     const show_gamepad = searchParams.get('show_gamepad') == 'true'
     let   vm_password  = "unknown"
-    try { vm_password  = atob(searchParams.get('vm_password') ?? "dW5rbm93bg==") } catch { }
+    try { vm_password  = atob(atob(searchParams.get('vm_password') ?? "ZFc1cmJtOTNiZz09")) } catch { }
 
     const [connectionPath,setConnectionPath]       = useState<any[]>([]);
     const [videoConnectivity,setVideoConnectivity] = useState<ConnectStatus>('not started');
@@ -98,6 +99,7 @@ export default function Home () {
  	const [showQR, setQRShow]                      = useState<string|null>(null)
  	const [warningRotate, setWarning]              = useState(false)
     const shouldResetKey                           = useRef(true) 
+    const [isGuideModalOpen, setGuideModalOpen] = useState(true)
 
     const router = useRouter();
 
@@ -105,6 +107,14 @@ export default function Home () {
         if (platform == 'mobile') 
             setWarning(width < height)
 	}    
+
+    useLayoutEffect(()=>{
+        const isGuideModalLocal = localStorage.getItem('isGuideModalLocal')
+        if(isGuideModalLocal == 'false' || isGuideModalLocal == 'true'){
+            setGuideModalOpen(JSON.parse(isGuideModalLocal))
+        }
+    },[])
+
     useEffect(() => {
 		checkHorizontal(window.innerWidth,window.innerHeight)
         window.addEventListener('resize', (e: UIEvent) => {
@@ -232,7 +242,7 @@ export default function Home () {
             throw new Error(`invalid URL, please check again (｡◕‿‿◕｡)`)
 
         localStorage.setItem("reference",ref)
-        localStorage.setItem("scancode", scancode.toString() )
+        localStorage.setItem("scancode", scancode)
         const core = new SbCore()
         if (!await core.Authenticated() && user_ref == undefined) {
             await core.LoginWithGoogle()
@@ -256,7 +266,7 @@ export default function Home () {
         const {Email ,SignalingConfig ,WebRTCConfig,PingCallback,FetchCallback} = result
         callback = PingCallback
         fetch_callback = FetchCallback
-        await LogConnectionEvent(ConnectionEvent.ApplicationStarted,`hi ${Email}`)
+        await LogConnectionEvent(ConnectionEvent.ApplicationStarted,`Login as ${Email}`)
 
 
         localStorage.setItem("signaling",JSON.stringify(SignalingConfig))
@@ -345,7 +355,7 @@ export default function Home () {
         SetupConnection() 
             .catch((err)=>{
                 TurnOnAlert(formatError((err as Error)?.message ?? ""))
-                setTimeout(() => router.push(REDIRECT_PAGE),5000)
+                //setTimeout(() => router.push(REDIRECT_PAGE),5000)
             })
             .then(async () => {
                 SetupWebRTC()
@@ -357,7 +367,7 @@ export default function Home () {
                         return
                     else if(!data.is_ping_worker_account) {
                         await TurnOnAlert('worker terminated')
-                        setTimeout(() => router.push(REDIRECT_PAGE),5000)
+                        //setTimeout(() => router.push(REDIRECT_PAGE),5000)
                     }
                 },30 * 1000)
             })
@@ -367,9 +377,17 @@ export default function Home () {
 
 
 
+    const selection = async (displays: string[]) => {
+        const result = await AskSelectDisplay(displays)
+        console.log(result)
+        if(!result) return
+        return result
+    }
 
 
-
+    const displaySelect = async function () {
+        client.SwitchDisplay(selection)
+    }
     const fullscreenCallback = async function () {
         setIOSFullscreen(old => !old)
     }
@@ -400,7 +418,6 @@ export default function Home () {
         SetupWebRTC()
     }
     const keyboardCallback = async(val,action: "up" | "down") => {
-        console.log(val,action)
         client?.hid?.TriggerKey(action == "up" ? EventCode.KeyUp : EventCode.KeyDown,val)
     }
     const gamepadQR = async() => {
@@ -408,6 +425,13 @@ export default function Home () {
         setTimeout(() => setQRShow(null),10000)
     }
 
+    const Customization = ()=> {
+        return <GuideLine 
+            platform={platform} 
+            isModalOpen={isGuideModalOpen} 
+            closeModal={() => setGuideModalOpen(false)}
+        />
+    }
 
     return (
         <Body>
@@ -416,6 +440,7 @@ export default function Home () {
                 vm_password={vm_password}
                 touch_mode_callback={touchModeCallback}
                 bitrate_callback={bitrateCallback}
+                display_callback={displaySelect}
                 gamepad_callback_a={GamepadACallback}
                 gamepad_callback_b={GamepadBCallback}
                 mouse_move_callback={MouseMoveCallback}
@@ -429,7 +454,11 @@ export default function Home () {
             ></WebRTCControl>
             <RemoteVideo
                 ref={remoteVideo}
-                src={no_video ? null : platform == 'desktop' ? video_desktop : video_desktop}
+                src={!no_video 
+                    ? platform == 'desktop' 
+                    ? video_desktop 
+                    : video_desktop
+                    : null}
                 autoPlay
                 muted
                 playsInline
@@ -467,6 +496,7 @@ export default function Home () {
                 path        ={connectionPath}
                 platform    ={platform}
             />
+            <Customization/>
         </Body>
     );
 };
@@ -514,8 +544,6 @@ const TextModal = styled.p`
 	font-weight: 500;
 	color: white;
 `
-//export default Home;?
-
 const ButtonModal = styled.button`
     border: 0;
     border-radius: 0.25em;

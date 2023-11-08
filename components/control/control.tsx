@@ -1,20 +1,24 @@
 "use client"
 
 import { Fullscreen, LockReset, } from "@mui/icons-material";
+import HomeIcon from '@mui/icons-material/Home';
 import SportsEsportsOutlinedIcon from '@mui/icons-material/SportsEsportsOutlined';
 import VideoSettingsOutlinedIcon from '@mui/icons-material/VideoSettingsOutlined';
 import KeyboardIcon from '@mui/icons-material/Keyboard';
+import KeyIcon from '@mui/icons-material/Key';
+import SettingsIcon from '@mui/icons-material/Settings';
 import React, { useEffect, useState, createContext, useRef } from "react"; // we need this to make JSX compile
 import { Platform } from "../../core/utils/platform";
 import { requestFullscreen } from "../../core/utils/screen";
 import { AskSelectBitrate } from "../popup/popup";
 import { VirtualGamepad } from "../virtGamepad/virtGamepad";
 import MobileControl from "./mobileControl";
-import SettingsIcon from '@mui/icons-material/Settings';
 import DesktopControl from "./desktopControl";
 import Setting from "../setting/setting";
 import { useShift } from "../../core/utils/convert";
-
+import VirtKeyboard from "../virtKeyboard";
+import { useRouter, useSearchParams } from "next/navigation";
+import AspectRatioIcon from '@mui/icons-material/AspectRatio';
 
 export type ButtonMode = "static" | "draggable" | "disable";
 
@@ -22,6 +26,8 @@ export const ConTrolContext = createContext<{
 	DefaultPosition:boolean
 }| null>(null)
 
+
+const REDIRECT_PAGE = "https://app.thinkmay.net/"
 
 export const WebRTCControl = (input: {
 	touch_mode_callback				: (mode: 'trackpad' | 'gamepad' | 'mouse' | 'none') 	=> Promise<void>,
@@ -31,6 +37,7 @@ export const WebRTCControl = (input: {
 	keyboard_callback				: (key: string, 			type: 'up' | 'down') 		=> Promise<void>,
 	mouse_move_callback				: (x: number, y: number) 								=> Promise<void>,
 	bitrate_callback				: (bitrate: number) 									=> Promise<void>,
+	display_callback				: () 													=> Promise<void>,
 
 	gamepad_qr					    : () => Promise<void>,
 	reset_callback					: () => Promise<void>,
@@ -42,76 +49,43 @@ export const WebRTCControl = (input: {
 	video							: HTMLVideoElement
 }) => {
 	const [enableVGamepad, setenableVGamepad] 		= useState<ButtonMode>('disable');
+	useEffect(() => { 
+		setenableVGamepad(input.show_gamepad ? "static" : "disable") 
+	},[])
+
 	const [isModalSettingOpen, setModalSettingOpen] = useState(false)
 	const [actions, setactions] 					= useState<any[]>([]);
-	const [TextValue,setTextValue]       			= useState<string[]>([]);
-	const [OldTextValue,setOldTextValue] 			= useState<string[]>([]);
 	const [OpenControl, setOpenControl]  			= useState<boolean>(false)
 
-	const [Clipboard,setClipboard] 					= useState<boolean>(false);
-    const inputRef 									= useRef<HTMLInputElement>(null);
+	const [isOpenKeyboard,setOpenKeyBoard] 			= useState<boolean>(false);
+    const router = useRouter();
+	useEffect(()=>{
+		if(isOpenKeyboard || enableVGamepad =='draggable')
+			input.touch_mode_callback('none')
+		else if(enableVGamepad =='static')
+			input.touch_mode_callback('gamepad')
+		else
+			input.touch_mode_callback('trackpad')
+	},[isOpenKeyboard, enableVGamepad])
 
 	useEffect(() => {
-		if (TextValue.length > OldTextValue.length) {
-			for (let index = OldTextValue.length; index < TextValue.length; index++) {
-				const element = TextValue[index];
-				const shift = useShift(element)
-
-				if (shift) 
-					input.keyboard_callback("Shift","down")
-				input.keyboard_callback(element,"down")
-				input.keyboard_callback(element,"up")
-				if (shift) 
-					input.keyboard_callback("Shift","up")
-			}
-		} else {
-			for (let index = 0; index < OldTextValue.length - TextValue.length; index++) {
-				input.keyboard_callback("Backspace","down")
-				input.keyboard_callback("Backspace","up")
-			}
-		}
-
-		setOldTextValue(TextValue)
-	},[TextValue])
-
-	useEffect(() => {
-		if (!Clipboard) {
-			inputRef.current.blur()
-			return
-		}
-
-		inputRef.current.focus()
-		const read = () => { setTextValue(inputRef.current.value.split("")) }
-		const interval = setInterval(read,50)
-		return () => {clearInterval(interval)}
-	},[Clipboard])
-
-	useEffect(() => {
-		switch (enableVGamepad) {
-			case 'disable':
-				input.touch_mode_callback('trackpad')
-				break;
-			case 'static':
-				input.touch_mode_callback('gamepad')
-				break;
-			case 'draggable':
-				input.touch_mode_callback('none')
-				break;
-		}
-	}, [enableVGamepad])
-	useEffect(() => { setenableVGamepad(input.show_gamepad ? "static" : "disable") },[])
-
-	useEffect(() => {
-		if (input.platform == 'mobile')
-			setactions([button.reset,button.bitrate,button.vgamepad,button.setting,button.keyboard,button.fullscreen,button.password])
-		else 
-			setactions([button.reset,button.bitrate,button.vgamepad,button.fullscreen,button.password])
-
+		const actions = input.platform == 'mobile' 
+			? [button.reset,button.display,button.bitrate,button.vgamepad,button.setting,button.keyboard,button.fullscreen, button.home]
+			: [button.reset,button.display,button.bitrate,button.vgamepad,button.fullscreen, button.home]
+		if (input.vm_password != "unknown") 
+			actions.push(button.password)
+		
+		setactions(actions)
 	}, [input.platform])
 
 	const button = {
+		display: {
+			icon: <AspectRatioIcon color="inherit"/>,
+			name: "Display & FPS",
+			action: input.display_callback,
+		},
 		bitrate : {
-			icon: <VideoSettingsOutlinedIcon />,
+			icon: <VideoSettingsOutlinedIcon  color="inherit"/>,
 			name: "Bitrate",
 			action: async () => {
 				setOpenControl(false)
@@ -123,14 +97,14 @@ export const WebRTCControl = (input: {
 			},
 		},
 		vgamepad : {
-				icon: <SportsEsportsOutlinedIcon />,
+				icon: <SportsEsportsOutlinedIcon  color="inherit"/>,
 				name: "Open Gamepad",
 				action: () => {
 					if (input.platform == 'desktop') {
 						input.gamepad_qr()
 						return
 					}
-
+					setOpenKeyBoard(false)
 					setenableVGamepad((prev) => {
 						setOpenControl(false)
 						switch (prev) {
@@ -143,27 +117,33 @@ export const WebRTCControl = (input: {
 				},
 			},
 		keyboard : {
-				icon: <KeyboardIcon />,
-				name: "Write to clipboard",
+				icon: <KeyboardIcon  color="inherit"/>,
+				name: "Open Keyboard",
 				action: () => { 
-					setClipboard(old => {
-						if (old) 
-							setOpenControl(false)
-
-						return !old
-					}) 
+					setenableVGamepad('disable')
+					setOpenKeyBoard(o => !o)
 				},
 			},
 		password : {
-				icon: <KeyboardIcon />,
+				icon: <KeyIcon  color="inherit"/>,
 				name: "Paste Window password",
 				action: () => { 
-					setOldTextValue([])
-					setTextValue(input.vm_password.split(""))
+					const chars = input.vm_password.split("")
+					for (let index = 0; index < chars.length; index++) {
+						const element = chars[index];
+						const shift = useShift(element)
+
+						if (shift) 
+							input.keyboard_callback("Shift","down")
+						input.keyboard_callback(element,"down")
+						input.keyboard_callback(element,"up")
+						if (shift) 
+							input.keyboard_callback("Shift","up")
+					}
 				},
 			},
 		fullscreen : {
-				icon: <Fullscreen />,
+				icon: <Fullscreen  color="inherit"/>,
 				name: "Enter fullscreen",
 				action: () => {
 					requestFullscreen()
@@ -172,15 +152,23 @@ export const WebRTCControl = (input: {
 				}
 			},
 		reset : {
-				icon: <LockReset/>,
+				icon: <LockReset color="inherit"/>,
 				name: "Reset",
 				action: input.reset_callback 
 			},
 		setting : {
-				icon: <SettingsIcon />,
+				icon: <SettingsIcon  color="inherit"/>,
 				name: "Setting",
 				action: () => { 
 					setModalSettingOpen(true) 
+				},
+			}
+			,
+		home : {
+				icon: <HomeIcon  color="inherit"/>,
+				name: "Go back to Dashboard",
+				action: () => { 
+					router.push(REDIRECT_PAGE)
 				},
 			}
 	}
@@ -228,9 +216,12 @@ export const WebRTCControl = (input: {
 						}}
 
 						actions={actions}
+						keyBoardCallBack = {input.keyboard_callback}
 					/> 
 					: <DesktopControl 
 						actions={actions} 
+						keyBoardCallBack = {input.keyboard_callback}
+
 					/>
 				}
 				</div>
@@ -256,12 +247,10 @@ export const WebRTCControl = (input: {
 					closeModal={() => setModalSettingOpen(false) }
 				/>
 
-				<input 
-					ref={inputRef} 
-					type="text" 
-					placeholder="" 
-					onBlur={() => setClipboard(false)}
-					style={{opacity:"0"}}
+				<VirtKeyboard 
+					isOpen={isOpenKeyboard}
+					keyBoardCallBack = {input.keyboard_callback}
+					close={()=>{setOpenKeyBoard(false)}}
 				/>
 			</>
 		</ConTrolContext.Provider >
