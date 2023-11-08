@@ -80,12 +80,12 @@ export const WebRTCControl = (input: {
 
 	const button = {
 		display: {
-			icon: <AspectRatioIcon />,
+			icon: <AspectRatioIcon color="inherit"/>,
 			name: "Display & FPS",
 			action: input.display_callback,
 		},
 		bitrate : {
-			icon: <VideoSettingsOutlinedIcon />,
+			icon: <VideoSettingsOutlinedIcon  color="inherit"/>,
 			name: "Bitrate",
 			action: async () => {
 				setOpenControl(false)
@@ -97,7 +97,7 @@ export const WebRTCControl = (input: {
 			},
 		},
 		vgamepad : {
-				icon: <SportsEsportsOutlinedIcon />,
+				icon: <SportsEsportsOutlinedIcon  color="inherit"/>,
 				name: "Open Gamepad",
 				action: () => {
 					if (input.platform == 'desktop') {
@@ -117,7 +117,7 @@ export const WebRTCControl = (input: {
 				},
 			},
 		keyboard : {
-				icon: <KeyboardIcon />,
+				icon: <KeyboardIcon  color="inherit"/>,
 				name: "Open Keyboard",
 				action: () => { 
 					setenableVGamepad('disable')
@@ -125,7 +125,7 @@ export const WebRTCControl = (input: {
 				},
 			},
 		password : {
-				icon: <KeyIcon />,
+				icon: <KeyIcon  color="inherit"/>,
 				name: "Paste Window password",
 				action: () => { 
 					const chars = input.vm_password.split("")
@@ -143,7 +143,7 @@ export const WebRTCControl = (input: {
 				},
 			},
 		fullscreen : {
-				icon: <Fullscreen />,
+				icon: <Fullscreen  color="inherit"/>,
 				name: "Enter fullscreen",
 				action: () => {
 					requestFullscreen()
@@ -152,12 +152,12 @@ export const WebRTCControl = (input: {
 				}
 			},
 		reset : {
-				icon: <LockReset/>,
+				icon: <LockReset color="inherit"/>,
 				name: "Reset",
 				action: input.reset_callback 
 			},
 		setting : {
-				icon: <SettingsIcon />,
+				icon: <SettingsIcon  color="inherit"/>,
 				name: "Setting",
 				action: () => { 
 					setModalSettingOpen(true) 
@@ -165,7 +165,7 @@ export const WebRTCControl = (input: {
 			}
 			,
 		home : {
-				icon: <HomeIcon />,
+				icon: <HomeIcon  color="inherit"/>,
 				name: "Go back to Dashboard",
 				action: () => { 
 					router.push(REDIRECT_PAGE)

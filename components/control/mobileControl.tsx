@@ -56,6 +56,7 @@ const WrapperContent = styled.div`
 	margin-right: 16px;
 	/*background: rgb(242 232 232 / 60%);#5fccfbab*/
 	background: #5fccfbab;
+	color: black;
 `;
 const WrapperButton = styled.div`
     width: 100%;
@@ -91,6 +92,8 @@ const ButtonIcon = styled.button`
 	min-width: 45px;
 	height: 100%;
 	font-weight: 500;    
+	color: black;
+
 	
 `;
 
