@@ -11,39 +11,49 @@ const Container = styled.div`
     /* background: red; */
     position: relative;
 `;
-const DefaultButton = styled.button`
+export const DefaultGamePadButton = styled.button`
     /* depened on Container */
+    display: flex;
+    align-items: center;
+    justify-content:center;
+    outline: none;
+
     width: inherit;
     height: inherit;
-    color: #C3B5B5;
+    color: rgba(255, 255, 255, 0.5);
+
     border: 1px solid currentColor;
     border-radius: 50%;
-    position: absolute;
     background-color: transparent;
     -webkit-user-select: none;
     -ms-user-select: none; 
     user-select: none;
 `;
 
-const ButtonY = styled(DefaultButton)`
+const DefaultYbxaBtn = styled(DefaultGamePadButton)`
+    position: absolute;
+    
+
+`
+const ButtonY = styled(DefaultYbxaBtn)`
     top: 0;
     right: 50%;
 
     transform: translate(50%, -100%);
 `;
 
-const ButtonB = styled(DefaultButton)`
+const ButtonB = styled(DefaultYbxaBtn)`
     bottom: 0;
     right: 50%;
 
     transform: translate(50%, 100%);
 `;
-const ButtonX = styled(DefaultButton)`
+const ButtonX = styled(DefaultYbxaBtn)`
     right: 0;
     top: 50%;
     transform: translate(100%, -50%);
 `;
-const ButtonA = styled(DefaultButton)`
+const ButtonA = styled(DefaultYbxaBtn)`
     top: 50%;
     left: 0%;
     transform: translate(-100%, -50%);

@@ -3,7 +3,7 @@ import React, { useRef, useState, useEffect, useLayoutEffect, useTransition, use
 import Draggable, { DraggableData, DraggableEvent } from "react-draggable";
 import styled from "styled-components";
 import { ButtonMode, ConTrolContext } from "../control/control";
-import { YBXA } from "./gamepad/y_b_x_a";
+import { DefaultGamePadButton, YBXA } from "./gamepad/y_b_x_a";
 import DPad from "./gamepad/d_pad";
 import { LeftFuncButton, RightFuncButton } from "./gamepad/func_button";
 import { useSetting } from "../../context/settingProvider";
@@ -264,31 +264,20 @@ export const ButtonGroupRight = (props: ButtonGroupProps) => {
         </>
     );
 };
-const Rs = styled.button`
+const Rs = styled(DefaultGamePadButton)`
      /* depened on Container */
     width: ${props => props.size + 'px'};
     height: ${props => props.size + 'px'};
-    color: #C3B5B5;
-    border: 1px solid currentColor;
-    border-radius: 50%;
+    
     position: absolute;
-    background-color: transparent;
-    -webkit-user-select: none;
-    -ms-user-select: none; 
-    user-select: none;
+    
     
 `;
-const Ls = styled.button`
+const Ls = styled(DefaultGamePadButton)`
     width: ${props => props.size + 'px'};
     height: ${props => props.size + 'px'};
-    color: #C3B5B5;
-    border: 1px solid currentColor;
-    border-radius: 50%;
+    
     position: absolute;
-    background-color: transparent;
-    -webkit-user-select: none;
-    -ms-user-select: none; 
-    user-select: none;
 `
 const defaultButtonGroupLeftValue = {
     dpad: { x: 0.08, y: 0.45 },

@@ -1,4 +1,5 @@
 import styled from "styled-components";
+import { DefaultGamePadButton } from "./y_b_x_a";
 
 const DefautContainer = styled.div`
     display: flex;
@@ -20,6 +21,13 @@ const DefaultFuncBtn = styled.button`
     justify-content:center;
     outline: none;
     color: #C3B5B5;
+   
+    border: 1px solid #C3B5B5;
+    border-radius: 50%;
+    background-color: transparent;
+    -webkit-user-select: none;
+    -ms-user-select: none; 
+    user-select: none;
    
     border: 1px solid #C3B5B5;
     border-radius: 50%;
@@ -50,18 +58,18 @@ export function RightFuncButton(props: PropsTrigger) {
             className={className}
             {...rest}
         >
-            <DefaultFuncBtn
+            <DefaultGamePadButton
 
                 style={{ ...buttonSize }}
                 onTouchStart={(e: React.TouchEvent) => Touch(7, 'down')}
                 onTouchEnd={(e: React.TouchEvent) => Touch(7, 'up')}
-            >RT</DefaultFuncBtn>
-            <DefaultFuncBtn
+            >RT</DefaultGamePadButton>
+            <DefaultGamePadButton
 
                 style={{ ...buttonSize }}
                 onTouchStart={(e: React.TouchEvent) => Touch(5, 'down')}
                 onTouchEnd={(e: React.TouchEvent) => Touch(5, 'up')}
-            >RB</DefaultFuncBtn>
+            >RB</DefaultGamePadButton>
         </ContainerRightBtn>
     );
 }
@@ -76,16 +84,16 @@ export function LeftFuncButton(props: PropsTrigger) {
         <ContainerLeftBtn
         className={className}
         >
-            <DefaultFuncBtn
+            <DefaultGamePadButton
                 style={{ ...buttonSize }}
                 onTouchStart={(e: React.TouchEvent) => Touch(6, 'down')}
                 onTouchEnd={(e: React.TouchEvent) => Touch(6, 'up')}
-            >LT</DefaultFuncBtn>
-            <DefaultFuncBtn
+            >LT</DefaultGamePadButton>
+            <DefaultGamePadButton
                 style={{ ...buttonSize }}
                 onTouchStart={(e: React.TouchEvent) => Touch(4, 'down')}
                 onTouchEnd={(e: React.TouchEvent) => Touch(4, 'up')}
-            >LB</DefaultFuncBtn>
+            >LB</DefaultGamePadButton>
         </ContainerLeftBtn>
     );
 }
