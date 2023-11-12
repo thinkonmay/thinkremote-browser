@@ -210,12 +210,16 @@ function GuideLine({ isModalOpen, closeModal, platform }) {
 		if(languageLocal) setLanguage(languageLocal)
 	},[])
 	const handleDontShow = () => {
-		localStorage.setItem('isGuideModalLocal', 'false')
+		localStorage.setItem('isGuideModalLocal1', 'false')
+		localStorage.removeItem('isGuideModalLocal')
+
 		closeModal()
 
 	}
 	const handleGotit = () => {
+		localStorage.removeItem('isGuideModalLocal')
 		closeModal()
+
 	}
 
 	React.useEffect(() => {
@@ -229,8 +233,13 @@ function GuideLine({ isModalOpen, closeModal, platform }) {
 	return (
 		<Modal open={isModalOpen}>
 			<Container>
-				<Title>{title[language]}</Title>
-				<div style={{display: 'flex', gap: 8, alignItems:'center', marginLeft: 'auto'}}>	
+				<Title>
+					{/*{title[language]}*/}
+					THÔNG BÁO: <br/>
+					Phím <strong>Esc</strong> chuyển thành <strong>F1</strong>.
+
+				</Title>
+				{/*<div style={{display: 'flex', gap: 8, alignItems:'center', marginLeft: 'auto'}}>	
 					<LanguageIcon fontSize='large'/>
 					<LanguageSwitch>
 						<select
@@ -256,9 +265,7 @@ function GuideLine({ isModalOpen, closeModal, platform }) {
 							<Text>{btn.name[language]}</Text>
 						</Content>
 					))
-				}
-
-
+				}*/}
 				<ContainerButton style={{ marginTop: 14 }}>
 					<ButtonDontShow onClick={handleDontShow}>{dontShow[language]}</ButtonDontShow>
 					<ButtonGotit onClick={handleGotit}>Oke!</ButtonGotit>
