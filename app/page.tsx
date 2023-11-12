@@ -366,7 +366,7 @@ export default function Home () {
                     if(data == undefined) 
                         return
                     else if(!data.is_ping_worker_account) {
-                        await TurnOnAlert('worker terminated')
+                        await TurnOnAlert('RemotePC is shutdown')
                         setTimeout(() => router.push(REDIRECT_PAGE),5000)
                     }
                 },30 * 1000)
