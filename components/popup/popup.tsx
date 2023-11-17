@@ -137,7 +137,7 @@ export async function AskSelectBitrate(): Promise<number> {
             "1000": "1 mbps",
             "2000": "2 mbps",
             "3000": "3 mbps",
-            "6000": "6 mbps",
+            "6000": "6 mbps (*Recommend)",
             "8000": "8 mbps",
             "10000": "10 mbps",
              "20000": "20 mbps",

@@ -10,6 +10,7 @@ import VideoSettingsOutlinedIcon from '@mui/icons-material/VideoSettingsOutlined
 import KeyboardIcon from '@mui/icons-material/Keyboard';
 import SettingsIcon from '@mui/icons-material/Settings';
 import LanguageIcon from '@mui/icons-material/Language';
+import PriorityHighIcon from '@mui/icons-material/PriorityHigh';
 const Container = styled.div`
 	width: 350px;
     height: fit-content;
@@ -161,6 +162,13 @@ const buttonsMobile = [
 ]
 const buttonsDesktop = [
 	{
+		icon: <PriorityHighIcon fontSize='inherit' />,
+		name: {
+			vn: "Phím ESC chuyển thành F1",
+			en: "ESC move to F1"
+		}
+	},
+	{
 		icon: <LockReset fontSize='inherit' />,
 		name: {
 			vn: "Reset khi không lên hình hoặc mất tiếng",
@@ -189,11 +197,12 @@ const buttonsDesktop = [
 			vn: "Lưu ý: bắt buộc fullscreen khi chơi game",
 			en: "Notice: Playing requires fullscreen for best experience~"
 		}
-	}
+	},
+	
 ]
 
 const title = {
-	vn: "CHÚ Ý: Mở game trong ổ D, không lưu file ở ổ C",
+	vn: `CHÚ Ý: Mở game trong ổ D, không lưu file ở ổ C. Trình duyệt khuyến nghị: Chrome, Chromium + bitrate 6mbs`,
 	en: "NOTICE: Game's in disk D, mustn't save file in disk C"
 }
 const dontShow = {
@@ -203,15 +212,16 @@ const dontShow = {
 type Language = 'vn' | 'en'
 function GuideLine({ isModalOpen, closeModal, platform }) {
 	const [buttons, setButtons] = React.useState(buttonsDesktop)
-	const [language, setLanguage] = React.useState<Language>('en')
+	const [language, setLanguage] = React.useState<Language>('vn')
 
 	useLayoutEffect(()=>{
 		const languageLocal = localStorage.getItem('language') as Language
 		if(languageLocal) setLanguage(languageLocal)
 	},[])
 	const handleDontShow = () => {
-		localStorage.setItem('isGuideModalLocal1', 'false')
+		localStorage.setItem('isGuideModalLocal2', 'false')
 		localStorage.removeItem('isGuideModalLocal')
+		localStorage.removeItem('isGuideModalLocal1')
 
 		closeModal()
 
@@ -234,12 +244,9 @@ function GuideLine({ isModalOpen, closeModal, platform }) {
 		<Modal open={isModalOpen}>
 			<Container>
 				<Title>
-					{/*{title[language]}*/}
-					THÔNG BÁO: <br/>
-					Phím <strong>Esc</strong> chuyển thành <strong>F1</strong>.
-
+					{title[language]}
 				</Title>
-				{/*<div style={{display: 'flex', gap: 8, alignItems:'center', marginLeft: 'auto'}}>	
+				<div style={{display: 'flex', gap: 8, alignItems:'center', marginLeft: 'auto'}}>	
 					<LanguageIcon fontSize='large'/>
 					<LanguageSwitch>
 						<select
@@ -265,7 +272,7 @@ function GuideLine({ isModalOpen, closeModal, platform }) {
 							<Text>{btn.name[language]}</Text>
 						</Content>
 					))
-				}*/}
+				}
 				<ContainerButton style={{ marginTop: 14 }}>
 					<ButtonDontShow onClick={handleDontShow}>{dontShow[language]}</ButtonDontShow>
 					<ButtonGotit onClick={handleGotit}>Oke!</ButtonGotit>

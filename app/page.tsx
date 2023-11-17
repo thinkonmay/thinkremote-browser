@@ -109,7 +109,7 @@ export default function Home () {
 	}    
 
     useLayoutEffect(()=>{
-        const isGuideModalLocal = localStorage.getItem('isGuideModalLocal1')
+        const isGuideModalLocal = localStorage.getItem('isGuideModalLocal2')
         if(isGuideModalLocal == 'false' || isGuideModalLocal == 'true'){
             setGuideModalOpen(JSON.parse(isGuideModalLocal))
         }
