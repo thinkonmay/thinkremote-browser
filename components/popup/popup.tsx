@@ -99,13 +99,11 @@ export async function AskSelectDisplay( monitors: string[]): Promise<{
     TurnOffStatus();
     const swalInput = {};
     monitors.forEach(monitor => {
-        //swalInput[x] = {}
-        swalInput[`${monitor}|1920|1080|60`] = "FullHD 60fps"
-        swalInput[`${monitor}|1920|1080|120`] = "FullHD 120fps"
-        swalInput[`${monitor}|2560|1440|60`] = "2K 60fps"
-        swalInput[`${monitor}|2560|1440|120`] = "2K 120fps"
-        swalInput[`${monitor}|3840|2160|60`] = "4K 60fps"
-        swalInput[`${monitor}|3840|2160|120`] = "4K 120fps"
+        swalInput[`${monitor}`] = {}
+        swalInput[`${monitor}`][`${monitor}|1280|720|240`]     = "HD"
+        swalInput[`${monitor}`][`${monitor}|1920|1080|240`]    = "FullHD"
+        swalInput[`${monitor}`][`${monitor}|2560|1440|240`]    = "2K"
+        swalInput[`${monitor}`][`${monitor}|3840|2160|240`]    = "4K"
     })
 
     const { value } = await Swal.fire({
