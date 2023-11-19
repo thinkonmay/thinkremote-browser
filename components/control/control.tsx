@@ -71,7 +71,7 @@ export const WebRTCControl = (input: {
 	useEffect(() => {
 		const actions = input.platform == 'mobile' 
 			? [button.reset,button.display,button.bitrate,button.vgamepad,button.setting,button.keyboard,button.fullscreen, button.home]
-			: [button.reset,button.display,button.bitrate,button.vgamepad,button.fullscreen, button.home]
+			: [button.fullscreen, button.home, button.reset,button.display,button.bitrate,button.vgamepad ]
 		if (input.vm_password != "unknown") 
 			actions.push(button.password)
 		
