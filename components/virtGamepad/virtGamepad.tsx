@@ -3,7 +3,7 @@ import React, { useRef, useState, useEffect, useLayoutEffect, useTransition, use
 import Draggable, { DraggableData, DraggableEvent } from "react-draggable";
 import styled from "styled-components";
 import { ButtonMode, ConTrolContext } from "../control/control";
-import { YBXA } from "./gamepad/y_b_x_a";
+import { DefaultGamePadButton, YBXA } from "./gamepad/y_b_x_a";
 import DPad from "./gamepad/d_pad";
 import { LeftFuncButton, RightFuncButton } from "./gamepad/func_button";
 import { useSetting } from "../../context/settingProvider";
@@ -15,6 +15,7 @@ const JOYSTICK_SIZE = 100
 
 export const VirtualGamepad = (props: {
     draggable: ButtonMode;
+    isOpen: boolean
     AxisCallback: (
         x: number,
         y: number,
@@ -25,13 +26,14 @@ export const VirtualGamepad = (props: {
     const { draggable,
         AxisCallback,
         ButtonCallback,
+        isOpen
     } = props
 
-
+    console.log('render gampad');
     return (
         <>
             {draggable == "static" || draggable == "draggable" ? (
-                <ContainerVirGamepad style={{ zIndex: 2 }}>
+                <ContainerVirGamepad style={{ zIndex: 2 }} className={isOpen ? 'slide-in' : 'slide-out'}>
                     <ButtonGroupLeft
                         AxisCallback={AxisCallback}
                         ButtonCallback={ButtonCallback}
@@ -264,31 +266,20 @@ export const ButtonGroupRight = (props: ButtonGroupProps) => {
         </>
     );
 };
-const Rs = styled.button`
+const Rs = styled(DefaultGamePadButton)`
      /* depened on Container */
     width: ${props => props.size + 'px'};
     height: ${props => props.size + 'px'};
-    color: #C3B5B5;
-    border: 1px solid currentColor;
-    border-radius: 50%;
+    
     position: absolute;
-    background-color: transparent;
-    -webkit-user-select: none;
-    -ms-user-select: none; 
-    user-select: none;
+    
     
 `;
-const Ls = styled.button`
+const Ls = styled(DefaultGamePadButton)`
     width: ${props => props.size + 'px'};
     height: ${props => props.size + 'px'};
-    color: #C3B5B5;
-    border: 1px solid currentColor;
-    border-radius: 50%;
+    
     position: absolute;
-    background-color: transparent;
-    -webkit-user-select: none;
-    -ms-user-select: none; 
-    user-select: none;
 `
 const defaultButtonGroupLeftValue = {
     dpad: { x: 0.08, y: 0.45 },
@@ -479,6 +470,16 @@ const ContainerVirGamepad = styled.div`
     width: 100vw;
     height: 100vh;
     position: relative;
+    opacity: 0;
+
+    &.slide-in {
+		opacity: 1;
+	}
+
+	&.slide-out {
+        opacity: 0;
+
+	}	
 `;
 const WrapperJoyStick = styled.div``;
 const WrapperDrag = styled.div`

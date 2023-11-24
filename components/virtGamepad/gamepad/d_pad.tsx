@@ -4,6 +4,7 @@ import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowLeftIcon from '@mui/icons-material/KeyboardArrowLeft';
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
+import { DefaultGamePadButton } from "./y_b_x_a";
 
 const Container = styled.div`
     width: ${(props) => props.size ?? "20"}px;
@@ -12,19 +13,8 @@ const Container = styled.div`
   
 `;
 
-const DefaultButton = styled.button`
-     /* depened on Container */
-     width: inherit;
-    height: inherit;
-    color: #C3B5B5;
-    border: 1px solid currentColor;
-    border-radius: 50%;
+const DefaultButton = styled(DefaultGamePadButton)`
     position: absolute;
-    background-color: transparent;
-    -webkit-user-select: none;
-    -ms-user-select: none; 
-    user-select: none;
-    
 `;
 const Top = styled(DefaultButton)`
     top: 0;

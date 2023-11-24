@@ -7,7 +7,7 @@ import VideoSettingsOutlinedIcon from '@mui/icons-material/VideoSettingsOutlined
 import KeyboardIcon from '@mui/icons-material/Keyboard';
 import KeyIcon from '@mui/icons-material/Key';
 import SettingsIcon from '@mui/icons-material/Settings';
-import React, { useEffect, useState, createContext, useRef } from "react"; // we need this to make JSX compile
+import React, { useEffect, useState, createContext, useRef, memo } from "react"; // we need this to make JSX compile
 import { Platform } from "../../core/utils/platform";
 import { requestFullscreen } from "../../core/utils/screen";
 import { AskSelectBitrate } from "../popup/popup";
@@ -29,7 +29,7 @@ export const ConTrolContext = createContext<{
 
 const REDIRECT_PAGE = "https://app.thinkmay.net/"
 
-export const WebRTCControl = (input: {
+export const WebRTCControl = memo(function WebRTCControl (input: {
 	touch_mode_callback				: (mode: 'trackpad' | 'gamepad' | 'mouse' | 'none') 	=> Promise<void>,
 	gamepad_callback_a				: (x: number, y: number, 	type: 'left' | 'right') 	=> Promise<void>,
 	gamepad_callback_b				: (index: number, 			type: 'up' | 'down') 		=> Promise<void>,
@@ -47,7 +47,7 @@ export const WebRTCControl = (input: {
 	vm_password						: string,
 	platform						: Platform,
 	video							: HTMLVideoElement
-}) => {
+}) {
 	const [enableVGamepad, setenableVGamepad] 		= useState<ButtonMode>('disable');
 	useEffect(() => { 
 		setenableVGamepad(input.show_gamepad ? "static" : "disable") 
@@ -55,7 +55,7 @@ export const WebRTCControl = (input: {
 
 	const [isModalSettingOpen, setModalSettingOpen] = useState(false)
 	const [actions, setactions] 					= useState<any[]>([]);
-	const [OpenControl, setOpenControl]  			= useState<boolean>(false)
+	const [isOpenControl, setOpenControl]  			= useState<boolean>(false)
 
 	const [isOpenKeyboard,setOpenKeyBoard] 			= useState<boolean>(false);
     const router = useRouter();
@@ -198,7 +198,7 @@ export const WebRTCControl = (input: {
 				{
 					input.platform === 'mobile' 
 					?  <MobileControl
-						isClose={OpenControl}
+						isClose={isOpenControl}
 						handleOpen={() =>  setOpenControl(old => !old) }
 
 						isShowBtn={enableVGamepad === 'draggable'}
@@ -227,8 +227,10 @@ export const WebRTCControl = (input: {
 				</div>
 
 
-
-				<VirtualGamepad
+				{
+					input.platform === 'mobile' ?
+					<>
+					<VirtualGamepad
 					ButtonCallback={enableVGamepad =='draggable' 
 						? async (i,t  ) => {} 
 						: input.gamepad_callback_b}
@@ -236,6 +238,7 @@ export const WebRTCControl = (input: {
 						? async (x,y,t) => {} 
 						: input.gamepad_callback_a}
 					draggable={enableVGamepad}
+					isOpen={enableVGamepad !='disable'}
 				/>
 
 				<Setting
@@ -252,9 +255,13 @@ export const WebRTCControl = (input: {
 					keyBoardCallBack = {input.keyboard_callback}
 					close={()=>{setOpenKeyBoard(false)}}
 				/>
+					</>
+					: null
+				}
+				
 			</>
 		</ConTrolContext.Provider >
 	);
-};
-
+}
+)
 
