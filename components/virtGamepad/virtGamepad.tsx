@@ -15,6 +15,7 @@ const JOYSTICK_SIZE = 100
 
 export const VirtualGamepad = (props: {
     draggable: ButtonMode;
+    isOpen: boolean
     AxisCallback: (
         x: number,
         y: number,
@@ -25,13 +26,14 @@ export const VirtualGamepad = (props: {
     const { draggable,
         AxisCallback,
         ButtonCallback,
+        isOpen
     } = props
 
-
+    console.log('render gampad');
     return (
         <>
             {draggable == "static" || draggable == "draggable" ? (
-                <ContainerVirGamepad style={{ zIndex: 2 }}>
+                <ContainerVirGamepad style={{ zIndex: 2 }} className={isOpen ? 'slide-in' : 'slide-out'}>
                     <ButtonGroupLeft
                         AxisCallback={AxisCallback}
                         ButtonCallback={ButtonCallback}
@@ -468,6 +470,16 @@ const ContainerVirGamepad = styled.div`
     width: 100vw;
     height: 100vh;
     position: relative;
+    opacity: 0;
+
+    &.slide-in {
+		opacity: 1;
+	}
+
+	&.slide-out {
+        opacity: 0;
+
+	}	
 `;
 const WrapperJoyStick = styled.div``;
 const WrapperDrag = styled.div`

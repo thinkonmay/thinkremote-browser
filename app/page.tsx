@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import video_desktop from "../public/assets/videos/video_demo_desktop.mp4";
 import styled from "styled-components";
 
@@ -355,7 +355,7 @@ export default function Home () {
         SetupConnection() 
             .catch((err)=>{
                 TurnOnAlert(formatError((err as Error)?.message ?? ""))
-                setTimeout(() => router.push(REDIRECT_PAGE),5000)
+                //setTimeout(() => router.push(REDIRECT_PAGE),5000)
             })
             .then(async () => {
                 SetupWebRTC()
@@ -366,8 +366,8 @@ export default function Home () {
                     if(data == undefined) 
                         return
                     else if(!data.is_ping_worker_account) {
-                        await TurnOnAlert('RemotePC is shutdown')
-                        setTimeout(() => router.push(REDIRECT_PAGE),5000)
+                        //await TurnOnAlert('RemotePC is shutdown')
+                        //setTimeout(() => router.push(REDIRECT_PAGE),5000)
                     }
                 },30 * 1000)
             })
@@ -385,45 +385,46 @@ export default function Home () {
     }
 
 
-    const displaySelect = async function () {
+    const displaySelect = useCallback( async function () {
         client.SwitchDisplay(selection)
-    }
-    const fullscreenCallback = async function () {
+    }, [client])
+    const fullscreenCallback = useCallback(async function () {
         setIOSFullscreen(old => !old)
-    }
-    const touchModeCallback=async function(mode: 'trackpad' | 'gamepad' | 'mouse' | 'none') { 
+    },[])
+    const touchModeCallback=useCallback(async function(mode: 'trackpad' | 'gamepad' | 'mouse' | 'none') { 
         client?.hid?.setTouchMode(mode)
-    } 
-    const bitrateCallback= async function (bitrate: number) { 
+    },[client])
+    const bitrateCallback= useCallback(async function (bitrate: number) { 
         client?.ChangeBitrate(bitrate);
         // client?.ChangeFramerate(55);
-    } 
-    const GamepadACallback=async function(x: number, y: number, type: "left" | "right"): Promise<void> {
+    },[client])
+    const GamepadACallback=useCallback(async function(x: number, y: number, type: "left" | "right"): Promise<void> {
         client?.hid?.VirtualGamepadAxis(x,y,type);
-    } 
-    const GamepadBCallback=async function(index: number, type: "up" | "down"): Promise<void> {
+    },[client] )
+    const GamepadBCallback=useCallback(async function(index: number, type: "up" | "down"): Promise<void> {
         client?.hid?.VirtualGamepadButtonSlider(type == 'down',index);
-    }  
-    const MouseMoveCallback=async function (x: number, y: number): Promise<void> {
+    } ,[client] )
+    const MouseMoveCallback=useCallback(async function (x: number, y: number): Promise<void> {
         client?.hid?.mouseMoveRel({movementX:x,movementY:y});
-    } 
-    const MouseButtonCallback=async function (index: number, type: "up" | "down"): Promise<void> {
+    },[client] )
+
+    const MouseButtonCallback=useCallback(async function (index: number, type: "up" | "down"): Promise<void> {
         type == 'down' 
             ? client?.hid?.MouseButtonDown({button: index}) 
             : client?.hid?.MouseButtonUp({button: index})
-    } 
-    const resetConnection = async() => {
+    },[client] )
+    const resetConnection = useCallback(async() => {
         client?.hid?.ResetKeyStuck();
         client?.HardReset()                    
         SetupWebRTC()
-    }
-    const keyboardCallback = async(val,action: "up" | "down") => {
+    },[client])
+    const keyboardCallback = useCallback(async(val,action: "up" | "down") => {
         client?.hid?.TriggerKey(action == "up" ? EventCode.KeyUp : EventCode.KeyDown,val)
-    }
-    const gamepadQR = async() => {
+    },[client])
+    const gamepadQR = useCallback(async() => {
         setQRShow(`${THIS_PAGE}/?ref=${localStorage.getItem("reference")}&no_video=true&show_gamepad=true&turn=${turn ? "true" : "false"}`)
         setTimeout(() => setQRShow(null),10000)
-    }
+    },[])
 
     const Customization = ()=> {
         return <GuideLine 
