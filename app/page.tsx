@@ -260,7 +260,11 @@ export default function Home () {
             no_hid, 
             no_stretch,
             view_pointer, 
-            show_gamepad 
+            show_gamepad,
+            screen: { 
+                width:  window.screen.width,
+                height: window.screen.height 
+            }
         })
 
         const {Email ,SignalingConfig ,WebRTCConfig,PingCallback,FetchCallback} = result
