@@ -1,16 +1,25 @@
 "use client"
 
-import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
-import video_desktop from "../public/assets/videos/video_demo_desktop.mp4";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import styled from "styled-components";
+import video_desktop from "../public/assets/videos/video_demo_desktop.mp4";
 
+import { Modal } from "@mui/material";
+import { useRouter, useSearchParams } from "next/navigation";
+import QRCode from "react-qr-code";
+import { WebRTCControl } from "../components/control/control";
+import GuideLine from "../components/custom/guideline/guideline";
+import Metric from "../components/metric/metric";
 import {
     AskSelectDisplay,
     TurnOnAlert,
     TurnOnConfirm,
 } from "../components/popup/popup";
 import { Metrics, RemoteDesktopClient } from "../core/app";
-import { useRouter, useSearchParams } from "next/navigation";
+import { EventCode } from "../core/models/keys.model";
+import { AudioWrapper } from "../core/pipeline/sink/audio/wrapper";
+import { VideoWrapper } from "../core/pipeline/sink/video/wrapper";
+import { AudioMetrics, NetworkMetrics, VideoMetrics } from "../core/qos/models";
 import {
     AddNotifier,
     ConnectionEvent,
@@ -18,25 +27,16 @@ import {
     LogConnectionEvent,
     LogLevel,
 } from "../core/utils/log";
-import { WebRTCControl } from "../components/control/control";
 import {
+    Platform,
     getBrowser,
-	getOS,
-	getPlatform,
-	getResolution,
-	Platform,
+    getOS,
+    getPlatform,
+    getResolution,
 } from "../core/utils/platform";
-import SbCore, { WorkerStatus } from "../supabase";
-import { Modal } from "@mui/material";
 import { IconHorizontalPhone } from "../public/assets/svg/svg_cpn";
-import Metric  from "../components/metric/metric";
-import { AudioMetrics, NetworkMetrics, VideoMetrics } from "../core/qos/models";
-import { VideoWrapper } from "../core/pipeline/sink/video/wrapper";
-import { AudioWrapper } from "../core/pipeline/sink/audio/wrapper";
+import SbCore, { WorkerStatus } from "../supabase";
 import { formatError } from "../utils/formatError";
-import { EventCode } from "../core/models/keys.model";
-import QRCode from "react-qr-code";
-import GuideLine from "../components/custom/guideline/guideline";
 
 
 type StatsView = {
@@ -85,7 +85,13 @@ export default function Home () {
     const scancode     = searchParams.get('scancode') ?? scancode_local
     const show_gamepad = searchParams.get('show_gamepad') == 'true'
     let   vm_password  = "unknown"
-    try { vm_password  = atob(atob(searchParams.get('vm_password') ?? "ZFc1cmJtOTNiZz09")) } catch { }
+    let   ads_period   = 20
+    try { 
+        vm_password  = atob(atob(searchParams.get('vm_password') ?? "ZFc1cmJtOTNiZz09")) 
+        ads_period   = parseInt(searchParams.get('period')) 
+        if (Number.isNaN(ads_period)) 
+            ads_period = 20
+    } catch { }
 
     const [connectionPath,setConnectionPath]       = useState<any[]>([]);
     const [videoConnectivity,setVideoConnectivity] = useState<ConnectStatus>('not started');
@@ -286,6 +292,7 @@ export default function Home () {
             JSON.parse(localStorage.getItem('signaling')),
             JSON.parse(localStorage.getItem('webrtc')), {
                 turn,
+                ads_period,
                 platform,
                 no_video,
                 no_mic,
