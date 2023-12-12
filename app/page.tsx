@@ -236,7 +236,16 @@ export default function Home () {
             const interval = setTimeout(check_connection, 7 * 1000)
             return () =>{ clearTimeout(interval) }
         } else if (videoConnectivity == 'connected') {
-            const interval = setInterval(callback, 12 * 1000)
+            const interval = setInterval(() => {
+                const second = client.hid.last_active()
+                if (second > 12 && second < 5 * 60) {
+                    // warning 1
+                } else if (second > 5 * 60) {
+                    // warning 2
+                }
+
+                callback()
+            }, 12 * 1000)
             return () =>{ clearInterval(interval) }
         }
     }, [videoConnectivity,audioConnectivity])
