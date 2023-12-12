@@ -85,12 +85,12 @@ export default function Home () {
     const scancode     = searchParams.get('scancode') ?? scancode_local
     const show_gamepad = searchParams.get('show_gamepad') == 'true'
     let   vm_password  = "unknown"
-    let   ads_period   = 20
+    let   ads_period   = 50
     try { 
         vm_password  = atob(atob(searchParams.get('vm_password') ?? "ZFc1cmJtOTNiZz09")) 
         ads_period   = parseInt(searchParams.get('period')) 
         if (Number.isNaN(ads_period)) 
-            ads_period = 20
+            ads_period = 50
     } catch { }
 
     const [connectionPath,setConnectionPath]       = useState<any[]>([]);
