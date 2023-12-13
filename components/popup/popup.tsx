@@ -4,7 +4,7 @@ import 'sweetalert2/src/sweetalert2.scss'
 
 let have_swal : 'confirm' | 'popup' | 'none' = "none";
 
-export async function TurnOnAlert(error: string): Promise<void> {
+export async function TurnOnAlert(error: string, title?: string, icon?: 'error' | 'info' | 'warning' ): Promise<void> {
     if (have_swal == 'popup') {
         TurnOffStatus();
         have_swal = 'none'
@@ -17,9 +17,9 @@ export async function TurnOnAlert(error: string): Promise<void> {
 
     have_swal = 'popup';
     Swal.fire({
-        title: "Opps...",
+        title: title ?? "Opps...",
         text: error,
-        icon: "error",
+        icon: icon ?? "error",
         confirmButtonText: "OK",
     });
 }

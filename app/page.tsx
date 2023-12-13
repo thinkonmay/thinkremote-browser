@@ -238,10 +238,12 @@ export default function Home () {
         } else if (videoConnectivity == 'connected') {
             const interval = setInterval(() => {
                 const second = client.hid.last_active()
-                if (second > 12 && second < 5 * 60) {
-                    // warning 1
+                if (second > 3*60 && second < 5 * 60) {
+                    TurnOnAlert('Must be active','You are AFK', 'info')
+                    
                 } else if (second > 5 * 60) {
-                    // warning 2
+                    TurnOnAlert("If you aren't active, Pc will shut down after 10 minutes!",'Warning', 'warning')
+                    return
                 }
 
                 callback()
