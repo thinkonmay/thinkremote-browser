@@ -64,9 +64,11 @@ type ConnectStatus = 'not started' | 'started' | 'connecting' | 'connected' | 'c
 export default function Home () {    
     let ref_local        = ''
     let scancode_local        = ''
+    let demo_local        = ''
     if (typeof window !== 'undefined'){
-        ref_local        = localStorage.getItem("reference")
-        scancode_local        = localStorage.getItem('scancode')
+        demo_local          = localStorage.getItem('demo')
+        ref_local       =  localStorage.getItem("reference")
+        scancode_local          = localStorage.getItem('scancode')
 
     }
 
@@ -83,6 +85,7 @@ export default function Home () {
     const no_stretch   = searchParams.get('no_stretch') == 'true'
     const view_pointer = searchParams.get('pointer') == 'visible'
     const scancode     = searchParams.get('scancode') ?? scancode_local
+    const demo         = searchParams.get('demo') ?? demo_local
     const show_gamepad = searchParams.get('show_gamepad') == 'true'
     let   vm_password  = "unknown"
     let   ads_period   = 100
@@ -114,6 +117,30 @@ export default function Home () {
             setWarning(width < height)
 	}    
 
+    useLayoutEffect(()=>{
+        // demo check or return
+        const checkDemo = async() =>{
+            if(demo){
+                // Clear search params.
+                if (typeof window !== "undefined") { 
+                    await new Promise(r => setTimeout(r, 1000));
+                    window.history.replaceState(null, '', '/') 
+                }
+                // Delete local data
+                await new Promise(r => setTimeout(r, 2 * 60 * 1000));
+                localStorage.clear()
+                await new Promise(r => setTimeout(r, 10 * 60 * 1000));
+                TurnOnAlert('Will close after 3 minutes ','Your DEMO', 'info')
+                await new Promise(r => setTimeout(r, 3 * 60  * 1000));
+
+                setTimeout(() => client?.Close(), 100);
+                router.push(REDIRECT_PAGE)
+            }
+        }
+        checkDemo()
+
+
+    },[client])
     useLayoutEffect(()=>{
         const isGuideModalLocal = localStorage.getItem('isGuideModalLocal2')
         if(isGuideModalLocal == 'false' || isGuideModalLocal == 'true'){
@@ -260,6 +287,7 @@ export default function Home () {
 
         localStorage.setItem("reference",ref)
         localStorage.setItem("scancode", scancode)
+        localStorage.setItem("demo", demo)
         const core = new SbCore()
         if (!await core.Authenticated() && user_ref == undefined) {
             await core.LoginWithGoogle()
