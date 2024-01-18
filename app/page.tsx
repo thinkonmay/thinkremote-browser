@@ -120,7 +120,7 @@ export default function Home () {
     useLayoutEffect(()=>{
         // demo check or return
         const checkDemo = async() =>{
-            if(demo){
+            if(demo=='true'){
                 // Clear search params.
                 if (typeof window !== "undefined") { 
                     await new Promise(r => setTimeout(r, 1000));
