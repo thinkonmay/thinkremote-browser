@@ -97,8 +97,8 @@ export default class SbCore {
 			options: {
 				redirectTo:  process.env.NEXT_PUBLIC_REDIRECT_TO ?? 'https://remote.thinkmay.net',
 				queryParams: {
-					access_type: "offline",
-					prompt: "consent",
+					access_type: "offline"
+					// prompt: "consent",
 				},
 			},
 		});
