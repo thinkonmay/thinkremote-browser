@@ -35,6 +35,7 @@ export const WebRTCControl = memo(function WebRTCControl (input: {
 	gamepad_callback_b				: (index: number, 			type: 'up' | 'down') 		=> Promise<void>,
 	mouse_button_callback			: (index: number, 			type: 'up' | 'down') 		=> Promise<void>,
 	keyboard_callback				: (key: string, 			type: 'up' | 'down') 		=> Promise<void>,
+	clipboard_callback				: (content: string)								 		=> Promise<void>,
 	mouse_move_callback				: (x: number, y: number) 								=> Promise<void>,
 	bitrate_callback				: (bitrate: number) 									=> Promise<void>,
 	display_callback				: () 													=> Promise<void>,
@@ -217,6 +218,7 @@ export const WebRTCControl = memo(function WebRTCControl (input: {
 
 						actions={actions}
 						keyBoardCallBack = {input.keyboard_callback}
+						clipBoardCallBack ={input.clipboard_callback}
 					/> 
 					: <DesktopControl 
 						actions={actions} 

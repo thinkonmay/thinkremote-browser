@@ -122,6 +122,7 @@ interface Props {
 	onDefault: () => Promise<void>
 
 	keyBoardCallBack: (key: string, type: 'up' | 'down') => Promise<void>
+	clipBoardCallBack: (content: string) => Promise<void>
 
 
 }
@@ -148,8 +149,32 @@ const listKeyBroad = [
 	},
 	
 ]
-function MobileControl({ isClose, handleOpen, actions, isShowBtn, onOkey, onDefault, keyBoardCallBack }: Props) {
 
+function MobileControl({ isClose, handleOpen, actions, isShowBtn, onOkey, onDefault, keyBoardCallBack, clipBoardCallBack }: Props) {
+
+	const handlePasteText = async () =>{
+		let items = await navigator.clipboard.readText();
+		console.log(items);
+		clipBoardCallBack(items)
+
+		//for (let item of items) {
+		//	console.log(item);
+		//	if (!item.types.includes("text/plain"))
+		//		continue;
+
+		//	let reader = new FileReader;
+		//	reader.addEventListener("load", loadEvent => {
+		//		console.log(reader.result)
+
+		//		//clipBoardCallBack(reader.result)
+		//	});
+		//	reader.readAsText(await item.getType("text/html"));
+		//	console.log(reader.readAsText(await item.getType("text/plain")));
+		//	break;
+		//}
+
+		//  Send to server
+	}
 	const clickKey = (keys = []) => {
 		if(keys.length <= 1){
 			keyBoardCallBack(keys?.at(0), 'down')
@@ -189,6 +214,8 @@ function MobileControl({ isClose, handleOpen, actions, isShowBtn, onOkey, onDefa
 										<BtnKey key={index} onClick={() => { clickKey(key.val) }}>{key.name}</BtnKey>
 									))
 								}
+									<BtnKey  onClick={() =>handlePasteText() }>'Paste'</BtnKey>
+
 							</WrapperKey>
 						</>
 
