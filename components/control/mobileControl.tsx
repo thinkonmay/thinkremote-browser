@@ -3,6 +3,7 @@
 import styled, { keyframes } from "styled-components";
 import * as React from 'react';
 import { IoIosArrowForward, IoIosArrowBack } from "react-icons/io";
+import { isIos } from "../../utils/checking";
 
 
 
@@ -122,6 +123,7 @@ interface Props {
 	onDefault: () => Promise<void>
 
 	keyBoardCallBack: (key: string, type: 'up' | 'down') => Promise<void>
+	clipBoardCallBack: (content: string) => Promise<void>
 
 
 }
@@ -131,25 +133,31 @@ const listKeyBroad = [
 		val: ['Escape']
 	},
 	{
-		name: 'Backspace',
-		val: ['Backspace']
-	},
-	{
-		name: 'Alt F4',
-		val: ['Alt', 'F4']
-	},
-	{
 		name: 'Win+D',
 		val: ['lwin', 'd'] 
+	},
+	{
+		name: 'Ctrl C',
+		val: ['control', 'c']
 	},
 	{
 		name: 'Ctrl V',
 		val: ['control', 'v']
 	},
+	{
+		name: 'Backspace',
+		val: ['Backspace']
+	}
 	
 ]
-function MobileControl({ isClose, handleOpen, actions, isShowBtn, onOkey, onDefault, keyBoardCallBack }: Props) {
 
+function MobileControl({ isClose, handleOpen, actions, isShowBtn, onOkey, onDefault, keyBoardCallBack, clipBoardCallBack }: Props) {
+
+	const handlePasteText = async () =>{
+		let items = await navigator.clipboard.readText();
+		clipBoardCallBack(items)
+		clickKey(['control', 'v'])
+	}
 	const clickKey = (keys = []) => {
 		if(keys.length <= 1){
 			keyBoardCallBack(keys?.at(0), 'down')
@@ -188,6 +196,10 @@ function MobileControl({ isClose, handleOpen, actions, isShowBtn, onOkey, onDefa
 									listKeyBroad.map((key,index) => (
 										<BtnKey key={index} onClick={() => { clickKey(key.val) }}>{key.name}</BtnKey>
 									))
+								}
+									
+								{
+									isIos() ? <BtnKey  onClick={() =>handlePasteText() }>Paste</BtnKey> : null
 								}
 							</WrapperKey>
 						</>

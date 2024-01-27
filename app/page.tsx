@@ -476,6 +476,9 @@ export default function Home () {
         setTimeout(() => setQRShow(null),10000)
     },[])
 
+    const setClipBoard = useCallback(async(content: string) => {
+        client?.hid?.SetClipboard(content)
+    },[client])
     const Customization = ()=> {
         return <GuideLine 
             platform={platform} 
@@ -499,6 +502,7 @@ export default function Home () {
                 reset_callback={resetConnection}
                 fullscreen_callback={fullscreenCallback}
                 keyboard_callback={keyboardCallback}
+                clipboard_callback={setClipBoard}
                 gamepad_qr={gamepadQR}
                 show_gamepad={show_gamepad}
                 video={remoteVideo.current}
