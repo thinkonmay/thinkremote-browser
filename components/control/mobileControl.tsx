@@ -135,10 +135,10 @@ const listKeyBroad = [
 		name: 'Backspace',
 		val: ['Backspace']
 	},
-	{
-		name: 'Alt F4',
-		val: ['Alt', 'F4']
-	},
+	//{
+	//	name: 'Alt F4',
+	//	val: ['Alt', 'F4']
+	//},
 	{
 		name: 'Win+D',
 		val: ['lwin', 'd'] 
@@ -156,7 +156,7 @@ function MobileControl({ isClose, handleOpen, actions, isShowBtn, onOkey, onDefa
 		let items = await navigator.clipboard.readText();
 		console.log(items);
 		clipBoardCallBack(items)
-
+		clickKey(['control', 'v'])
 		//for (let item of items) {
 		//	console.log(item);
 		//	if (!item.types.includes("text/plain"))
@@ -172,6 +172,28 @@ function MobileControl({ isClose, handleOpen, actions, isShowBtn, onOkey, onDefa
 		//	console.log(reader.readAsText(await item.getType("text/plain")));
 		//	break;
 		//}
+
+		//  Send to server
+	}
+	const handlePasteText2 = async () =>{
+		let items = await navigator.clipboard.read();
+		
+		for (let item of items) {
+			console.log(item);
+			if (!item.types.includes("text/html"))
+				continue;
+
+			let reader = new FileReader;
+			reader.addEventListener("load", loadEvent => {
+				console.log(reader.result)
+				//@ts-ignore
+				clipBoardCallBack(reader.result)
+				clickKey(['control', 'v'])
+				//clipBoardCallBack(reader.result)
+			});
+			reader.readAsText(await item.getType("text/html"));
+			break;
+		}
 
 		//  Send to server
 	}
@@ -214,7 +236,8 @@ function MobileControl({ isClose, handleOpen, actions, isShowBtn, onOkey, onDefa
 										<BtnKey key={index} onClick={() => { clickKey(key.val) }}>{key.name}</BtnKey>
 									))
 								}
-									<BtnKey  onClick={() =>handlePasteText() }>'Paste'</BtnKey>
+									<BtnKey  onClick={() =>handlePasteText() }>Paste</BtnKey>
+									<BtnKey  onClick={() =>handlePasteText2() }>Paste2</BtnKey>
 
 							</WrapperKey>
 						</>
