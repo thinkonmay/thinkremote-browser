@@ -161,13 +161,7 @@ const buttonsMobile = [
 	}
 ]
 const buttonsDesktop = [
-	{
-		icon: <PriorityHighIcon fontSize='inherit' />,
-		name: {
-			vn: "Phím ESC chuyển thành F1",
-			en: "ESC move to F1"
-		}
-	},
+	
 	{
 		icon: <LockReset fontSize='inherit' />,
 		name: {
